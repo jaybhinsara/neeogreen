@@ -63,7 +63,8 @@ const COMPOSE_FRAGMENT = `
     float mag = 1.0 - 0.55 * dome;
     vec2 sampleUv = (mousePx + delta * mag) / uResolution;
 
-    float glyph = texture2D(uText, vec2(sampleUv.x + uOffsetX, sampleUv.y)).a;
+    vec2 wrappedUv = vec2(fract(sampleUv.x + uOffsetX), clamp(sampleUv.y, 0.0, 1.0));
+    float glyph = texture2D(uText, wrappedUv).a;
     vec3 color = mix(uBgColor, uTextColor, glyph);
 
     vec2 n = delta / uRadiusPx;
@@ -127,7 +128,7 @@ function RippleMarquee() {
     const textCanvas = document.createElement("canvas");
     const textCtx = textCanvas.getContext("2d")!;
     const textTexture = new THREE.CanvasTexture(textCanvas);
-    textTexture.wrapS = THREE.RepeatWrapping;
+    textTexture.wrapS = THREE.ClampToEdgeWrapping;
     textTexture.wrapT = THREE.ClampToEdgeWrapping;
     textTexture.generateMipmaps = false;
     textTexture.minFilter = THREE.LinearFilter;

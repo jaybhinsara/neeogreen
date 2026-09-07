@@ -137,7 +137,7 @@ function createLeafGeometry() {
 const PARTICLE_COUNT = 160;
 const DUST_DRIFT_RANGE = 2.2;
 
-function createDustGeometry(centerX: number) {
+function createDustGeometry() {
   const positions = new Float32Array(PARTICLE_COUNT * 3);
   const phases = new Float32Array(PARTICLE_COUNT);
   const speeds = new Float32Array(PARTICLE_COUNT);
@@ -148,9 +148,11 @@ function createDustGeometry(centerX: number) {
     // Biased toward the leaf itself (pow > 1 clusters more near r=0) rather
     // than spread evenly across the whole frame — keep this tight so the
     // dust reads as hugging the leaf, not scattered across the section.
+    // Centered at local origin — the Points object is repositioned to
+    // follow the leaf instead of baking an x offset into the geometry.
     const r = Math.pow(Math.random(), 1.8) * 0.85;
     const theta = Math.random() * Math.PI * 2;
-    positions[i * 3 + 0] = centerX + Math.cos(theta) * r;
+    positions[i * 3 + 0] = Math.cos(theta) * r;
     positions[i * 3 + 1] = (Math.random() - 0.5) * DUST_DRIFT_RANGE;
     positions[i * 3 + 2] = (Math.random() - 0.5) * 0.9;
     phases[i] = Math.random() * Math.PI * 2;
@@ -239,6 +241,20 @@ export default function LeafScene({ className }: { className?: string }) {
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
     camera.position.set(0, 0, 5.2);
 
+    // The leaf sits toward the right edge, but a FIXED x offset only works
+    // for wide desktop aspect ratios: the camera's horizontal field of view
+    // shrinks with a narrow (tall/mobile) aspect, so a fixed offset tuned
+    // for desktop can land entirely outside the frustum on a phone — the
+    // leaf renders, just off-screen. Scale the offset to the actual visible
+    // width instead, so it stays on-screen (and reads as "near the edge")
+    // at every viewport size.
+    function computeLeafX(aspect: number) {
+      const vFov = (camera.fov * Math.PI) / 180;
+      const halfHeight = Math.tan(vFov / 2) * camera.position.z;
+      const halfWidth = halfHeight * aspect;
+      return Math.min(2.1, halfWidth * 0.62);
+    }
+
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -302,15 +318,16 @@ export default function LeafScene({ className }: { className?: string }) {
       shaderRef = shader;
     };
 
+    const initialAspect = container.clientWidth / Math.max(container.clientHeight, 1);
     const mesh = new THREE.Mesh(geometry, material);
-    const BASE_POSITION = new THREE.Vector3(2.1, 0, 0);
+    const BASE_POSITION = new THREE.Vector3(computeLeafX(initialAspect), 0, 0);
     const BASE_ROTATION_Z = -0.15;
     mesh.position.copy(BASE_POSITION);
     mesh.rotation.z = BASE_ROTATION_Z;
     scene.add(mesh);
 
     // ── Glowing dust particles around the leaf ─────────────────────────────
-    const dustGeometry = createDustGeometry(mesh.position.x);
+    const dustGeometry = createDustGeometry();
     const dustMaterial = new THREE.ShaderMaterial({
       uniforms: {
         uTime: { value: 0 },
@@ -323,6 +340,7 @@ export default function LeafScene({ className }: { className?: string }) {
       blending: THREE.AdditiveBlending,
     });
     const dust = new THREE.Points(dustGeometry, dustMaterial);
+    dust.position.x = BASE_POSITION.x;
     scene.add(dust);
 
     const ambient = new THREE.AmbientLight(0x3a4a43, 1.1);
@@ -380,6 +398,10 @@ export default function LeafScene({ className }: { className?: string }) {
       camera.aspect = w / Math.max(h, 1);
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
+
+      BASE_POSITION.x = computeLeafX(camera.aspect);
+      mesh.position.x = BASE_POSITION.x;
+      dust.position.x = BASE_POSITION.x;
     }
     resize();
     const resizeObserver = new ResizeObserver(resize);

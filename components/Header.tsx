@@ -99,14 +99,19 @@ export function Header() {
         </button>
       </Container>
 
+      {/* Opaque backdrop: a plain, unanimated element tied 1:1 to menuOpen so
+          full-screen coverage is guaranteed the instant the menu opens,
+          independent of whether the slide-in animation below has run yet. */}
+      {menuOpen && <div className="fixed inset-0 top-20 z-40 bg-bg-primary md:hidden" />}
+
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 top-20 z-0 flex flex-col justify-between bg-bg-primary px-6 pb-10 pt-6 md:hidden"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 top-20 z-40 flex flex-col justify-between px-6 pb-10 pt-6 md:hidden"
           >
             <nav className="flex flex-col gap-1">
               {LINKS.map((link, i) => (

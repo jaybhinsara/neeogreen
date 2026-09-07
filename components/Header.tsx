@@ -41,10 +41,16 @@ export function Header() {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,border-color] duration-300",
-        scrolled
-          ? "border-b border-line-on-dark bg-bg-primary/70 backdrop-blur-md"
-          : "border-b border-transparent bg-transparent"
+        "fixed inset-x-0 top-0 z-50",
+        // No transition while the menu is open: this background must snap to
+        // fully opaque instantly, not fade in over 300ms (which was a real,
+        // visible window of partial transparency, not just a testing artifact).
+        menuOpen ? "" : "transition-[background-color,backdrop-filter,border-color] duration-300",
+        menuOpen
+          ? "border-b border-line-on-dark bg-bg-primary"
+          : scrolled
+            ? "border-b border-line-on-dark bg-bg-primary/70 backdrop-blur-md"
+            : "border-b border-transparent bg-transparent"
       )}
     >
       <Container className="flex h-20 items-center justify-between md:h-24">

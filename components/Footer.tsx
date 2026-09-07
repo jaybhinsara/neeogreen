@@ -99,8 +99,8 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a href="tel:+910000000000" className="hover:accent-gradient-text">
-                  +91 00000 00000
+                <a href="tel:+917567936593" className="hover:accent-gradient-text">
+                  +91 75679 36593
                 </a>
               </li>
               <li className="text-muted-on-dark">Surat, Gujarat, India</li>

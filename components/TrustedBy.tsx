@@ -14,11 +14,13 @@ const SEGMENTS = [
   "Export Orders",
 ];
 
-const SIM_RES = 256;
 const SCROLL_PX_PER_SEC = 46;
 const BG_COLOR = "#0b0f0d";
 const TEXT_COLOR = "#9ca9a3";
 const HIGHLIGHT_COLOR = "#5eead4";
+
+const SPRING_STIFFNESS = 260;
+const SPRING_DAMPING = 16;
 
 function supportsWebGL() {
   try {
@@ -37,65 +39,44 @@ const QUAD_VERTEX = `
   }
 `;
 
-const SIM_FRAGMENT = `
-  varying vec2 vUv;
-  uniform sampler2D uState;
-  uniform vec2 uTexel;
-  uniform vec2 uDropUv;
-  uniform float uDropStrength;
-  uniform float uDropRadius;
-
-  void main() {
-    vec4 state = texture2D(uState, vUv);
-    float height = state.r;
-    float velocity = state.g;
-
-    float sum =
-      texture2D(uState, vUv + vec2(uTexel.x, 0.0)).r +
-      texture2D(uState, vUv - vec2(uTexel.x, 0.0)).r +
-      texture2D(uState, vUv + vec2(0.0, uTexel.y)).r +
-      texture2D(uState, vUv - vec2(0.0, uTexel.y)).r;
-
-    velocity += (sum * 0.25 - height) * 2.0;
-    velocity *= 0.985;
-    height += velocity;
-
-    if (uDropStrength > 0.0) {
-      float dist = length(vUv - uDropUv);
-      float drop = 1.0 - smoothstep(0.0, uDropRadius, dist);
-      height += drop * uDropStrength;
-    }
-
-    gl_FragColor = vec4(height, velocity, 0.0, 1.0);
-  }
-`;
-
 const COMPOSE_FRAGMENT = `
   varying vec2 vUv;
-  uniform sampler2D uState;
   uniform sampler2D uText;
-  uniform vec2 uTexel;
+  uniform vec2 uResolution;
   uniform float uOffsetX;
   uniform vec3 uBgColor;
   uniform vec3 uTextColor;
   uniform vec3 uHighlightColor;
+  uniform vec2 uMouseUv;
+  uniform float uBubble;
+  uniform float uRadiusPx;
 
   void main() {
-    float hL = texture2D(uState, vUv - vec2(uTexel.x, 0.0)).r;
-    float hR = texture2D(uState, vUv + vec2(uTexel.x, 0.0)).r;
-    float hD = texture2D(uState, vUv - vec2(0.0, uTexel.y)).r;
-    float hU = texture2D(uState, vUv + vec2(0.0, uTexel.y)).r;
+    vec2 fragPx = vUv * uResolution;
+    vec2 mousePx = uMouseUv * uResolution;
+    vec2 delta = fragPx - mousePx;
+    float dist = length(delta);
 
-    vec3 normal = normalize(vec3(hL - hR, hD - hU, 1.0));
-    vec2 distortion = normal.xy * 0.07;
+    float t = clamp(dist / uRadiusPx, 0.0, 1.0);
+    float dome = smoothstep(1.0, 0.0, t) * uBubble;
 
-    vec2 textUv = vec2(vUv.x + uOffsetX, vUv.y) + distortion;
-    float glyph = texture2D(uText, textUv).a;
+    float mag = 1.0 - 0.55 * dome;
+    vec2 sampleUv = (mousePx + delta * mag) / uResolution;
 
+    float glyph = texture2D(uText, vec2(sampleUv.x + uOffsetX, sampleUv.y)).a;
     vec3 color = mix(uBgColor, uTextColor, glyph);
 
-    float specular = pow(max(dot(normal, normalize(vec3(0.3, 0.4, 0.85))), 0.0), 26.0);
-    color += uHighlightColor * specular * 1.3;
+    vec2 n = delta / uRadiusPx;
+    float z = sqrt(max(0.0, 1.0 - dot(n, n)));
+    vec3 normal = normalize(vec3(n, z));
+    vec3 lightDir = normalize(vec3(-0.35, 0.5, 0.8));
+
+    float specular = pow(max(dot(normal, lightDir), 0.0), 10.0);
+    float ring = smoothstep(0.55, 0.82, t) * smoothstep(1.0, 0.82, t) * uBubble;
+
+    color = mix(color, uHighlightColor, dome * 0.14);
+    color += uHighlightColor * specular * 0.9 * dome;
+    color += uHighlightColor * ring * 0.8;
 
     gl_FragColor = vec4(color, 1.0);
   }
@@ -135,40 +116,13 @@ function RippleMarquee() {
     let disposed = false;
     let rafId = 0;
     let loopWidth = 1;
+    let radiusPx = 60;
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     const quadGeo = new THREE.PlaneGeometry(2, 2);
-
-    const simMaterial = new THREE.ShaderMaterial({
-      vertexShader: QUAD_VERTEX,
-      fragmentShader: SIM_FRAGMENT,
-      uniforms: {
-        uState: { value: null as THREE.Texture | null },
-        uTexel: { value: new THREE.Vector2(1 / SIM_RES, 1 / SIM_RES) },
-        uDropUv: { value: new THREE.Vector2(0.5, 0.5) },
-        uDropStrength: { value: 0 },
-        uDropRadius: { value: 0.045 },
-      },
-    });
-    const simScene = new THREE.Scene();
-    simScene.add(new THREE.Mesh(quadGeo, simMaterial));
-
-    const rtOptions = {
-      type: THREE.HalfFloatType,
-      format: THREE.RGBAFormat,
-      depthBuffer: false,
-      stencilBuffer: false,
-    };
-    let rtA = new THREE.WebGLRenderTarget(SIM_RES, SIM_RES, rtOptions);
-    let rtB = new THREE.WebGLRenderTarget(SIM_RES, SIM_RES, rtOptions);
-    renderer.setRenderTarget(rtA);
-    renderer.clear();
-    renderer.setRenderTarget(rtB);
-    renderer.clear();
-    renderer.setRenderTarget(null);
 
     const textCanvas = document.createElement("canvas");
     const textCtx = textCanvas.getContext("2d")!;
@@ -233,6 +187,7 @@ function RippleMarquee() {
 
       textTexture.needsUpdate = true;
       loopWidth = cssWidth;
+      radiusPx = fontSize * 1.9;
     }
 
     drawText();
@@ -241,13 +196,15 @@ function RippleMarquee() {
       vertexShader: QUAD_VERTEX,
       fragmentShader: COMPOSE_FRAGMENT,
       uniforms: {
-        uState: { value: rtA.texture as THREE.Texture },
         uText: { value: textTexture },
-        uTexel: { value: new THREE.Vector2(1 / SIM_RES, 1 / SIM_RES) },
+        uResolution: { value: new THREE.Vector2(1, 1) },
         uOffsetX: { value: 0 },
         uBgColor: { value: new THREE.Color(BG_COLOR) },
         uTextColor: { value: new THREE.Color(TEXT_COLOR) },
         uHighlightColor: { value: new THREE.Color(HIGHLIGHT_COLOR) },
+        uMouseUv: { value: new THREE.Vector2(0.5, 0.5) },
+        uBubble: { value: 0 },
+        uRadiusPx: { value: radiusPx },
       },
     });
     const composeScene = new THREE.Scene();
@@ -258,13 +215,15 @@ function RippleMarquee() {
       const h = canvas!.clientHeight;
       renderer.setSize(w, h, false);
       drawText();
+      composeMaterial.uniforms.uResolution.value.set(w, h);
     }
     resize();
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
 
-    const pointer = { x: 0.5, y: 0.5, lastX: 0.5, lastY: 0.5, active: false };
-    let clickDrop = false;
+    const pointer = { x: 0.5, y: 0.5, active: false };
+    let bubbleValue = 0;
+    let bubbleVelocity = 0;
 
     function setPointerFromEvent(e: PointerEvent) {
       const rect = canvas!.getBoundingClientRect();
@@ -276,42 +235,35 @@ function RippleMarquee() {
     function onPointerMove(e: PointerEvent) {
       setPointerFromEvent(e);
     }
-    function onPointerDown(e: PointerEvent) {
+    function onPointerEnter(e: PointerEvent) {
       setPointerFromEvent(e);
-      clickDrop = true;
     }
     function onPointerLeave() {
       pointer.active = false;
     }
 
     canvas.addEventListener("pointermove", onPointerMove);
-    canvas.addEventListener("pointerdown", onPointerDown);
+    canvas.addEventListener("pointerenter", onPointerEnter);
     canvas.addEventListener("pointerleave", onPointerLeave);
+
+    let last = performance.now();
 
     function animate(now: number) {
       if (disposed) return;
+      const dt = Math.min((now - last) / 1000, 1 / 30);
+      last = now;
 
-      composeMaterial.uniforms.uOffsetX.value = ((now / 1000) * SCROLL_PX_PER_SEC) / Math.max(loopWidth, 1) % 1;
+      composeMaterial.uniforms.uOffsetX.value = (((now / 1000) * SCROLL_PX_PER_SEC) / Math.max(loopWidth, 1)) % 1;
 
-      const moved =
-        pointer.active &&
-        (Math.abs(pointer.x - pointer.lastX) > 0.0008 || Math.abs(pointer.y - pointer.lastY) > 0.0008);
-      simMaterial.uniforms.uDropStrength.value = clickDrop ? 1.1 : moved ? 0.55 : 0;
-      simMaterial.uniforms.uDropUv.value.set(pointer.x, pointer.y);
-      pointer.lastX = pointer.x;
-      pointer.lastY = pointer.y;
-      clickDrop = false;
+      const target = pointer.active ? 1 : 0;
+      const force = (target - bubbleValue) * SPRING_STIFFNESS - bubbleVelocity * SPRING_DAMPING;
+      bubbleVelocity += force * dt;
+      bubbleValue += bubbleVelocity * dt;
 
-      simMaterial.uniforms.uState.value = rtA.texture;
-      renderer.setRenderTarget(rtB);
-      renderer.render(simScene, camera);
-      renderer.setRenderTarget(null);
+      composeMaterial.uniforms.uBubble.value = Math.max(0, bubbleValue);
+      composeMaterial.uniforms.uMouseUv.value.set(pointer.x, pointer.y);
+      composeMaterial.uniforms.uRadiusPx.value = radiusPx;
 
-      const tmp = rtA;
-      rtA = rtB;
-      rtB = tmp;
-
-      composeMaterial.uniforms.uState.value = rtA.texture;
       renderer.render(composeScene, camera);
 
       rafId = requestAnimationFrame(animate);
@@ -323,13 +275,10 @@ function RippleMarquee() {
       cancelAnimationFrame(rafId);
       resizeObserver.disconnect();
       canvas.removeEventListener("pointermove", onPointerMove);
-      canvas.removeEventListener("pointerdown", onPointerDown);
+      canvas.removeEventListener("pointerenter", onPointerEnter);
       canvas.removeEventListener("pointerleave", onPointerLeave);
-      rtA.dispose();
-      rtB.dispose();
       textTexture.dispose();
       quadGeo.dispose();
-      simMaterial.dispose();
       composeMaterial.dispose();
       renderer.dispose();
     };

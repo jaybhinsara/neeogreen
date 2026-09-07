@@ -2,15 +2,66 @@ import type { Metadata } from "next";
 import { clashDisplay, inter } from "./fonts";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { CustomCursor } from "@/components/CustomCursor";
+import { SITE } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "NeeoGreen — Packaging & Brand Studio",
-  description:
-    "NeeoGreen designs custom eco-friendly packaging, brand identity, and social presence for restaurants, cafes, cloud kitchens, and D2C food brands. Based in Surat, India.",
-  icons: {
-    icon: "/logo/favicon-source.svg",
+  metadataBase: new URL(SITE.url),
+  title: {
+    default: `${SITE.name} — ${SITE.tagline}`,
+    template: `%s — ${SITE.name}`,
   },
+  description: SITE.description,
+  keywords: [
+    "brand identity studio",
+    "branding agency India",
+    "eco friendly packaging design",
+    "sustainable packaging Surat",
+    "digital marketing agency for restaurants",
+    "packaging design studio",
+    "social media marketing agency India",
+  ],
+  authors: [{ name: SITE.name }],
+  alternates: { canonical: "/" },
+  icons: { icon: "/logo/favicon-source.svg" },
+  openGraph: {
+    type: "website",
+    url: SITE.url,
+    siteName: SITE.name,
+    title: `${SITE.name} — ${SITE.tagline}`,
+    description: SITE.description,
+    locale: "en_IN",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE.name} — ${SITE.tagline}`,
+    description: SITE.description,
+  },
+};
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  name: SITE.name,
+  description: SITE.description,
+  url: SITE.url,
+  logo: `${SITE.url}/logo/icon.svg`,
+  image: `${SITE.url}/logo/icon.svg`,
+  email: SITE.email,
+  telephone: SITE.phone,
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: SITE.locality,
+    addressRegion: SITE.region,
+    addressCountry: SITE.country,
+  },
+  areaServed: "IN",
+  sameAs: Object.values(SITE.social),
+  makesOffer: [
+    { "@type": "Offer", itemOffered: { "@type": "Service", name: "Brand Identity Design" } },
+    { "@type": "Offer", itemOffered: { "@type": "Service", name: "Eco-Friendly Packaging Design" } },
+    { "@type": "Offer", itemOffered: { "@type": "Service", name: "Digital & Social Marketing" } },
+  ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -20,6 +71,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${clashDisplay.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-bg-primary text-ink-on-dark">
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger -- static, non-user-controlled structured data
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
         <SmoothScroll />
         <CustomCursor />
         {children}

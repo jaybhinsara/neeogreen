@@ -7,11 +7,12 @@ export function Manifesto() {
       <Container>
         <Reveal>
           <p className="max-w-5xl font-display text-[clamp(26px,4.2vw,56px)] font-medium leading-[1.18] tracking-[-0.01em] text-ink-on-dark">
-            Every cup, box, and bag a customer touches is a brand moment. Most
-            eco packaging still looks like an afterthought.{" "}
+            A brand isn&rsquo;t just a logo, and it isn&rsquo;t just a box.
+            It&rsquo;s the name someone remembers, the packaging they
+            photograph, the feed they follow.{" "}
             <span className="accent-gradient-text">
-              NeeoGreen exists to make sustainable packaging look — and feel —
-              like it belongs to a brand people already love.
+              NeeoGreen builds all three as one studio — not three separate
+              vendors who&rsquo;ve never spoken to each other.
             </span>
           </p>
         </Reveal>

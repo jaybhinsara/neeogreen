@@ -2,18 +2,18 @@ import { Reveal } from "./Reveal";
 import { cn } from "@/lib/cn";
 
 const WORDS: { text: string; big?: boolean }[] = [
+  { text: "Brand Strategy", big: true },
+  { text: "Logo Design" },
   { text: "Packaging Design", big: true },
   { text: "Dielines" },
-  { text: "Brand Identity", big: true },
+  { text: "Brand Guidelines" },
+  { text: "Social Media Marketing", big: true },
   { text: "Material Sourcing" },
-  { text: "Guidelines" },
-  { text: "Print Production", big: true },
-  { text: "Kraft & PLA" },
-  { text: "Social Templates" },
-  { text: "Launch Assets", big: true },
+  { text: "Content Design" },
+  { text: "Campaign Assets", big: true },
   { text: "Compostable Stock" },
-  { text: "Content Direction" },
-  { text: "Packaging Systems", big: true },
+  { text: "Launch Strategy" },
+  { text: "Digital Presence", big: true },
 ];
 
 export function CapabilityCloud() {

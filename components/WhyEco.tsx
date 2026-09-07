@@ -23,7 +23,7 @@ export function WhyEco() {
           <div className="flex flex-col items-start">
             <Reveal>
               <span className="text-xs uppercase tracking-[0.14em] text-muted-on-dark">
-                Why eco
+                The packaging side, specifically
               </span>
             </Reveal>
             <Reveal delay={0.05}>
@@ -33,9 +33,9 @@ export function WhyEco() {
             </Reveal>
             <Reveal delay={0.1}>
               <p className="mt-6 max-w-lg text-base text-muted-on-dark md:text-lg">
-                Sustainability is a material spec here, not a marketing
-                claim. Every packaging system we ship is built on material
-                choices we can name.
+                Sustainability is a material spec, not a marketing claim.
+                When packaging design is part of the brief, every system we
+                ship is built on material choices we can name.
               </p>
             </Reveal>
 

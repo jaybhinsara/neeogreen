@@ -5,6 +5,7 @@ import type { MouseEvent } from "react";
 import { Container } from "./Container";
 import { Logo } from "./Logo";
 import { scrollToHash } from "@/lib/lenis-singleton";
+import { SERVICES } from "@/lib/site";
 
 function handleAnchorClick(e: MouseEvent<HTMLAnchorElement>, href: string) {
   const hashIndex = href.indexOf("#");
@@ -13,7 +14,7 @@ function handleAnchorClick(e: MouseEvent<HTMLAnchorElement>, href: string) {
 }
 
 const SITEMAP = [
-  { href: "/#services", label: "Services" },
+  ...SERVICES.map((s) => ({ href: `/services/${s.slug}`, label: s.title })),
   { href: "/#studio", label: "Studio" },
   { href: "/contact", label: "Contact" },
 ];
@@ -62,8 +63,8 @@ export function Footer() {
           <div className="flex flex-col gap-5">
             <Logo />
             <p className="max-w-xs text-sm text-muted-on-dark">
-              A packaging and brand design studio in Surat, India, building
-              custom eco-friendly packaging systems for restaurants and food
+              A brand, packaging, and digital marketing studio in Surat,
+              India, building complete brand systems for restaurants and food
               brands.
             </p>
           </div>

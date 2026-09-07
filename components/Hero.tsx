@@ -73,11 +73,11 @@ export function Hero({ ready }: { ready: boolean }) {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted-on-dark md:text-xs"
         >
-          Packaging &times; Brand Studio &mdash; Surat, India
+          Brand &middot; Packaging &middot; Digital &mdash; Surat, India
         </motion.p>
 
         <h1 className="font-display text-[clamp(36px,9vw,148px)] font-semibold uppercase leading-[0.94] tracking-[-0.03em] text-ink-on-dark [overflow-wrap:anywhere]">
-          {["Packaging that", "carries your", "brand further"].map((line, i) => (
+          {["Brand first.", "Packaging next.", "Digital always."].map((line, i) => (
             <span key={line} className="block overflow-hidden">
               <motion.span
                 initial={{ y: "110%" }}
@@ -97,9 +97,10 @@ export function Hero({ ready }: { ready: boolean }) {
           transition={{ duration: 0.6, delay: 0.45 }}
           className="max-w-xl text-lg text-muted-on-dark md:text-xl"
         >
-          We design custom eco-friendly packaging, brand identity, and social
-          presence for restaurants and food brands &mdash; from first sketch
-          to the shelf.
+          We build complete brand systems &mdash; identity, eco-friendly
+          packaging, and the digital &amp; social marketing to launch them
+          &mdash; for restaurants, cafés, and food brands who want to be
+          remembered.
         </motion.p>
 
         <motion.div

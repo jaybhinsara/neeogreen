@@ -3,11 +3,14 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Container } from "@/components/Container";
 import { ContactForm } from "@/components/ContactForm";
+import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Contact — NeeoGreen",
+  title: "Contact",
   description:
-    "Start a packaging or brand project with NeeoGreen. Based in Surat, India, working with restaurants, cafes, and food brands everywhere.",
+    "Start a brand, packaging, or digital marketing project with NeeoGreen. Based in Surat, India, working with restaurants, cafés, and food brands everywhere.",
+  alternates: { canonical: "/contact" },
+  openGraph: { url: `${SITE.url}/contact`, title: `Contact — ${SITE.name}` },
 };
 
 export default function ContactPage() {
@@ -22,11 +25,12 @@ export default function ContactPage() {
                 Start a project
               </span>
               <h1 className="max-w-md font-display text-[clamp(36px,5.5vw,64px)] font-semibold uppercase leading-[0.98] tracking-[-0.02em] text-ink-on-dark">
-                Let&rsquo;s talk packaging
+                Let&rsquo;s talk brand
               </h1>
               <p className="max-w-sm text-base text-muted-on-dark">
-                Tell us about the brand and what you need on the shelf. We
-                reply to every inquiry within two business days.
+                Tell us what you&rsquo;re building — identity, packaging,
+                digital marketing, or all three. We reply to every inquiry
+                within two business days.
               </p>
 
               <div className="flex flex-col gap-3 border-t border-line-on-dark pt-8 text-sm">

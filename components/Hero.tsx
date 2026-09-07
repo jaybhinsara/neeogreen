@@ -67,16 +67,7 @@ export function Hero({ ready }: { ready: boolean }) {
       )}
 
       <Container className="relative z-10 flex flex-col gap-8 md:gap-10">
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted-on-dark md:text-xs"
-        >
-          Brand &middot; Packaging &middot; Digital &mdash; Surat, India
-        </motion.p>
-
-        <h1 className="font-display text-[clamp(36px,9vw,148px)] font-semibold uppercase leading-[0.94] tracking-[-0.03em] text-ink-on-dark [overflow-wrap:anywhere]">
+        <h1 className="font-display text-[clamp(30px,6.4vw,104px)] font-semibold uppercase leading-[0.96] tracking-[-0.03em] text-ink-on-dark [overflow-wrap:anywhere]">
           {["Brand first.", "Packaging next.", "Digital always."].map((line, i) => (
             <span key={line} className="block overflow-hidden">
               <motion.span

@@ -5,12 +5,40 @@ import { useState, type FormEvent } from "react";
 const PROJECT_TYPES = ["Packaging design", "Brand identity", "Social & digital", "Not sure yet"];
 
 export function ContactForm() {
-  const [status, setStatus] = useState<"idle" | "sent">("idle");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // No backend wired yet — connect to an API route or form service before launch.
-    setStatus("sent");
+    setStatus("sending");
+    setError(null);
+
+    const form = e.currentTarget;
+    const data = new FormData(form);
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.get("name"),
+          email: data.get("email"),
+          company: data.get("company"),
+          projectType: data.get("projectType"),
+          message: data.get("message"),
+        }),
+      });
+
+      if (!res.ok) {
+        const payload = await res.json().catch(() => null);
+        throw new Error(payload?.error ?? "Something went wrong. Please try again.");
+      }
+
+      setStatus("sent");
+    } catch (err) {
+      setStatus("error");
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    }
   }
 
   if (status === "sent") {
@@ -64,11 +92,18 @@ export function ContactForm() {
         />
       </label>
 
+      {status === "error" && error && (
+        <p className="text-sm text-red-400" role="alert">
+          {error}
+        </p>
+      )}
+
       <button
         type="submit"
-        className="inline-flex w-fit items-center rounded-full accent-gradient px-8 py-4 text-sm font-medium uppercase tracking-[0.1em] text-bg-primary transition-opacity hover:opacity-90"
+        disabled={status === "sending"}
+        className="inline-flex w-fit items-center rounded-full accent-gradient px-8 py-4 text-sm font-medium uppercase tracking-[0.1em] text-bg-primary transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        Send message
+        {status === "sending" ? "Sending…" : "Send message"}
       </button>
     </form>
   );

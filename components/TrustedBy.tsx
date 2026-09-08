@@ -248,9 +248,14 @@ function RippleMarquee() {
     canvas.addEventListener("pointerleave", onPointerLeave);
 
     let last = performance.now();
+    let loopRunning = false;
+    let isOnScreen = true;
 
     function animate(now: number) {
-      if (disposed) return;
+      if (disposed || !isOnScreen) {
+        loopRunning = false;
+        return;
+      }
       const dt = Math.min((now - last) / 1000, 1 / 30);
       last = now;
 
@@ -269,11 +274,44 @@ function RippleMarquee() {
 
       rafId = requestAnimationFrame(animate);
     }
-    rafId = requestAnimationFrame(animate);
+
+    function startLoop() {
+      if (loopRunning) return;
+      loopRunning = true;
+      last = performance.now();
+      rafId = requestAnimationFrame(animate);
+    }
+    function stopLoop() {
+      loopRunning = false;
+      cancelAnimationFrame(rafId);
+    }
+
+    startLoop();
+
+    // Pause the loop while the tab is hidden or the strip is scrolled out of
+    // view — otherwise this renders every frame forever, even when nobody
+    // can see it, stealing main-thread time from clicks elsewhere.
+    function onVisibility() {
+      if (document.hidden) stopLoop();
+      else if (isOnScreen) startLoop();
+    }
+    document.addEventListener("visibilitychange", onVisibility);
+
+    const intersectionObserver = new IntersectionObserver(
+      ([entry]) => {
+        isOnScreen = entry.isIntersecting;
+        if (isOnScreen && !document.hidden) startLoop();
+        else stopLoop();
+      },
+      { threshold: 0 }
+    );
+    intersectionObserver.observe(container);
 
     return () => {
       disposed = true;
       cancelAnimationFrame(rafId);
+      document.removeEventListener("visibilitychange", onVisibility);
+      intersectionObserver.disconnect();
       resizeObserver.disconnect();
       canvas.removeEventListener("pointermove", onPointerMove);
       canvas.removeEventListener("pointerenter", onPointerEnter);

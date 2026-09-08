@@ -408,11 +408,21 @@ export default function LeafScene({ className }: { className?: string }) {
     resizeObserver.observe(container);
 
     // ── Animation loop ──────────────────────────────────────────────────
+    // Gated by both tab visibility and viewport intersection: this scene
+    // renders every frame forever otherwise, burning CPU/GPU (and stealing
+    // main-thread time from clicks elsewhere on the page) even while the
+    // hero is scrolled far out of view.
     const startTime = performance.now();
     let rafId = 0;
     let mouseStrength = 0;
+    let loopRunning = false;
+    let isOnScreen = true;
 
     function animate() {
+      if (!isOnScreen) {
+        loopRunning = false;
+        return;
+      }
       rafId = requestAnimationFrame(animate);
       const elapsed = (performance.now() - startTime) / 1000;
 
@@ -449,28 +459,46 @@ export default function LeafScene({ className }: { className?: string }) {
       renderer.render(scene, camera);
     }
 
+    function startLoop() {
+      if (loopRunning || reduced) return;
+      loopRunning = true;
+      animate();
+    }
+    function stopLoop() {
+      loopRunning = false;
+      cancelAnimationFrame(rafId);
+    }
+
     // Respect reduced motion: render one static frame instead of looping.
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
       resize();
       renderer.render(scene, camera);
     } else {
-      animate();
+      startLoop();
     }
 
-    // Pause the loop while the tab is hidden.
+    // Pause the loop while the tab is hidden or the hero is scrolled out of view.
     function onVisibility() {
-      if (document.hidden) {
-        cancelAnimationFrame(rafId);
-      } else if (!reduced) {
-        animate();
-      }
+      if (document.hidden) stopLoop();
+      else if (isOnScreen) startLoop();
     }
     document.addEventListener("visibilitychange", onVisibility);
+
+    const intersectionObserver = new IntersectionObserver(
+      ([entry]) => {
+        isOnScreen = entry.isIntersecting;
+        if (isOnScreen && !document.hidden) startLoop();
+        else stopLoop();
+      },
+      { threshold: 0 }
+    );
+    intersectionObserver.observe(container);
 
     return () => {
       cancelAnimationFrame(rafId);
       document.removeEventListener("visibilitychange", onVisibility);
+      intersectionObserver.disconnect();
       window.removeEventListener("pointermove", onPointerMove);
       resizeObserver.disconnect();
       geometry.dispose();

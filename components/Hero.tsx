@@ -70,6 +70,7 @@ export function Hero({ ready }: { ready: boolean }) {
           src="/logo/icon.svg"
           alt=""
           aria-hidden="true"
+          fetchPriority="high"
           className="pointer-events-none absolute -right-16 top-1/2 z-0 h-[130%] w-auto -translate-y-1/2 opacity-[0.07] md:-right-10 md:opacity-[0.09]"
         />
       )}

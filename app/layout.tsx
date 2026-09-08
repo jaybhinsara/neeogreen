@@ -71,6 +71,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${clashDisplay.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-bg-primary text-ink-on-dark">
+        {/* React hoists this into <head>. The Hero's leaf mark is the LCP
+            element on first paint (before hydration swaps in the WebGL
+            canvas). This SVG is also referenced by other <img> tags without
+            fetchPriority, and Next's own auto-generated preload for it
+            doesn't inherit "high" from any single instance — so declare it
+            explicitly here rather than depending on that. */}
+        <link rel="preload" as="image" href="/logo/icon.svg" fetchPriority="high" />
         <script
           type="application/ld+json"
           // eslint-disable-next-line react/no-danger -- static, non-user-controlled structured data

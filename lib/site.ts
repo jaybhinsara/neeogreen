@@ -1,7 +1,7 @@
 export const SITE = {
   name: "NeeoGreen",
   tagline: "Brand, Packaging & Digital Studio",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://neeogreen.vercel.app",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.neeogreen.com",
   description:
     "NeeoGreen builds complete brand systems — identity, eco-friendly packaging, and digital & social marketing — for restaurants, cafés, cloud kitchens, and D2C food brands. Based in Surat, India.",
   email: "hello@neeogreen.com",

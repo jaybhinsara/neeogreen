@@ -5,7 +5,7 @@ export const SITE = {
   description:
     "NeeoGreen builds complete brand systems — identity, eco-friendly packaging, and digital & social marketing — for restaurants, cafés, cloud kitchens, and D2C food brands. Based in Surat, India.",
   email: "hello@neeogreen.com",
-  phone: "+91 00000 00000",
+  phone: "+91 75679 36593",
   locality: "Surat",
   region: "Gujarat",
   country: "IN",

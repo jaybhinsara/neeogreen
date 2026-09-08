@@ -37,8 +37,8 @@ export default function ContactPage() {
                 <a href="mailto:hello@neeogreen.com" className="text-ink-on-dark hover:accent-gradient-text">
                   hello@neeogreen.com
                 </a>
-                <a href="tel:+910000000000" className="text-ink-on-dark hover:accent-gradient-text">
-                  +91 00000 00000
+                <a href="tel:+917567936593" className="text-ink-on-dark hover:accent-gradient-text">
+                  +91 75679 36593
                 </a>
                 <span className="text-muted-on-dark">Surat, Gujarat, India</span>
               </div>

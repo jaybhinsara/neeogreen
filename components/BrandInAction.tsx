@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Container } from "./Container";
 import { Reveal } from "./Reveal";
 import { LeafIcon } from "./LeafIcon";
@@ -81,11 +82,12 @@ export function BrandInAction() {
                     product.aspect
                   )}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element -- generated mockup photo, not a fixed remote asset */}
-                  <img
+                  <Image
                     src={product.src}
                     alt=""
-                    className="h-full w-full object-cover"
+                    fill
+                    sizes="(min-width: 768px) 25vw, 50vw"
+                    className="object-cover"
                   />
                   <Badge />
                 </div>

@@ -23,7 +23,15 @@ export function Hero({ ready }: { ready: boolean }) {
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!reduced && supportsWebGL()) setUse3d(true);
+    // Mobile GPUs generally support WebGL fine, but MeshPhysicalMaterial's
+    // transmission forces Three.js to render the whole scene a second time
+    // (an extra pass for the refraction buffer) every frame — combined with
+    // clearcoat + iridescence this is heavy enough to hang or crash the tab
+    // on throttled/low-end mobile hardware (confirmed via Lighthouse mobile
+    // reporting "the page stopped responding"). Use the plain SVG fallback
+    // on coarse-pointer (touch) devices instead of gambling on GPU headroom.
+    const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+    if (!reduced && !coarsePointer && supportsWebGL()) setUse3d(true);
   }, []);
 
   function handleMouseMove(e: React.MouseEvent<HTMLElement>) {

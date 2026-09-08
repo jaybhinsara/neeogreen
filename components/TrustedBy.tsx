@@ -105,7 +105,8 @@ function RippleMarquee() {
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced || !supportsWebGL()) {
+    const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+    if (reduced || coarsePointer || !supportsWebGL()) {
       setUseFallback(true);
       return;
     }

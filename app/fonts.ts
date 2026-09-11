@@ -1,5 +1,5 @@
 import localFont from "next/font/local";
-import { Inter } from "next/font/google";
+import { Inter, Instrument_Serif } from "next/font/google";
 
 export const clashDisplay = localFont({
   src: [
@@ -17,5 +17,13 @@ export const clashDisplay = localFont({
 export const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+export const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: "italic",
+  variable: "--font-accent-serif",
   display: "swap",
 });

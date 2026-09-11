@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { clashDisplay, inter } from "./fonts";
+import { clashDisplay, inter, instrumentSerif } from "./fonts";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { CustomCursor } from "@/components/CustomCursor";
+import { GridLines } from "@/components/GridLines";
 import { SITE } from "@/lib/site";
 import "./globals.css";
 
@@ -68,7 +69,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${clashDisplay.variable} ${inter.variable} h-full antialiased`}
+      className={`${clashDisplay.variable} ${inter.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-bg-primary text-ink-on-dark">
         {/* React hoists this into <head>. The Hero's leaf mark is the LCP
@@ -85,6 +86,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
         <SmoothScroll />
         <CustomCursor />
+        <GridLines />
         {children}
       </body>
     </html>

@@ -10,7 +10,8 @@ import { scrollToHash } from "@/lib/lenis-singleton";
 
 const LINKS = [
   { href: "/#services", label: "Services" },
-  { href: "/#studio", label: "Studio" },
+  { href: "/studio", label: "Studio" },
+  { href: "/work", label: "Work" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -46,63 +47,76 @@ export function Header() {
         // fully opaque instantly, not fade in over 300ms (which was a real,
         // visible window of partial transparency, not just a testing artifact).
         menuOpen ? "" : "transition-[background-color,backdrop-filter,border-color] duration-300",
+        // Desktop chrome moves onto the floating pill below — the bar itself
+        // stays transparent at md: and up. Mobile keeps the exact classes it
+        // had before (full-width bar, opaque while the menu is open); that
+        // path is untouched.
         menuOpen
-          ? "border-b border-line-on-dark bg-bg-primary"
+          ? "border-b border-line-on-dark bg-bg-primary md:border-none md:bg-transparent"
           : scrolled
-            ? "border-b border-line-on-dark bg-bg-primary/70 backdrop-blur-md"
+            ? "border-b border-line-on-dark bg-bg-primary/70 backdrop-blur-md md:border-none md:bg-transparent md:backdrop-blur-none"
             : "border-b border-transparent bg-transparent"
       )}
     >
-      <Container className="flex h-20 items-center justify-between md:h-24">
-        <Link
-          href="/#top"
-          onClick={(e) => handleAnchorClick(e, "/#top")}
-          aria-label="NeeoGreen home"
-          className="relative z-10"
+      <Container>
+        <div
+          className={cn(
+            "flex h-20 items-center justify-between md:h-auto md:rounded-full md:border md:border-line-on-dark md:px-6 md:py-3 md:mt-4 md:transition-colors md:duration-300",
+            scrolled
+              ? "md:bg-bg-primary/80 md:backdrop-blur-xl md:shadow-[0_8px_30px_rgba(0,0,0,0.35)]"
+              : "md:bg-bg-primary/40 md:backdrop-blur-xl"
+          )}
         >
-          <Logo />
-        </Link>
+          <Link
+            href="/#top"
+            onClick={(e) => handleAnchorClick(e, "/#top")}
+            aria-label="NeeoGreen home"
+            className="relative z-10"
+          >
+            <Logo />
+          </Link>
 
-        <nav className="hidden items-center gap-10 md:flex">
-          {LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={(e) => handleAnchorClick(e, link.href)}
-              className="text-xs uppercase tracking-[0.12em] text-muted-on-dark transition-colors hover:text-ink-on-dark"
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
+          <nav className="hidden items-center gap-10 md:flex">
+            {LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) => handleAnchorClick(e, link.href)}
+                className="text-xs uppercase tracking-[0.12em] text-muted-on-dark transition-colors hover:text-ink-on-dark"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
 
-        <Link
-          href="/contact"
-          className="hidden items-center rounded-full accent-gradient px-5 py-2.5 text-xs font-medium uppercase tracking-[0.1em] text-bg-primary transition-opacity hover:opacity-90 md:inline-flex"
-        >
-          Start a project
-        </Link>
+          <Link
+            href="/contact"
+            className="hidden items-center rounded-full accent-gradient px-5 py-2.5 text-xs font-medium uppercase tracking-[0.1em] text-bg-primary transition-opacity hover:opacity-90 md:inline-flex"
+          >
+            Start a project
+          </Link>
 
-        <button
-          type="button"
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((v) => !v)}
-          className="relative z-10 flex h-9 w-9 flex-col items-center justify-center gap-1.5 md:hidden"
-        >
-          <span
-            className={cn(
-              "block h-px w-6 bg-ink-on-dark transition-transform duration-300",
-              menuOpen && "translate-y-[3.5px] rotate-45"
-            )}
-          />
-          <span
-            className={cn(
-              "block h-px w-6 bg-ink-on-dark transition-transform duration-300",
-              menuOpen && "-translate-y-[3.5px] -rotate-45"
-            )}
-          />
-        </button>
+          <button
+            type="button"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((v) => !v)}
+            className="relative z-10 flex h-9 w-9 flex-col items-center justify-center gap-1.5 md:hidden"
+          >
+            <span
+              className={cn(
+                "block h-px w-6 bg-ink-on-dark transition-transform duration-300",
+                menuOpen && "translate-y-[3.5px] rotate-45"
+              )}
+            />
+            <span
+              className={cn(
+                "block h-px w-6 bg-ink-on-dark transition-transform duration-300",
+                menuOpen && "-translate-y-[3.5px] -rotate-45"
+              )}
+            />
+          </button>
+        </div>
       </Container>
 
       {/* Opaque backdrop: a plain, unanimated element tied 1:1 to menuOpen so

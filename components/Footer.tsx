@@ -15,7 +15,8 @@ function handleAnchorClick(e: MouseEvent<HTMLAnchorElement>, href: string) {
 
 const SITEMAP = [
   ...SERVICES.map((s) => ({ href: `/services/${s.slug}`, label: s.title })),
-  { href: "/#studio", label: "Studio" },
+  { href: "/studio", label: "Studio" },
+  { href: "/work", label: "Work" },
   { href: "/contact", label: "Contact" },
 ];
 

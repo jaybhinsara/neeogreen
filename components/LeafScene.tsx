@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 
 // ---------------------------------------------------------------------------
 // Ashima Arts / Stefan Gustavson "webgl-noise" 3D simplex noise (MIT-style,
@@ -74,180 +76,18 @@ float snoise(vec3 v) {
 }
 `;
 
-// Same tapered-leaf silhouette math used for the flat logo icon (scripts/generate-logo.mjs),
-// so the 3D piece reads as the same brand shape, just alive.
-function widthProfile(t: number, a = 1.7, b = 2.6) {
-  const peakT = a / (a + b);
-  const peakVal = Math.pow(peakT, a) * Math.pow(1 - peakT, b);
-  return (Math.pow(t, a) * Math.pow(1 - t, b)) / peakVal;
-}
-
-// ── Tune the leaf's proportions here ───────────────────────────────────────
+// ── Tune the leaf's scale here ──────────────────────────────────────────
+// The model is authored at its own arbitrary size; scale it to roughly this
+// tall (matches the footprint the procedural leaf used to occupy).
 const LEAF_LENGTH = 2.75;
-const LEAF_MAX_WIDTH = 0.72;
-const LEAF_BEND = 0.32; // overall bow along the length — higher reads as more three-dimensional as it turns
-const LEAF_FOLD = 0.08; // depth of the central spine crease
-const SEGMENTS_U = 48; // across the width
-const SEGMENTS_V = 96; // along the length
-
-function createLeafGeometry() {
-  const positions: number[] = [];
-  const uvs: number[] = [];
-  const indices: number[] = [];
-
-  for (let iv = 0; iv <= SEGMENTS_V; iv++) {
-    const v = iv / SEGMENTS_V; // 0 = tip, 1 = base
-    const y = (0.5 - v) * LEAF_LENGTH;
-    const halfWidth = widthProfile(v) * LEAF_MAX_WIDTH;
-    const bendZ = Math.sin(v * Math.PI) * LEAF_BEND;
-
-    for (let iu = 0; iu <= SEGMENTS_U; iu++) {
-      const u = iu / SEGMENTS_U; // 0..1 across the width
-      const x = (u - 0.5) * 2 * halfWidth;
-      const fold = 1 - Math.abs(u - 0.5) * 2; // 1 at spine, 0 at edges
-      const z = bendZ + fold * LEAF_FOLD * widthProfile(v);
-      positions.push(x, y, z);
-      uvs.push(u, v);
-    }
-  }
-
-  for (let iv = 0; iv < SEGMENTS_V; iv++) {
-    for (let iu = 0; iu < SEGMENTS_U; iu++) {
-      const a = iv * (SEGMENTS_U + 1) + iu;
-      const b = a + 1;
-      const c = a + (SEGMENTS_U + 1);
-      const d = c + 1;
-      indices.push(a, c, b, b, c, d);
-    }
-  }
-
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
-  geometry.setIndex(indices);
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-// ---------------------------------------------------------------------------
-// Vein network — baked ONCE into a canvas texture (never computed per-pixel
-// in the shader). A previous per-pixel vein shader crashed the tab under
-// load; sampling a pre-rendered texture costs one lookup regardless of how
-// dense the pattern is, so this stays cheap no matter how intricate it looks.
-// UV space matches createLeafGeometry(): u = across width, v = 0 at the tip,
-// 1 at the base.
-// ---------------------------------------------------------------------------
-// Draws one hand-tremor stroke along a quadratic curve: walking the curve in
-// small steps and nudging each point by a random perpendicular-ish offset,
-// instead of one perfectly smooth bezier. That per-step wobble is what reads
-// as "drawn by hand" rather than "vector line."
-function sketchyQuadratic(
-  ctx: CanvasRenderingContext2D,
-  x0: number,
-  y0: number,
-  cx: number,
-  cy: number,
-  x1: number,
-  y1: number,
-  jitter: number,
-  segments = 14
-) {
-  ctx.beginPath();
-  for (let s = 0; s <= segments; s++) {
-    const t = s / segments;
-    const mt = 1 - t;
-    const x = mt * mt * x0 + 2 * mt * t * cx + t * t * x1;
-    const y = mt * mt * y0 + 2 * mt * t * cy + t * t * y1;
-    // Taper the wobble to zero at both ends so strokes still meet cleanly.
-    const taper = Math.sin(t * Math.PI);
-    const jx = x + (Math.random() - 0.5) * jitter * taper;
-    const jy = y + (Math.random() - 0.5) * jitter * taper;
-    if (s === 0) ctx.moveTo(jx, jy);
-    else ctx.lineTo(jx, jy);
-  }
-  ctx.stroke();
-}
-
-function createVeinTexture(): THREE.CanvasTexture {
-  const size = 1024;
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext("2d")!;
-  ctx.clearRect(0, 0, size, size);
-  ctx.strokeStyle = "#ffffff";
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
-
-  // Central spine — drawn as two overlapping wobbly passes, like a pen
-  // re-tracing the same line, rather than one perfectly straight vector.
-  ctx.lineWidth = size * 0.0045;
-  for (let pass = 0; pass < 2; pass++) {
-    ctx.globalAlpha = 0.55;
-    sketchyQuadratic(
-      ctx,
-      size * (0.5 + (Math.random() - 0.5) * 0.01),
-      size * 0.03,
-      size * (0.5 + (Math.random() - 0.5) * 0.02),
-      size * 0.5,
-      size * (0.5 + (Math.random() - 0.5) * 0.01),
-      size * 0.97,
-      size * 0.006,
-      40
-    );
-  }
-
-  // Side veins branch off the spine and curve out toward the edge, tapering
-  // near the tip and base. Each one is drawn as 2-3 overlapping jittered
-  // passes at slightly different widths/opacities — the layered, uneven-
-  // pressure look of real pen strokes — plus fine secondary veins branching
-  // off those for the dense hand-drawn density in the reference image.
-  const veinCount = 34;
-  for (let i = 0; i < veinCount; i++) {
-    const t = (i + 0.5) / veinCount;
-    const v = 0.05 + t * 0.9 + (Math.random() - 0.5) * 0.015;
-    const side = i % 2 === 0 ? 1 : -1;
-    const spread = Math.sin(t * Math.PI) * (0.85 + Math.random() * 0.3);
-
-    const startX = size * 0.5;
-    const startY = size * v;
-    const angleJitter = (Math.random() - 0.5) * 0.12;
-    const midX = size * (0.5 + side * (0.2 + angleJitter) * spread);
-    const midY = startY - size * (0.015 + Math.random() * 0.015);
-    const endX = size * (0.5 + side * (0.42 + angleJitter) * spread);
-    const endY = startY + size * 0.05 * side * (0.7 + Math.random() * 0.6);
-
-    const passes = 2 + (Math.random() < 0.4 ? 1 : 0);
-    for (let p = 0; p < passes; p++) {
-      ctx.lineWidth = size * (0.0011 + 0.0014 * spread) * (1 - p * 0.25);
-      ctx.globalAlpha = (0.22 + 0.28 * spread) * (1 - p * 0.3);
-      sketchyQuadratic(ctx, startX, startY, midX, midY, endX, endY, size * 0.008);
-    }
-
-    const fineVeins = 3 + (i % 2);
-    for (let f = 1; f <= fineVeins; f++) {
-      const ft = f / (fineVeins + 1);
-      const bx = startX + (midX - startX) * ft;
-      const by = startY + (midY - startY) * ft;
-      const fEndX = bx + (endX - bx) * (0.75 + Math.random() * 0.2);
-      const fEndY = by + (endY - by) * 0.85 - size * 0.012;
-      const fMidX = (bx + fEndX) / 2 + (Math.random() - 0.5) * size * 0.02;
-      const fMidY = (by + fEndY) / 2 - size * 0.01;
-
-      ctx.lineWidth = size * 0.0007;
-      ctx.globalAlpha = (0.12 + 0.16 * spread) * (0.8 + Math.random() * 0.4);
-      sketchyQuadratic(ctx, bx, by, fMidX, fMidY, fEndX, fEndY, size * 0.006);
-    }
-  }
-  ctx.globalAlpha = 1;
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.wrapS = THREE.ClampToEdgeWrapping;
-  texture.wrapT = THREE.ClampToEdgeWrapping;
-  texture.generateMipmaps = false;
-  texture.minFilter = THREE.LinearFilter;
-  return texture;
-}
+const LEAF_MODEL_URL = "/models/leaf.glb";
+// The model has a long stem trailing below the main blade, so its bounding-
+// box center (used to recenter it) sits well below the blade's own visual
+// center of mass — centering on that box alone pushes the blade up near the
+// header. Nudge the whole mesh down so the blade sits centered in frame and
+// the stem trails off toward where the base-hugging dust particles already
+// concentrate.
+const LEAF_Y_OFFSET = -0.1;
 
 // ---------------------------------------------------------------------------
 // Glowing dust particles — fully GPU-driven drift and twinkle, no per-frame
@@ -384,114 +224,178 @@ export default function LeafScene({ className }: { className?: string }) {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.appendChild(renderer.domElement);
 
-    const geometry = createLeafGeometry();
-
-    const material = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color("#1f6b4f"),
-      metalness: 0.1,
-      roughness: 0.25,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.15,
-      transmission: 0.4,
-      thickness: 0.5,
-      iridescence: 0.55,
-      iridescenceIOR: 1.3,
-      ior: 1.4,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 0.88,
-    });
-
-    // Inject fluid noise + mouse-ripple displacement into the built-in
-    // physical vertex shader, so we keep Three's PBR lighting for free.
-    // A glowing vein network is added in the fragment shader too — but only
-    // ever as a single texture sample against a texture baked once up front
-    // (createVeinTexture), never as per-pixel line math. That per-pixel
-    // approach is what crashed the tab previously; this costs the same
-    // regardless of how dense the vein pattern looks.
-    const veinTexture = createVeinTexture();
-    let shaderRef: ShaderRef = null;
-    material.onBeforeCompile = (shader) => {
-      shader.uniforms.uTime = { value: 0 };
-      shader.uniforms.uMouseLocal = { value: new THREE.Vector3(999, 999, 0) };
-      shader.uniforms.uMouseStrength = { value: 0 };
-      shader.uniforms.uVeinTex = { value: veinTexture };
-      shader.uniforms.uVeinGlowA = { value: new THREE.Color("#34d399") };
-      shader.uniforms.uVeinGlowB = { value: new THREE.Color("#22d3ee") };
-
-      shader.vertexShader =
-        `
-        uniform float uTime;
-        uniform vec3 uMouseLocal;
-        uniform float uMouseStrength;
-        varying vec2 vLeafUv;
-        ${SNOISE_GLSL}
-        ` + shader.vertexShader;
-
-      shader.vertexShader = shader.vertexShader.replace(
-        "#include <begin_vertex>",
-        `
-        #include <begin_vertex>
-
-        vLeafUv = uv;
-
-        // Ambient ripple: adjust 1.4 (spatial scale) and 0.18 (time speed) to
-        // change how tight / fast the fluid ripples move.
-        float ambientNoise = snoise(vec3(position.x * 1.4, position.y * 1.4, uTime * 0.18));
-
-        // Localized ripple where the mouse recently moved fast.
-        float mouseDist = distance(position.xy, uMouseLocal.xy);
-        float mouseRipple = uMouseStrength * exp(-mouseDist * 3.2) *
-          sin(mouseDist * 10.0 - uTime * 4.0);
-
-        // Adjust 0.05 to change how strongly the surface bulges with the ripple.
-        float displacement = ambientNoise * 0.05 + mouseRipple * 0.12;
-        transformed += normal * displacement;
-        `
-      );
-
-      shader.fragmentShader =
-        `
-        uniform float uTime;
-        uniform sampler2D uVeinTex;
-        uniform vec3 uVeinGlowA;
-        uniform vec3 uVeinGlowB;
-        varying vec2 vLeafUv;
-        ` + shader.fragmentShader;
-
-      shader.fragmentShader = shader.fragmentShader.replace(
-        "#include <dithering_fragment>",
-        `
-        // Traveling pulse along the leaf's length, like light moving through
-        // the vein network — one texture sample plus a few scalar ops.
-        float veinMask = texture2D(uVeinTex, vLeafUv).r;
-        float pulse = sin(vLeafUv.y * 6.0 - uTime * 1.6) * 0.5 + 0.5;
-        vec3 veinGlow = mix(uVeinGlowA, uVeinGlowB, vLeafUv.x);
-
-        // Hot core gathered near the base (like light pooling at the stem
-        // before radiating out through the veins) fading toward white at its
-        // brightest point — the "glowing from within" quality, not just
-        // glowing lines.
-        float core = smoothstep(0.35, 1.0, vLeafUv.y);
-        vec3 hotColor = mix(veinGlow, vec3(1.0), core * 0.7);
-
-        gl_FragColor.rgb += veinGlow * veinMask * (0.55 + 0.85 * pulse) * 1.4;
-        gl_FragColor.rgb += hotColor * core * (0.5 + 0.5 * pulse) * 0.9;
-
-        #include <dithering_fragment>
-        `
-      );
-
-      shaderRef = shader;
-    };
-
+    // The leaf is a user-supplied model (optimized from ~34MB down to ~1.8MB
+    // via gltf-transform: meshopt-compressed geometry + 512px WebP textures —
+    // see the git history for the original asset). Loading is async, so wrap
+    // it in a persistent Group added to the scene immediately: rotation/tilt
+    // below always targets this group, whether or not the model has finished
+    // loading yet, instead of scattering null-checks through animate()/resize().
     const initialAspect = container.clientWidth / Math.max(container.clientHeight, 1);
-    const mesh = new THREE.Mesh(geometry, material);
-    const BASE_POSITION = new THREE.Vector3(computeLeafX(initialAspect), 0, 0);
+    const mesh = new THREE.Group();
+    const BASE_POSITION = new THREE.Vector3(computeLeafX(initialAspect), LEAF_Y_OFFSET, 0);
     const BASE_ROTATION_Z = -0.15;
     mesh.position.copy(BASE_POSITION);
     mesh.rotation.z = BASE_ROTATION_Z;
     scene.add(mesh);
+
+    // Populated once the model loads; animate()/cleanup guard on these being set.
+    let shaderRef: ShaderRef = null;
+    let activeMesh: THREE.Mesh | null = null;
+    let loadedGeometry: THREE.BufferGeometry | null = null;
+    let loadedMaterial: THREE.MeshPhysicalMaterial | null = null;
+    let halfHeight = 1;
+
+    const gltfLoader = new GLTFLoader();
+    gltfLoader.setMeshoptDecoder(MeshoptDecoder);
+    gltfLoader.load(
+      LEAF_MODEL_URL,
+      (gltf) => {
+        let found: THREE.Mesh | null = null;
+        gltf.scene.traverse((child) => {
+          if (!found && (child as THREE.Mesh).isMesh) found = child as THREE.Mesh;
+        });
+        if (!found) return;
+        const loadedMesh = found as THREE.Mesh;
+
+        const geometry = loadedMesh.geometry;
+        geometry.computeBoundingBox();
+        const bbox = geometry.boundingBox!;
+        const size = new THREE.Vector3();
+        bbox.getSize(size);
+        const center = new THREE.Vector3();
+        bbox.getCenter(center);
+        geometry.translate(-center.x, -center.y, -center.z);
+        halfHeight = Math.max(size.y / 2, 0.0001);
+
+        loadedMesh.scale.setScalar(LEAF_LENGTH / Math.max(size.y, 0.0001));
+
+        // Reuse the model's own normal map (if any) for its sculpted surface
+        // detail, but replace the base material entirely with our own so the
+        // color/glass/glow treatment matches the rest of the brand regardless
+        // of whatever the source model was textured with.
+        const sourceMaterial = Array.isArray(loadedMesh.material)
+          ? loadedMesh.material[0]
+          : loadedMesh.material;
+        const normalMap =
+          sourceMaterial && "normalMap" in sourceMaterial
+            ? (sourceMaterial as THREE.MeshStandardMaterial).normalMap
+            : null;
+
+        const material = new THREE.MeshPhysicalMaterial({
+          color: new THREE.Color("#1f6b4f"),
+          normalMap: normalMap ?? undefined,
+          metalness: 0.1,
+          roughness: 0.3,
+          clearcoat: 1.0,
+          clearcoatRoughness: 0.15,
+          transmission: 0.4,
+          thickness: 0.5,
+          iridescence: 0.5,
+          iridescenceIOR: 1.3,
+          ior: 1.4,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.9,
+        });
+
+        // Inject fluid noise + mouse-ripple displacement, plus a magical
+        // fresnel/rim glow — into the built-in physical shader, so we keep
+        // Three's PBR lighting for free. The glow uses view-angle (fresnel)
+        // and local vertex position rather than UVs, since this is an
+        // imported model whose UV layout we don't control (unlike the old
+        // procedural leaf's own vein texture, which relied on knowing the
+        // UV mapping exactly).
+        material.onBeforeCompile = (shader) => {
+          shader.uniforms.uTime = { value: 0 };
+          shader.uniforms.uMouseLocal = { value: new THREE.Vector3(999, 999, 0) };
+          shader.uniforms.uMouseStrength = { value: 0 };
+          shader.uniforms.uGlowA = { value: new THREE.Color("#34d399") };
+          shader.uniforms.uGlowB = { value: new THREE.Color("#22d3ee") };
+          shader.uniforms.uHalfHeight = { value: halfHeight };
+
+          shader.vertexShader =
+            `
+            uniform float uTime;
+            uniform vec3 uMouseLocal;
+            uniform float uMouseStrength;
+            varying vec3 vLocalPos;
+            ${SNOISE_GLSL}
+            ` + shader.vertexShader;
+
+          shader.vertexShader = shader.vertexShader.replace(
+            "#include <begin_vertex>",
+            `
+            #include <begin_vertex>
+
+            vLocalPos = position;
+
+            // Ambient ripple: adjust 1.4 (spatial scale) and 0.18 (time speed)
+            // to change how tight / fast the fluid ripples move.
+            float ambientNoise = snoise(vec3(position.x * 1.4, position.y * 1.4, uTime * 0.18));
+
+            // Localized ripple where the mouse recently moved fast.
+            float mouseDist = distance(position.xy, uMouseLocal.xy);
+            float mouseRipple = uMouseStrength * exp(-mouseDist * 3.2) *
+              sin(mouseDist * 10.0 - uTime * 4.0);
+
+            // Adjust 0.05 to change how strongly the surface bulges with the ripple.
+            float displacement = ambientNoise * 0.05 + mouseRipple * 0.12;
+            transformed += normal * displacement;
+            `
+          );
+
+          shader.fragmentShader =
+            `
+            uniform float uTime;
+            uniform vec3 uGlowA;
+            uniform vec3 uGlowB;
+            uniform float uHalfHeight;
+            varying vec3 vLocalPos;
+            ` + shader.fragmentShader;
+
+          shader.fragmentShader = shader.fragmentShader.replace(
+            "#include <dithering_fragment>",
+            `
+            // Magical glow, two parts:
+            // 1. A fresnel rim — brightest at grazing angles, like light
+            //    catching the edge of glass — using the surface normal and
+            //    view direction Three already provides, so it works
+            //    regardless of this model's UV layout.
+            // 2. A hot core gathered near the base (negative local Y, where
+            //    this model's stem sits) fading toward white at its
+            //    brightest point, using the mesh's own measured half-height
+            //    rather than a guessed constant.
+            vec3 viewDir = normalize(vViewPosition);
+            vec3 glowNormal = normalize(vNormal);
+            float fresnel = pow(1.0 - max(dot(glowNormal, viewDir), 0.0), 2.2);
+            float pulse = sin(uTime * 1.6) * 0.5 + 0.5;
+            vec3 rimGlow = mix(uGlowA, uGlowB, fresnel);
+
+            float baseAmount = clamp(-vLocalPos.y / uHalfHeight, 0.0, 1.0);
+            float core = smoothstep(0.0, 0.85, baseAmount);
+            vec3 hotColor = mix(rimGlow, vec3(1.0), core * 0.7);
+
+            gl_FragColor.rgb += rimGlow * fresnel * (0.6 + 0.6 * pulse) * 1.3;
+            gl_FragColor.rgb += hotColor * core * (0.5 + 0.5 * pulse) * 0.9;
+
+            #include <dithering_fragment>
+            `
+          );
+
+          shaderRef = shader;
+        };
+
+        loadedMesh.material = material;
+        loadedGeometry = geometry;
+        loadedMaterial = material;
+        activeMesh = loadedMesh;
+        mesh.add(loadedMesh);
+      },
+      undefined,
+      (error) => {
+        console.error("Failed to load leaf model:", error);
+      }
+    );
 
     // ── Glowing dust particles around the leaf ─────────────────────────────
     const dustGeometry = createDustGeometry();
@@ -614,11 +518,13 @@ export default function LeafScene({ className }: { className?: string }) {
       mouseStrength += (mouseSpeed / 80 - mouseStrength) * 0.15;
       mouseSpeed *= 0.85;
 
-      if (shaderRef) {
+      if (shaderRef && activeMesh) {
         shaderRef.uniforms.uTime.value = elapsed;
         shaderRef.uniforms.uMouseStrength.value = mouseStrength;
-        // Mouse point in the mesh's local space, for the shader's ripple falloff.
-        const localMouse = mesh.worldToLocal(hitPoint.clone());
+        // Mouse point in the loaded mesh's own local space (not the wrapping
+        // group's — the shader's raw `position` attribute is pre-scale/offset,
+        // in the mesh's own space) for the shader's ripple falloff.
+        const localMouse = activeMesh.worldToLocal(hitPoint.clone());
         shaderRef.uniforms.uMouseLocal.value.set(localMouse.x, localMouse.y, 0);
       }
       dustMaterial.uniforms.uTime.value = elapsed;
@@ -668,9 +574,8 @@ export default function LeafScene({ className }: { className?: string }) {
       intersectionObserver.disconnect();
       window.removeEventListener("pointermove", onPointerMove);
       resizeObserver.disconnect();
-      geometry.dispose();
-      material.dispose();
-      veinTexture.dispose();
+      loadedGeometry?.dispose();
+      loadedMaterial?.dispose();
       dustGeometry.dispose();
       dustMaterial.dispose();
       renderer.dispose();

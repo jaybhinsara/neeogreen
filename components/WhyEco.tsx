@@ -22,13 +22,13 @@ export function WhyEco() {
         <div className="grid gap-16 md:grid-cols-[1.15fr_1fr] md:gap-16">
           <div className="flex flex-col items-start">
             <Reveal>
-              <span className="text-xs uppercase tracking-[0.14em] text-muted-on-dark">
+              <span className="font-accent text-2xl italic text-muted-on-dark md:text-3xl">
                 The packaging side, specifically
               </span>
             </Reveal>
             <Reveal delay={0.05}>
               <h2 className="mt-4 max-w-xl font-display text-[clamp(32px,5vw,64px)] font-semibold uppercase leading-[0.98] tracking-[-0.02em] text-ink-on-dark">
-                Proof, not a pitch
+                Proof, not a pitch<span className="accent-gradient-text">.</span>
               </h2>
             </Reveal>
             <Reveal delay={0.1}>

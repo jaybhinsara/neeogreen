@@ -63,7 +63,7 @@ export function Hero({ ready }: { ready: boolean }) {
       />
 
       {use3d ? (
-        <LeafScene className="pointer-events-none absolute inset-0 z-0 opacity-80" />
+        <LeafScene className="pointer-events-none absolute inset-0 z-0 opacity-85" />
       ) : (
         // eslint-disable-next-line @next/next/no-img-element -- decorative brand mark, bleeds off-canvas
         <img
@@ -77,7 +77,7 @@ export function Hero({ ready }: { ready: boolean }) {
 
       <Container className="relative z-10 flex flex-col gap-8 md:gap-10">
         <h1 className="font-display text-[clamp(30px,6.4vw,104px)] font-semibold uppercase leading-[0.96] tracking-[-0.03em] text-ink-on-dark [overflow-wrap:anywhere]">
-          {["Brand first.", "Packaging next.", "Digital always."].map((line, i) => (
+          {["One studio.", "Every touchpoint.", "No guesswork."].map((line, i) => (
             <span key={line} className="block overflow-hidden">
               <motion.span
                 initial={{ y: "110%" }}
@@ -97,10 +97,9 @@ export function Hero({ ready }: { ready: boolean }) {
           transition={{ duration: 0.6, delay: 0.45 }}
           className="max-w-xl text-lg text-muted-on-dark md:text-xl"
         >
-          We build complete brand systems &mdash; identity, eco-friendly
-          packaging, and the digital &amp; social marketing to launch them
-          &mdash; for restaurants, cafés, and food brands who want to be
-          remembered.
+          One studio for identity, eco-friendly packaging, and the digital
+          push to launch them &mdash; built for restaurants and food brands
+          who want to be remembered.
         </motion.p>
 
         <motion.div

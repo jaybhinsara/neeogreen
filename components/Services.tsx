@@ -25,13 +25,14 @@ export function Services() {
     <section id="services" className="py-24 md:py-40">
       <Container>
         <Reveal>
-          <span className="text-xs uppercase tracking-[0.14em] text-muted-on-dark">
+          <span className="font-accent text-2xl italic text-muted-on-dark md:text-3xl">
             What we do
           </span>
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="mt-4 max-w-3xl font-display text-[clamp(32px,5vw,64px)] font-semibold uppercase leading-[0.98] tracking-[-0.02em] text-ink-on-dark">
             Three disciplines, one studio
+            <span className="accent-gradient-text">.</span>
           </h2>
         </Reveal>
 

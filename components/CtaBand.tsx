@@ -17,7 +17,7 @@ export function CtaBand() {
           <h2 className="max-w-4xl font-display text-[clamp(32px,7vw,96px)] font-semibold uppercase leading-[0.98] tracking-[-0.02em] text-ink-on-dark [overflow-wrap:anywhere]">
             Let&rsquo;s build a brand
             <br />
-            people remember
+            people remember<span className="accent-gradient-text">.</span>
           </h2>
         </Reveal>
         <Reveal delay={0.1}>

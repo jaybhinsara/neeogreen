@@ -78,20 +78,18 @@ float snoise(vec3 v) {
 
 // ── Tune the leaf's scale here ──────────────────────────────────────────
 // The model is authored at its own arbitrary size; scale it to roughly this
-// tall. Kept smaller than the old procedural leaf's footprint on purpose —
-// at full hero width this is a corner accent behind the headline, not a
-// full-bleed piece, and the model's own proportions (a wide blade plus a
-// long trailing stem) make it read much bigger than a plain height number
-// suggests once the stem is included.
-const LEAF_LENGTH = 2.0;
+// tall. Sized as a large, full-bleed right-side centerpiece per direct
+// feedback (a marked-up screenshot showing the leaf should fill roughly the
+// right half of the hero, top to bottom) — not a small corner accent.
+const LEAF_LENGTH = 3.3;
 const LEAF_MODEL_URL = "/models/leaf.glb";
 // The model has a long stem trailing below the main blade, so its bounding-
 // box center (used to recenter it) sits well below the blade's own visual
 // center of mass — centering on that box alone pushes the blade up into the
 // header. Confirmed via a real screenshot (not just this sandbox's own
 // preview, which has repeatedly under-reported how high the blade actually
-// sits) that -0.1 still let the blade touch the nav pill and the stem cross
-// straight through the headline — push it down hard enough to clear both.
+// sits) that a small nudge wasn't enough — push it down hard enough to
+// clear the header even at this much larger scale.
 const LEAF_Y_OFFSET = -0.55;
 
 // ---------------------------------------------------------------------------
@@ -221,7 +219,7 @@ export default function LeafScene({ className }: { className?: string }) {
       const vFov = (camera.fov * Math.PI) / 180;
       const halfHeight = Math.tan(vFov / 2) * camera.position.z;
       const halfWidth = halfHeight * aspect;
-      return Math.min(2.5, halfWidth * 0.68);
+      return Math.min(2.2, halfWidth * 0.5);
     }
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });

@@ -222,7 +222,10 @@ export default function LeafScene({ className }: { className?: string }) {
     }
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // Capped lower than the usual 2x: this canvas now covers roughly half
+    // the hero at full size, so the retina-resolution fragment cost adds up
+    // fast. 1.5x is still sharp enough for a soft, glowing shape like this.
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.appendChild(renderer.domElement);
 
@@ -290,8 +293,14 @@ export default function LeafScene({ className }: { className?: string }) {
           roughness: 0.3,
           clearcoat: 1.0,
           clearcoatRoughness: 0.15,
-          transmission: 0.4,
-          thickness: 0.5,
+          // `transmission` forces Three to render the whole scene a second
+          // time into an offscreen buffer every frame (the same cost that
+          // crashed the mobile tab a few commits back — see the comment on
+          // the `(pointer: coarse)` gate in Hero.tsx). It was cheap while
+          // this mesh was a small corner accent; now that it fills half the
+          // hero at full desktop size, that extra full-screen pass was
+          // dragging down scroll smoothness. The fresnel glow already baked
+          // into the shader below covers the "glassy" look without it.
           iridescence: 0.5,
           iridescenceIOR: 1.3,
           ior: 1.4,

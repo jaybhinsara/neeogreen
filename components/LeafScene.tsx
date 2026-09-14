@@ -85,12 +85,11 @@ const LEAF_LENGTH = 3.3;
 const LEAF_MODEL_URL = "/models/leaf.glb";
 // The model has a long stem trailing below the main blade, so its bounding-
 // box center (used to recenter it) sits well below the blade's own visual
-// center of mass — centering on that box alone pushes the blade up into the
-// header. Confirmed via a real screenshot (not just this sandbox's own
-// preview, which has repeatedly under-reported how high the blade actually
-// sits) that a small nudge wasn't enough — push it down hard enough to
-// clear the header even at this much larger scale.
-const LEAF_Y_OFFSET = -0.55;
+// center of mass. Direct feedback on a real screenshot (marked with a line
+// near the bottom of the fold) asked for the whole leaf pushed further down
+// than -0.55 — the stem now trails off past the bottom edge, which is fine,
+// it matches where the base-hugging dust particles already concentrate.
+const LEAF_Y_OFFSET = -1.0;
 
 // ---------------------------------------------------------------------------
 // Glowing dust particles — fully GPU-driven drift and twinkle, no per-frame

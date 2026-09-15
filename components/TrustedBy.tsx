@@ -103,13 +103,36 @@ function RippleMarquee() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [useFallback, setUseFallback] = useState(false);
 
+  // The cursor-ripple/lens distortion reads as a nice detail at desktop
+  // widths, but on a narrow window it can visibly warp two adjacent words
+  // together (e.g. "Export" and "Orders" merging) since the same effect now
+  // covers a much larger share of the marquee's width. Gate on the same
+  // `md` breakpoint the rest of the layout uses (not just pointer type), so
+  // a mouse-and-trackpad laptop window resized down to mobile width gets the
+  // same plain, consistent marquee a touch device does — and re-check on
+  // resize so rotating a device or resizing a window switches live instead
+  // of only at mount.
   useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
-    if (reduced || coarsePointer || !supportsWebGL()) {
-      setUseFallback(true);
-      return;
+    const reducedQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const coarseQuery = window.matchMedia("(pointer: coarse)");
+    const narrowQuery = window.matchMedia("(max-width: 767px)");
+    const hasWebGL = supportsWebGL();
+
+    function evaluate() {
+      setUseFallback(reducedQuery.matches || coarseQuery.matches || narrowQuery.matches || !hasWebGL);
     }
+    evaluate();
+
+    narrowQuery.addEventListener("change", evaluate);
+    coarseQuery.addEventListener("change", evaluate);
+    return () => {
+      narrowQuery.removeEventListener("change", evaluate);
+      coarseQuery.removeEventListener("change", evaluate);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (useFallback) return;
 
     const container = containerRef.current;
     const canvas = canvasRef.current;
@@ -322,7 +345,7 @@ function RippleMarquee() {
       composeMaterial.dispose();
       renderer.dispose();
     };
-  }, []);
+  }, [useFallback]);
 
   return (
     <div ref={containerRef} className="relative overflow-hidden border-y border-line-on-dark py-6 md:py-8">

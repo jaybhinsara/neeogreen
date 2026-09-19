@@ -34,7 +34,7 @@ export default async function OpengraphImage() {
             display: "flex",
           }}
         >
-          Brand · Packaging · Digital — Surat, India
+          Managed IT · Cybersecurity · Cloud — Surat, India
         </div>
         <div
           style={{
@@ -60,7 +60,7 @@ export default async function OpengraphImage() {
             display: "flex",
           }}
         >
-          Building brand systems — identity, eco packaging, and digital marketing — for food brands that want to be remembered.
+          Managed IT support, cybersecurity, cloud, and custom software for businesses and individuals who just want their technology to work.
         </div>
       </div>
     ),

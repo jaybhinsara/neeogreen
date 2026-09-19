@@ -3,19 +3,19 @@ import { Container } from "./Container";
 import { Reveal } from "./Reveal";
 
 const STATS = [
-  { value: "100%", label: "Recyclable or compostable material options" },
-  { value: "0", label: "Single-use plastic in any packaging we spec" },
-  { value: "3", label: "Material families: kraft, PLA-lined, compostable stock" },
+  { value: "< 1hr", label: "Typical response time on support tickets" },
+  { value: "Flat", label: "Transparent, flat-rate pricing — no surprise invoices" },
+  { value: "0", label: "Call-center scripts — you talk to the engineer who fixes it" },
 ];
 
-const MATERIALS = [
-  "FSC-certified paper",
-  "PLA-lined cups",
-  "Compostable mailer stock",
-  "Soy & water-based inks",
+const COMMITMENTS = [
+  "Senior engineers, not a script",
+  "Proactive monitoring, not just break-fix",
+  "Transparent flat-rate pricing",
+  "A help desk that actually answers",
 ];
 
-export function WhyEco() {
+export function WhyNeeoGreen() {
   return (
     <section className="py-24 md:py-40">
       <Container>
@@ -23,30 +23,31 @@ export function WhyEco() {
           <div className="flex flex-col items-start">
             <Reveal>
               <span className="font-accent text-2xl italic text-muted-on-dark md:text-3xl">
-                The packaging side, specifically
+                Why NeeoGreen
               </span>
             </Reveal>
             <Reveal delay={0.05}>
               <h2 className="mt-4 max-w-xl font-display text-[clamp(32px,5vw,64px)] font-semibold uppercase leading-[0.98] tracking-[-0.02em] text-ink-on-dark">
-                Proof, not a pitch<span className="accent-gradient-text">.</span>
+                Commitments, not a pitch<span className="accent-gradient-text">.</span>
               </h2>
             </Reveal>
             <Reveal delay={0.1}>
               <p className="mt-6 max-w-lg text-base text-muted-on-dark md:text-lg">
-                Sustainability is a material spec, not a marketing claim.
-                When packaging design is part of the brief, every system we
-                ship is built on material choices we can name.
+                Reliability is a set of commitments we hold ourselves to, not
+                a marketing claim. Every engagement runs on the same
+                response-time and pricing standards, whether you&rsquo;re a
+                growing business or a single home office.
               </p>
             </Reveal>
 
             <Reveal delay={0.15} className="w-full">
               <ul className="mt-10 flex max-w-lg flex-wrap gap-3">
-                {MATERIALS.map((m) => (
+                {COMMITMENTS.map((c) => (
                   <li
-                    key={m}
+                    key={c}
                     className="rounded-full border border-line-on-dark px-4 py-2 text-xs uppercase tracking-[0.08em] text-muted-on-dark"
                   >
-                    {m}
+                    {c}
                   </li>
                 ))}
               </ul>

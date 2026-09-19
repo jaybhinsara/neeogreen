@@ -6,12 +6,12 @@ import { cn } from "@/lib/cn";
 import { LeafIcon } from "./LeafIcon";
 
 const SEGMENTS = [
-  "Restaurants",
-  "Cafés",
-  "Cloud Kitchens",
-  "QSR Chains",
-  "D2C Food Brands",
-  "Export Orders",
+  "Small Businesses",
+  "Startups",
+  "Enterprises",
+  "Healthcare Practices",
+  "Retail & E-commerce",
+  "Home & Individuals",
 ];
 
 const SCROLL_PX_PER_SEC = 46;

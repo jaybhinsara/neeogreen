@@ -4,23 +4,23 @@ import { Reveal } from "./Reveal";
 const STEPS = [
   {
     n: "01",
-    title: "Discover",
-    desc: "Menu, margins, and shipping realities — we learn the brand before we sketch a single die-line.",
+    title: "Assess",
+    desc: "A real audit of your systems, network, and risk — before we recommend a single fix.",
   },
   {
     n: "02",
-    title: "Design",
-    desc: "Concepts, material options, and a packaging system that carries the brand across every SKU.",
+    title: "Plan",
+    desc: "A prioritized roadmap matched to your budget and growth plan, not a generic checklist.",
   },
   {
     n: "03",
-    title: "Prototype & Sample",
-    desc: "Physical samples in hand before commitment — structure, print, and material tested together.",
+    title: "Implement",
+    desc: "Migrations, setup, and rollouts scheduled around your business hours, not ours.",
   },
   {
     n: "04",
-    title: "Produce & Launch",
-    desc: "Production handoff, quality checks, and launch-ready social assets shipped alongside the packaging.",
+    title: "Support",
+    desc: "Ongoing monitoring and a help desk that answers, so problems get caught before they cost you.",
   },
 ];
 
@@ -35,7 +35,7 @@ export function Process() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="mt-4 max-w-3xl font-display text-[clamp(32px,5vw,64px)] font-semibold uppercase leading-[0.98] tracking-[-0.02em] text-ink-on-light">
-            Four steps, no guesswork
+            Four steps, no downtime
           </h2>
         </Reveal>
 

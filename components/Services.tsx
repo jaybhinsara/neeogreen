@@ -6,17 +6,29 @@ import { CapabilityCloud } from "./CapabilityCloud";
 import { SERVICES } from "@/lib/site";
 
 const TAGS: Record<string, { glyph: "design" | "build" | "ship"; label: string }[]> = {
-  "brand-identity": [
-    { glyph: "design", label: "Strategy" },
-    { glyph: "build", label: "Guidelines" },
+  "managed-it-support": [
+    { glyph: "build", label: "Help Desk" },
+    { glyph: "ship", label: "24/7 Monitoring" },
   ],
-  "packaging-design": [
-    { glyph: "design", label: "Concept" },
-    { glyph: "build", label: "Dielines" },
+  cybersecurity: [
+    { glyph: "build", label: "Endpoint Security" },
+    { glyph: "design", label: "Backup & DR" },
   ],
-  "digital-marketing": [
-    { glyph: "design", label: "Content" },
-    { glyph: "ship", label: "Launch" },
+  "cloud-solutions": [
+    { glyph: "design", label: "Migration" },
+    { glyph: "build", label: "Cost Optimization" },
+  ],
+  "software-web-development": [
+    { glyph: "design", label: "Custom Apps" },
+    { glyph: "build", label: "Websites" },
+  ],
+  "networking-infrastructure": [
+    { glyph: "build", label: "Wi-Fi & Servers" },
+    { glyph: "design", label: "Structured Cabling" },
+  ],
+  "it-consulting": [
+    { glyph: "design", label: "Roadmaps" },
+    { glyph: "ship", label: "CRM/ERP" },
   ],
 };
 
@@ -31,7 +43,7 @@ export function Services() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="mt-4 max-w-3xl font-display text-[clamp(32px,5vw,64px)] font-semibold uppercase leading-[0.98] tracking-[-0.02em] text-ink-on-dark">
-            Three disciplines, one studio
+            IT services, end to end
             <span className="accent-gradient-text">.</span>
           </h2>
         </Reveal>
@@ -43,7 +55,7 @@ export function Services() {
         <div className="grid gap-0 md:grid-cols-3">
           {SERVICES.map((s, i) => (
             <Reveal key={s.slug} delay={0.1 * i}>
-              <div className="flex h-full flex-col gap-6 border-b border-line-on-dark py-10 md:border-b-0 md:border-r md:py-14 md:pr-10 [&:last-child]:md:border-r-0">
+              <div className="flex h-full flex-col gap-6 border-b border-line-on-dark py-10 md:border-r md:py-14 md:pr-10 [&:nth-child(3n)]:md:border-r-0 [&:nth-child(n+4)]:md:border-b-0">
                 <span className="font-display text-sm font-medium tracking-[-0.01em] accent-gradient-text">
                   {s.n}
                 </span>

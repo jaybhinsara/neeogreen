@@ -77,7 +77,7 @@ export function Hero({ ready }: { ready: boolean }) {
 
       <Container className="relative z-10 flex flex-col gap-8 md:gap-10">
         <h1 className="font-display text-[clamp(30px,6.4vw,104px)] font-semibold uppercase leading-[0.96] tracking-[-0.03em] text-ink-on-dark [overflow-wrap:anywhere]">
-          {["One studio.", "Every touchpoint.", "No guesswork."].map((line, i) => (
+          {["Technology that works.", "Support that answers.", "No downtime."].map((line, i) => (
             <span key={line} className="block overflow-hidden">
               <motion.span
                 initial={{ y: "110%" }}
@@ -97,9 +97,9 @@ export function Hero({ ready }: { ready: boolean }) {
           transition={{ duration: 0.6, delay: 0.45 }}
           className="max-w-xl text-lg text-muted-on-dark md:text-xl"
         >
-          One studio for identity, eco-friendly packaging, and the digital
-          push to launch them &mdash; built for restaurants and food brands
-          who want to be remembered.
+          Managed IT support, cybersecurity, cloud, and custom software
+          &mdash; one team for businesses and individuals who just want
+          their technology to work.
         </motion.p>
 
         <motion.div

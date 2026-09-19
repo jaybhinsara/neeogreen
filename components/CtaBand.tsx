@@ -15,9 +15,9 @@ export function CtaBand() {
       <Container className="relative z-10 flex flex-col items-center gap-10 text-center">
         <Reveal>
           <h2 className="max-w-4xl font-display text-[clamp(32px,7vw,96px)] font-semibold uppercase leading-[0.98] tracking-[-0.02em] text-ink-on-dark [overflow-wrap:anywhere]">
-            Let&rsquo;s build a brand
+            Let&rsquo;s keep your
             <br />
-            people remember<span className="accent-gradient-text">.</span>
+            technology running<span className="accent-gradient-text">.</span>
           </h2>
         </Reveal>
         <Reveal delay={0.1}>
@@ -25,7 +25,7 @@ export function CtaBand() {
             href="/contact"
             className="inline-flex items-center rounded-full accent-gradient px-8 py-4 text-sm font-medium uppercase tracking-[0.1em] text-bg-primary transition-opacity hover:opacity-90"
           >
-            Start a project
+            Get a free consultation
           </Link>
         </Reveal>
       </Container>

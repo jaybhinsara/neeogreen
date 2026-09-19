@@ -7,8 +7,8 @@ export function Statement() {
       <Container>
         <Reveal>
           <p className="text-center font-display text-[clamp(22px,3.4vw,40px)] font-semibold uppercase leading-[1.15] tracking-[-0.01em] text-ink-on-dark">
-            Brand, packaging, and digital —{" "}
-            <span className="accent-gradient-text">one studio, not three vendors.</span>
+            Support, security, and strategy —{" "}
+            <span className="accent-gradient-text">one team, not three vendors.</span>
           </p>
         </Reveal>
       </Container>

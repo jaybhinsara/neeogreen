@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 
-const PROJECT_TYPES = ["Packaging design", "Brand identity", "Social & digital", "Not sure yet"];
+const PROJECT_TYPES = ["Managed IT support", "Cybersecurity", "Cloud & software", "Not sure yet"];
 
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
@@ -48,7 +48,7 @@ export function ContactForm() {
           Message sent
         </span>
         <p className="text-sm text-muted-on-dark">
-          We reply to every project inquiry within two business days.
+          We reply to every inquiry within two business days.
         </p>
       </div>
     );
@@ -60,11 +60,11 @@ export function ContactForm() {
         <Field label="Name" name="name" type="text" required />
         <Field label="Email" name="email" type="email" required />
       </div>
-      <Field label="Company / Brand" name="company" type="text" />
+      <Field label="Company (optional)" name="company" type="text" />
 
       <div className="flex flex-col gap-3">
         <span className="text-xs uppercase tracking-[0.12em] text-muted-on-dark">
-          Project type
+          What do you need?
         </span>
         <div className="flex flex-wrap gap-3">
           {PROJECT_TYPES.map((type) => (
@@ -81,14 +81,14 @@ export function ContactForm() {
 
       <label className="flex flex-col gap-2">
         <span className="text-xs uppercase tracking-[0.12em] text-muted-on-dark">
-          Project details
+          How can we help?
         </span>
         <textarea
           name="message"
           required
           rows={5}
           className="resize-none border-b border-line-on-dark bg-transparent py-3 text-base text-ink-on-dark outline-none transition-colors placeholder:text-muted-on-dark focus:border-accent-1"
-          placeholder="Tell us about the brand, the packaging you need, and rough timeline."
+          placeholder="Tell us what's going on with your systems, and how soon you need help."
         />
       </label>
 

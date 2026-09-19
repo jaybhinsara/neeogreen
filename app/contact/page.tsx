@@ -8,7 +8,7 @@ import { SITE } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Start a brand, packaging, or digital marketing project with NeeoGreen. Based in Surat, India, working with restaurants, cafés, and food brands everywhere.",
+    "Get a free consultation with NeeoGreen — managed IT support, cybersecurity, cloud, and custom software. Based in Surat, India, working with businesses and individuals everywhere.",
   alternates: { canonical: "/contact" },
   openGraph: { url: `${SITE.url}/contact`, title: `Contact — ${SITE.name}` },
 };
@@ -22,14 +22,14 @@ export default function ContactPage() {
           <div className="grid gap-16 md:grid-cols-[1fr_1.3fr] md:gap-10">
             <div className="flex flex-col gap-8">
               <span className="text-xs uppercase tracking-[0.14em] text-muted-on-dark">
-                Start a project
+                Free consultation
               </span>
               <h1 className="max-w-md font-display text-[clamp(36px,5.5vw,64px)] font-semibold uppercase leading-[0.98] tracking-[-0.02em] text-ink-on-dark">
-                Let&rsquo;s talk brand
+                Let&rsquo;s talk IT
               </h1>
               <p className="max-w-sm text-base text-muted-on-dark">
-                Tell us what you&rsquo;re building — identity, packaging,
-                digital marketing, or all three. We reply to every inquiry
+                Tell us what you&rsquo;re dealing with — support, security,
+                cloud, or something else entirely. We reply to every inquiry
                 within two business days.
               </p>
 

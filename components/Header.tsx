@@ -10,8 +10,8 @@ import { scrollToHash } from "@/lib/lenis-singleton";
 
 const LINKS = [
   { href: "/#services", label: "Services" },
-  { href: "/studio", label: "Studio" },
-  { href: "/work", label: "Work" },
+  { href: "/about", label: "About" },
+  { href: "/approach", label: "Approach" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -93,7 +93,7 @@ export function Header() {
             href="/contact"
             className="hidden items-center rounded-full accent-gradient px-5 py-2.5 text-xs font-medium uppercase tracking-[0.1em] text-bg-primary transition-opacity hover:opacity-90 md:inline-flex"
           >
-            Start a project
+            Free Consultation
           </Link>
 
           <button
@@ -156,7 +156,7 @@ export function Header() {
               onClick={() => setMenuOpen(false)}
               className="inline-flex items-center justify-center rounded-full accent-gradient px-5 py-3.5 text-xs font-medium uppercase tracking-[0.1em] text-bg-primary"
             >
-              Start a project
+              Free Consultation
             </Link>
           </motion.div>
         )}

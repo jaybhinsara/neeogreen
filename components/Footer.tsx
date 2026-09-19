@@ -15,8 +15,8 @@ function handleAnchorClick(e: MouseEvent<HTMLAnchorElement>, href: string) {
 
 const SITEMAP = [
   ...SERVICES.map((s) => ({ href: `/services/${s.slug}`, label: s.title })),
-  { href: "/studio", label: "Studio" },
-  { href: "/work", label: "Work" },
+  { href: "/about", label: "About" },
+  { href: "/approach", label: "Approach" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -45,12 +45,11 @@ const SOCIALS = [
     ),
   },
   {
-    label: "Behance",
-    href: "https://behance.net",
+    label: "X (Twitter)",
+    href: "https://x.com",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
-        <path d="M3 7h6.2a2.6 2.6 0 010 5.2H3zM3 12.2h6.6a2.8 2.8 0 010 5.6H3z" />
-        <path d="M14.5 13.4c0-2.3 1.6-4 3.9-4s3.6 1.6 3.6 3.9v.5h-6.4c0 1.6 1 2.7 2.6 2.7 1.1 0 1.8-.4 2.3-1.1M15.5 7.6h4.6" />
+      <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+        <path d="M18.9 2H22l-7.6 8.7L23 22h-7l-5.5-6.6L4.1 22H1l8.1-9.3L1 2h7.2l5 6.1zm-1.2 18h1.7L7.4 4H5.6z" />
       </svg>
     ),
   },
@@ -64,9 +63,8 @@ export function Footer() {
           <div className="flex flex-col gap-5">
             <Logo />
             <p className="max-w-xs text-sm text-muted-on-dark">
-              A brand, packaging, and digital marketing studio in Surat,
-              India, building complete brand systems for restaurants and food
-              brands.
+              Managed IT support, cybersecurity, cloud, and custom software
+              for businesses and individuals — based in Surat, India.
             </p>
           </div>
 

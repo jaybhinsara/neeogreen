@@ -105,7 +105,7 @@ export function ServicePage({ content }: { content: ServiceContent }) {
                 href="/contact"
                 className="inline-flex items-center rounded-full accent-gradient px-8 py-4 text-sm font-medium uppercase tracking-[0.1em] text-bg-primary transition-opacity hover:opacity-90"
               >
-                Start a project
+                Get a free consultation
               </Link>
             </Reveal>
           </div>

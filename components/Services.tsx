@@ -55,7 +55,7 @@ export function Services() {
         <div className="grid gap-0 md:grid-cols-3">
           {SERVICES.map((s, i) => (
             <Reveal key={s.slug} delay={0.1 * i}>
-              <div className="flex h-full flex-col gap-6 border-b border-line-on-dark py-10 md:border-r md:py-14 md:pr-10 [&:nth-child(3n)]:md:border-r-0 [&:nth-child(n+4)]:md:border-b-0">
+              <div className="flex h-full flex-col gap-6 border-b border-line-on-dark py-10 md:py-14 md:pr-10 [&:nth-child(n+4)]:md:border-b-0">
                 <span className="font-display text-sm font-medium tracking-[-0.01em] accent-gradient-text">
                   {s.n}
                 </span>

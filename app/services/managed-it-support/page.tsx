@@ -29,7 +29,7 @@ const content = {
 export const metadata: Metadata = {
   title: content.title,
   description:
-    "Managed IT support for businesses and individuals — 24/7 monitoring, a help desk that answers, and proactive maintenance instead of a break-fix bill.",
+    "Managed IT support for businesses and individuals across Surat, Ahmedabad, Vadodara, Rajkot, and Gandhinagar — 24/7 monitoring, a help desk that answers, and proactive maintenance instead of a break-fix bill.",
   alternates: { canonical: "/services/managed-it-support" },
   openGraph: { url: `${SITE.url}/services/managed-it-support`, title: `${content.title} — ${SITE.name}` },
 };
@@ -39,7 +39,7 @@ const serviceJsonLd = {
   "@type": "Service",
   serviceType: "Managed IT Support",
   provider: { "@type": "ProfessionalService", name: SITE.name, url: SITE.url },
-  areaServed: "IN",
+  areaServed: SITE.serviceCities.map((city) => ({ "@type": "City", name: city })),
   description: metadata.description,
 };
 

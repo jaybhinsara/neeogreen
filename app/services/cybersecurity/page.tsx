@@ -29,7 +29,7 @@ const content = {
 export const metadata: Metadata = {
   title: content.title,
   description:
-    "Cybersecurity and data protection for businesses and individuals — endpoint protection, tested backups, and disaster recovery planning that actually works when you need it.",
+    "Cybersecurity and data protection for businesses and individuals across Surat, Ahmedabad, Vadodara, Rajkot, and Gandhinagar — endpoint protection, tested backups, and disaster recovery planning that actually works.",
   alternates: { canonical: "/services/cybersecurity" },
   openGraph: { url: `${SITE.url}/services/cybersecurity`, title: `${content.title} — ${SITE.name}` },
 };
@@ -39,7 +39,7 @@ const serviceJsonLd = {
   "@type": "Service",
   serviceType: "Cybersecurity Services",
   provider: { "@type": "ProfessionalService", name: SITE.name, url: SITE.url },
-  areaServed: "IN",
+  areaServed: SITE.serviceCities.map((city) => ({ "@type": "City", name: city })),
   description: metadata.description,
 };
 

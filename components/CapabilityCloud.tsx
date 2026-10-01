@@ -5,16 +5,16 @@ import { Reveal } from "./Reveal";
 import { cn } from "@/lib/cn";
 
 const WORDS: { text: string; big?: boolean }[] = [
+  { text: "Web Development", big: true },
+  { text: "Web Design" },
+  { text: "Software Engineering", big: true },
+  { text: "UI/UX Design" },
+  { text: "Custom Software" },
   { text: "Managed IT Support", big: true },
   { text: "Help Desk" },
+  { text: "Cybersecurity" },
   { text: "Cloud Migration", big: true },
-  { text: "Network Setup" },
-  { text: "Data Backup" },
-  { text: "Cybersecurity", big: true },
-  { text: "Endpoint Protection" },
-  { text: "IT Consulting" },
-  { text: "Software Development", big: true },
-  { text: "Disaster Recovery" },
+  { text: "Internal Tools" },
   { text: "System Integration" },
   { text: "24/7 Monitoring" },
 ];

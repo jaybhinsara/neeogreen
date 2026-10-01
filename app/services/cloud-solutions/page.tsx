@@ -29,7 +29,7 @@ const content = {
 export const metadata: Metadata = {
   title: content.title,
   description:
-    "Cloud migration and management for businesses — Microsoft 365, Google Workspace, AWS, and Azure, migrated carefully and then monitored and cost-optimized.",
+    "Cloud migration and management for businesses across Surat, Ahmedabad, Vadodara, Rajkot, and Gandhinagar — Microsoft 365, Google Workspace, AWS, and Azure, migrated and then monitored and cost-optimized.",
   alternates: { canonical: "/services/cloud-solutions" },
   openGraph: { url: `${SITE.url}/services/cloud-solutions`, title: `${content.title} — ${SITE.name}` },
 };
@@ -39,7 +39,7 @@ const serviceJsonLd = {
   "@type": "Service",
   serviceType: "Cloud Migration and Management",
   provider: { "@type": "ProfessionalService", name: SITE.name, url: SITE.url },
-  areaServed: "IN",
+  areaServed: SITE.serviceCities.map((city) => ({ "@type": "City", name: city })),
   description: metadata.description,
 };
 

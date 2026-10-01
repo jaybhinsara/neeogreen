@@ -6,6 +6,18 @@ import { CapabilityCloud } from "./CapabilityCloud";
 import { SERVICES } from "@/lib/site";
 
 const TAGS: Record<string, { glyph: "design" | "build" | "ship"; label: string }[]> = {
+  "web-development": [
+    { glyph: "build", label: "Websites" },
+    { glyph: "ship", label: "Web Apps" },
+  ],
+  "web-design": [
+    { glyph: "design", label: "UI/UX" },
+    { glyph: "design", label: "Prototyping" },
+  ],
+  "software-engineering": [
+    { glyph: "build", label: "Custom Software" },
+    { glyph: "build", label: "Internal Tools" },
+  ],
   "managed-it-support": [
     { glyph: "build", label: "Help Desk" },
     { glyph: "ship", label: "24/7 Monitoring" },
@@ -17,18 +29,6 @@ const TAGS: Record<string, { glyph: "design" | "build" | "ship"; label: string }
   "cloud-solutions": [
     { glyph: "design", label: "Migration" },
     { glyph: "build", label: "Cost Optimization" },
-  ],
-  "software-web-development": [
-    { glyph: "design", label: "Custom Apps" },
-    { glyph: "build", label: "Websites" },
-  ],
-  "networking-infrastructure": [
-    { glyph: "build", label: "Wi-Fi & Servers" },
-    { glyph: "design", label: "Structured Cabling" },
-  ],
-  "it-consulting": [
-    { glyph: "design", label: "Roadmaps" },
-    { glyph: "ship", label: "CRM/ERP" },
   ],
 };
 
@@ -43,7 +43,7 @@ export function Services() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="mt-4 max-w-3xl font-display text-[clamp(32px,5vw,64px)] font-semibold uppercase leading-[0.98] tracking-[-0.02em] text-ink-on-dark">
-            IT services, end to end
+            Web, software, and IT — end to end
             <span className="accent-gradient-text">.</span>
           </h2>
         </Reveal>

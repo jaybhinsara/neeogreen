@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 
-const PROJECT_TYPES = ["Managed IT support", "Cybersecurity", "Cloud & software", "Not sure yet"];
+const PROJECT_TYPES = ["Web development", "Web design", "Software engineering", "Managed IT & cloud", "Not sure yet"];
 
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");

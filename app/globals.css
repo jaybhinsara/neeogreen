@@ -12,6 +12,12 @@
   --color-accent-1: #34d399;
   --color-accent-2: #22d3ee;
 
+  /* Full-bleed color-block section backgrounds — paired with ink-on-dark/
+     muted-on-dark text (same tokens used on --color-bg-primary) so no new
+     text-color tokens are needed. */
+  --color-block-emerald: #0a4a35;
+  --color-block-cyan: #083344;
+
   --font-display: var(--font-clash-display), ui-sans-serif, sans-serif;
   --font-body: var(--font-inter), ui-sans-serif, sans-serif;
   --font-accent: var(--font-accent-serif), ui-serif, serif;

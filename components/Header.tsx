@@ -2,7 +2,8 @@
 
 import { useEffect, useState, type MouseEvent } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
+import { motion, AnimatePresence, useScroll } from "framer-motion";
 import { Logo } from "./Logo";
 import { cn } from "@/lib/cn";
 import { scrollToHash } from "@/lib/lenis-singleton";
@@ -23,21 +24,71 @@ function handleAnchorClick(e: MouseEvent<HTMLAnchorElement>, href: string) {
   if (scrollToHash(href.slice(hashIndex))) e.preventDefault();
 }
 
-function NavLink({ href, label }: { href: string; label: string }) {
+// Leaf silhouette: two opposite corners rounded, two nearly sharp.
+const LEAF_PILL = "rounded-[22px_6px_22px_6px]";
+const LEAF_BUTTON = "rounded-[12px_3px_12px_3px]";
+
+function NavLink({
+  href,
+  label,
+  index,
+  active,
+}: {
+  href: string;
+  label: string;
+  index: number;
+  active: boolean;
+}) {
   return (
     <a
       href={href}
       onClick={(e) => handleAnchorClick(e, href)}
-      className="text-sm opacity-80 transition-opacity hover:opacity-100"
+      aria-current={active ? "page" : undefined}
+      className="group relative flex items-baseline gap-1.5 py-1 text-sm"
     >
-      {label}
+      <span className="font-mono text-[10px] text-brand transition-colors group-hover:text-accent-1 in-data-pill:text-accent-1/80">
+        {String(index + 1).padStart(2, "0")}
+      </span>
+      <span className={cn("transition-opacity", active ? "opacity-100" : "opacity-75 group-hover:opacity-100")}>
+        {label}
+      </span>
+      <span
+        aria-hidden="true"
+        className={cn(
+          "absolute inset-x-0 -bottom-0.5 h-px origin-left bg-linear-to-r from-brand to-accent-1 transition-transform duration-500 ease-out",
+          active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+        )}
+      />
     </a>
+  );
+}
+
+function BookCallButton({ className, onClick }: { className?: string; onClick?: () => void }) {
+  return (
+    <Link
+      href="/contact"
+      onClick={onClick}
+      className={cn(
+        "label-mono inline-flex items-center gap-2.5 whitespace-nowrap bg-brand text-white transition-colors hover:bg-brand-deep",
+        LEAF_BUTTON,
+        className
+      )}
+    >
+      <span aria-hidden="true" className="relative flex h-1.5 w-1.5">
+        <span className="absolute inset-0 animate-ping rounded-full bg-accent-1 opacity-75 motion-reduce:animate-none" />
+        <span className="relative h-1.5 w-1.5 rounded-full bg-accent-1" />
+      </span>
+      Book a call
+    </Link>
   );
 }
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const { scrollYProgress } = useScroll();
+  const isActive = (href: string) => !href.includes("#") && pathname === href;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -55,21 +106,22 @@ export function Header() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-4 md:px-6">
-      {/* Desktop: a full-width split nav over the page at the top, which
-          collapses into a centered translucent pill once you scroll — the
-          pill stays legible over cream, the emerald block, and the black
-          block alike because it carries its own dark backdrop. */}
+      {/* Desktop: a full-width split nav at the top that collapses into a
+          leaf-shaped, forest-tinted glass bar once you scroll. It carries
+          its own dark backdrop so it reads over cream, emerald and black. */}
       <div
+        data-pill={scrolled || undefined}
         className={cn(
-          "mx-auto hidden grid-cols-[1fr_auto_1fr] items-center transition-[max-width,margin,padding,background-color,border-radius,color] duration-500 ease-out md:grid",
+          "relative mx-auto hidden grid-cols-[1fr_auto_1fr] items-center overflow-hidden transition-[max-width,margin,padding,background-color,box-shadow,color] duration-500 ease-out md:grid",
+          LEAF_PILL,
           scrolled
-            ? "mt-4 max-w-[920px] rounded-xl bg-ink/55 px-6 py-3.5 text-white backdrop-blur-xl"
+            ? "mt-4 max-w-[920px] bg-[#06140e]/75 px-6 py-3.5 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_0_1px_rgba(52,211,153,0.14),0_18px_40px_-18px_rgba(5,7,6,0.6)] backdrop-blur-xl"
             : "mt-0 max-w-[1440px] px-10 py-7 text-ink"
         )}
       >
         <nav className="flex items-center gap-8">
-          {LEFT_LINKS.map((link) => (
-            <NavLink key={link.href} {...link} />
+          {LEFT_LINKS.map((link, i) => (
+            <NavLink key={link.href} {...link} index={i} active={isActive(link.href)} />
           ))}
         </nav>
 
@@ -78,16 +130,26 @@ export function Header() {
         </Link>
 
         <nav className="flex items-center justify-end gap-8">
-          {RIGHT_LINKS.map((link) => (
-            <NavLink key={link.href} {...link} />
+          {RIGHT_LINKS.map((link, i) => (
+            <NavLink
+              key={link.href}
+              {...link}
+              index={LEFT_LINKS.length + i}
+              active={isActive(link.href)}
+            />
           ))}
-          <Link
-            href="/contact"
-            className="label-mono whitespace-nowrap rounded-md bg-brand px-4 py-2.5 text-white transition-colors hover:bg-brand-deep"
-          >
-            Book a call
-          </Link>
+          <BookCallButton className="px-4 py-2.5" />
         </nav>
+
+        {/* Growth vein: tracks how far down the page you are. */}
+        <motion.span
+          aria-hidden="true"
+          style={{ scaleX: scrollYProgress }}
+          className={cn(
+            "pointer-events-none absolute inset-x-0 bottom-0 h-px origin-left bg-linear-to-r from-brand via-accent-1 to-accent-2 transition-opacity duration-500",
+            scrolled ? "opacity-100" : "opacity-0"
+          )}
+        />
       </div>
 
       {/* Mobile */}
@@ -145,19 +207,16 @@ export function Header() {
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 0.05 * i }}
-                  className="border-b border-line py-5 font-heading text-4xl font-medium tracking-[-0.03em] text-ink"
+                  className="flex items-baseline gap-3 border-b border-line py-5 font-heading text-4xl font-medium tracking-[-0.03em] text-ink"
                 >
+                  <span className="font-mono text-xs tracking-normal text-brand">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
                   {link.label}
                 </motion.a>
               ))}
             </nav>
-            <Link
-              href="/contact"
-              onClick={() => setMenuOpen(false)}
-              className="label-mono inline-flex items-center justify-center rounded-md bg-brand px-5 py-4 text-white"
-            >
-              Book a call
-            </Link>
+            <BookCallButton onClick={() => setMenuOpen(false)} className="justify-center px-5 py-4" />
           </motion.div>
         )}
       </AnimatePresence>

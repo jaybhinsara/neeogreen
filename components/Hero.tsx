@@ -76,7 +76,7 @@ export function Hero({ ready }: { ready: boolean }) {
       )}
 
       <Container className="relative z-10 flex flex-col gap-8 md:gap-10">
-        <h1 className="font-display text-[clamp(30px,6.4vw,104px)] font-semibold uppercase leading-[0.96] tracking-[-0.03em] text-ink-on-dark [overflow-wrap:anywhere]">
+        <h1 className="font-display text-[clamp(26px,5vw,80px)] font-semibold uppercase leading-[0.96] tracking-[-0.03em] text-ink-on-dark [overflow-wrap:anywhere]">
           {["Technology that works.", "Support that answers.", "No downtime."].map((line, i) => (
             <span key={line} className="block overflow-hidden">
               <motion.span

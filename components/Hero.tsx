@@ -84,7 +84,7 @@ export function Hero({ ready }: { ready: boolean }) {
               transition={{ duration: 0.6, delay: 0.5 }}
               className="label-mono text-muted"
             >
-              Surat &middot; Ahmedabad &middot; Vadodara &middot; Rajkot &middot; Gandhinagar
+              Design &middot; Engineering &middot; Software &mdash; Worldwide
             </motion.p>
           </div>
         </motion.div>

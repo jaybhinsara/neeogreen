@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { clashDisplay, inter, jetbrainsMono } from "./fonts";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { CustomCursor } from "@/components/CustomCursor";
+import { ScrollThumb } from "@/components/ScrollThumb";
 import { SITE } from "@/lib/site";
 import "./globals.css";
 
@@ -88,6 +89,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
         <SmoothScroll />
         <CustomCursor />
+        <ScrollThumb />
         {children}
       </body>
     </html>

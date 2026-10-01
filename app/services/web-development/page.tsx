@@ -21,9 +21,9 @@ const content = {
     { title: "Implement", desc: "Built in stages you can see and test, not a black box until launch day." },
     { title: "Support", desc: "Bug fixes, updates, and hosting support after launch." },
   ],
-  whyTitle: "Why work with a local development team",
+  whyTitle: "Why work with one accountable team",
   whyBody:
-    "A freelancer disappears after the invoice clears, and an overseas agency is asleep when something breaks. We're based in Surat, working with businesses across Gujarat — reachable, accountable, and still here next year.",
+    "A freelancer disappears after the invoice clears, and a big agency hands you to a junior after the pitch. We're one studio that designs, builds, and supports what we ship — reachable in your working hours, and still here next year.",
 };
 
 export const metadata: Metadata = {

@@ -33,7 +33,7 @@ export default async function OpengraphImage() {
             display: "flex",
           }}
         >
-          Web Development · Web Design · Software Engineering — Surat, Gujarat
+          Web Development · Web Design · Software Engineering
         </div>
         <div
           style={{
@@ -59,7 +59,7 @@ export default async function OpengraphImage() {
             display: "flex",
           }}
         >
-          Web development, web design, and software engineering — plus managed IT, cloud, and cybersecurity — for businesses across Surat, Ahmedabad, Vadodara, Rajkot, and Gandhinagar.
+          A design and engineering studio building websites, software, and the IT behind them — for businesses everywhere.
         </div>
       </div>
     ),

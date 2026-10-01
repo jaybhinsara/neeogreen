@@ -11,11 +11,9 @@ import { scrollToHash } from "@/lib/lenis-singleton";
 const LEFT_LINKS = [
   { href: "/#services", label: "Services" },
   { href: "/about", label: "About" },
-];
-const RIGHT_LINKS = [
   { href: "/approach", label: "Approach" },
-  { href: "/contact", label: "Contact" },
 ];
+const RIGHT_LINKS = [{ href: "/contact", label: "Contact" }];
 const ALL_LINKS = [...LEFT_LINKS, ...RIGHT_LINKS];
 
 function handleAnchorClick(e: MouseEvent<HTMLAnchorElement>, href: string) {
@@ -28,27 +26,14 @@ function handleAnchorClick(e: MouseEvent<HTMLAnchorElement>, href: string) {
 const LEAF_PILL = "rounded-[22px_6px_22px_6px]";
 const LEAF_BUTTON = "rounded-[12px_3px_12px_3px]";
 
-function NavLink({
-  href,
-  label,
-  index,
-  active,
-}: {
-  href: string;
-  label: string;
-  index: number;
-  active: boolean;
-}) {
+function NavLink({ href, label, active }: { href: string; label: string; active: boolean }) {
   return (
     <a
       href={href}
       onClick={(e) => handleAnchorClick(e, href)}
       aria-current={active ? "page" : undefined}
-      className="group relative flex items-baseline gap-1.5 py-1 text-sm"
+      className="group relative py-1 text-sm"
     >
-      <span className="font-mono text-[10px] text-brand transition-colors group-hover:text-accent-1 in-data-pill:text-accent-1/80">
-        {String(index + 1).padStart(2, "0")}
-      </span>
       <span className={cn("transition-opacity", active ? "opacity-100" : "opacity-75 group-hover:opacity-100")}>
         {label}
       </span>
@@ -110,7 +95,6 @@ export function Header() {
           leaf-shaped, forest-tinted glass bar once you scroll. It carries
           its own dark backdrop so it reads over cream, emerald and black. */}
       <div
-        data-pill={scrolled || undefined}
         className={cn(
           "relative mx-auto hidden grid-cols-[1fr_auto_1fr] items-center overflow-hidden transition-[max-width,margin,padding,background-color,box-shadow,color] duration-500 ease-out md:grid",
           LEAF_PILL,
@@ -120,8 +104,8 @@ export function Header() {
         )}
       >
         <nav className="flex items-center gap-8">
-          {LEFT_LINKS.map((link, i) => (
-            <NavLink key={link.href} {...link} index={i} active={isActive(link.href)} />
+          {LEFT_LINKS.map((link) => (
+            <NavLink key={link.href} {...link} active={isActive(link.href)} />
           ))}
         </nav>
 
@@ -130,13 +114,8 @@ export function Header() {
         </Link>
 
         <nav className="flex items-center justify-end gap-8">
-          {RIGHT_LINKS.map((link, i) => (
-            <NavLink
-              key={link.href}
-              {...link}
-              index={LEFT_LINKS.length + i}
-              active={isActive(link.href)}
-            />
+          {RIGHT_LINKS.map((link) => (
+            <NavLink key={link.href} {...link} active={isActive(link.href)} />
           ))}
           <BookCallButton className="px-4 py-2.5" />
         </nav>
@@ -207,11 +186,8 @@ export function Header() {
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 0.05 * i }}
-                  className="flex items-baseline gap-3 border-b border-line py-5 font-heading text-4xl font-medium tracking-[-0.03em] text-ink"
+                  className="border-b border-line py-5 font-heading text-4xl font-medium tracking-[-0.03em] text-ink"
                 >
-                  <span className="font-mono text-xs tracking-normal text-brand">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
                   {link.label}
                 </motion.a>
               ))}

@@ -52,10 +52,9 @@ export default function AboutPage() {
             <Reveal delay={0.1}>
               <p className="mt-12 max-w-[50ch] text-lg leading-relaxed text-muted md:text-xl">
                 NeeoGreen is a web development, web design, and software
-                engineering team based in Surat, Gujarat. We work with
-                businesses and individuals across Surat, Ahmedabad, Vadodara,
-                Rajkot, and Gandhinagar who&rsquo;d rather have one team own
-                their technology than juggle a different vendor for every
+                engineering studio headquartered in Surat, India, working with
+                businesses in any time zone who&rsquo;d rather have one team
+                own their technology than juggle a different vendor for every
                 problem.
               </p>
             </Reveal>

@@ -14,17 +14,24 @@ export const metadata: Metadata = {
   },
   description: SITE.description,
   keywords: [
-    "managed IT services",
-    "IT support Surat",
-    "cybersecurity services India",
+    "web development Surat",
+    "web design Surat",
+    "software engineering Gujarat",
+    "web development company Ahmedabad",
+    "web design studio Vadodara",
+    "software development company Rajkot",
+    "website development Gandhinagar",
+    "managed IT services Gujarat",
+    "cybersecurity services Surat",
     "cloud migration services",
-    "custom software development India",
-    "IT consulting India",
-    "network setup services",
   ],
   authors: [{ name: SITE.name }],
   alternates: { canonical: "/" },
   icons: { icon: "/logo/favicon-source.svg" },
+  other: {
+    "geo.region": "IN-GJ",
+    "geo.placename": SITE.serviceCities.join(", "),
+  },
   openGraph: {
     type: "website",
     url: SITE.url,
@@ -56,15 +63,15 @@ const organizationJsonLd = {
     addressRegion: SITE.region,
     addressCountry: SITE.country,
   },
-  areaServed: "IN",
+  areaServed: SITE.serviceCities.map((city) => ({ "@type": "City", name: city })),
   sameAs: Object.values(SITE.social),
   makesOffer: [
+    { "@type": "Offer", itemOffered: { "@type": "Service", name: "Web Development" } },
+    { "@type": "Offer", itemOffered: { "@type": "Service", name: "Web Design" } },
+    { "@type": "Offer", itemOffered: { "@type": "Service", name: "Software Engineering" } },
     { "@type": "Offer", itemOffered: { "@type": "Service", name: "Managed IT Support" } },
     { "@type": "Offer", itemOffered: { "@type": "Service", name: "Cybersecurity & Data Protection" } },
     { "@type": "Offer", itemOffered: { "@type": "Service", name: "Cloud Solutions" } },
-    { "@type": "Offer", itemOffered: { "@type": "Service", name: "Custom Software & Web Development" } },
-    { "@type": "Offer", itemOffered: { "@type": "Service", name: "Networking & Infrastructure" } },
-    { "@type": "Offer", itemOffered: { "@type": "Service", name: "IT Consulting & Digital Transformation" } },
   ],
 };
 
@@ -75,13 +82,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${clashDisplay.variable} ${inter.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-bg-primary text-ink-on-dark">
-        {/* React hoists this into <head>. The Hero's leaf mark is the LCP
-            element on first paint (before hydration swaps in the WebGL
-            canvas). This SVG is also referenced by other <img> tags without
-            fetchPriority, and Next's own auto-generated preload for it
-            doesn't inherit "high" from any single instance — so declare it
-            explicitly here rather than depending on that. */}
-        <link rel="preload" as="image" href="/logo/icon.svg" fetchPriority="high" />
         <script
           type="application/ld+json"
           // eslint-disable-next-line react/no-danger -- static, non-user-controlled structured data

@@ -34,7 +34,7 @@ export default async function OpengraphImage() {
             display: "flex",
           }}
         >
-          Managed IT · Cybersecurity · Cloud — Surat, India
+          Web Development · Web Design · Software Engineering — Surat, Gujarat
         </div>
         <div
           style={{
@@ -60,7 +60,7 @@ export default async function OpengraphImage() {
             display: "flex",
           }}
         >
-          Managed IT support, cybersecurity, cloud, and custom software for businesses and individuals who just want their technology to work.
+          Web development, web design, and software engineering — plus managed IT, cloud, and cybersecurity — for businesses across Surat, Ahmedabad, Vadodara, Rajkot, and Gandhinagar.
         </div>
       </div>
     ),

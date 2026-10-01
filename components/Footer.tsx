@@ -63,8 +63,9 @@ export function Footer() {
           <div className="flex flex-col gap-5">
             <Logo />
             <p className="max-w-xs text-sm text-muted-on-dark">
-              Managed IT support, cybersecurity, cloud, and custom software
-              for businesses and individuals — based in Surat, India.
+              Web development, web design, and software engineering for
+              businesses across Surat, Ahmedabad, Vadodara, Rajkot, and
+              Gandhinagar — plus managed IT and cloud support.
             </p>
           </div>
 

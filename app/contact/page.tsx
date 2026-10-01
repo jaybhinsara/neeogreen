@@ -8,7 +8,7 @@ import { SITE } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Get a free consultation with NeeoGreen — managed IT support, cybersecurity, cloud, and custom software. Based in Surat, India, working with businesses and individuals everywhere.",
+    "Get a free consultation with NeeoGreen — web development, web design, and software engineering, plus managed IT and cloud support. Serving Surat, Ahmedabad, Vadodara, Rajkot, and Gandhinagar.",
   alternates: { canonical: "/contact" },
   openGraph: { url: `${SITE.url}/contact`, title: `Contact — ${SITE.name}` },
 };

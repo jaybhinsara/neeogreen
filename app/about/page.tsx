@@ -9,7 +9,7 @@ import { SITE } from "@/lib/site";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "NeeoGreen is a managed IT services team based in Surat, India — one team for managed support, cybersecurity, cloud, and custom software, not vendors handed off in sequence.",
+    "NeeoGreen is a web development, web design, and software engineering team based in Surat, Gujarat — serving Surat, Ahmedabad, Vadodara, Rajkot, and Gandhinagar, plus managed IT and cloud support.",
   alternates: { canonical: "/about" },
   openGraph: { url: `${SITE.url}/about`, title: `About — ${SITE.name}` },
 };
@@ -70,10 +70,12 @@ export default function AboutPage() {
           </Reveal>
           <Reveal delay={0.1}>
             <p className="mt-8 max-w-2xl text-lg text-muted-on-dark md:text-xl">
-              NeeoGreen is a managed IT services team based in Surat, India.
-              We work with businesses and individuals who&rsquo;d rather have
-              one team own their technology than juggle a different vendor
-              for every problem.
+              NeeoGreen is a web development, web design, and software
+              engineering team based in Surat, Gujarat. We work with
+              businesses and individuals across Surat, Ahmedabad, Vadodara,
+              Rajkot, and Gandhinagar who&rsquo;d rather have one team own
+              their technology than juggle a different vendor for every
+              problem.
             </p>
           </Reveal>
 

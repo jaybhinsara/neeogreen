@@ -3,12 +3,12 @@ import { Reveal } from "./Reveal";
 
 export function Statement() {
   return (
-    <section className="border-y border-line-on-dark py-16 md:py-24">
+    <section className="bg-block-emerald py-20 md:py-32">
       <Container>
         <Reveal>
-          <p className="text-center font-display text-[clamp(22px,3.4vw,40px)] font-semibold uppercase leading-[1.15] tracking-[-0.01em] text-ink-on-dark">
-            Support, security, and strategy —{" "}
-            <span className="accent-gradient-text">one team, not three vendors.</span>
+          <p className="text-center font-display text-[clamp(24px,4vw,52px)] font-semibold uppercase leading-[1.12] tracking-[-0.01em] text-ink-on-dark">
+            Web, software, and IT —{" "}
+            <span className="text-accent-2">one team, not three vendors.</span>
           </p>
         </Reveal>
       </Container>

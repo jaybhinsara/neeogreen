@@ -3,8 +3,23 @@ import { Reveal } from "./Reveal";
 
 export function Manifesto() {
   return (
-    <section className="border-y border-line-on-dark py-24 md:py-40">
-      <Container>
+    <section className="relative overflow-hidden border-y border-line-on-dark py-24 md:py-40">
+      <video
+        aria-hidden="true"
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover opacity-60"
+      >
+        <source src="/video/hero-leaf.mp4" type="video/mp4" />
+      </video>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 bg-bg-primary/50"
+      />
+
+      <Container className="relative z-10">
         <Reveal>
           <span className="font-accent text-2xl italic text-muted-on-dark md:text-3xl">
             Our philosophy

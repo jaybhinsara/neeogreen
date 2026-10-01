@@ -44,7 +44,7 @@ export function Loader({ onDone }: { onDone: () => void }) {
     <AnimatePresence onExitComplete={onDone}>
       {!exiting && (
         <motion.div
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-bg-primary"
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-page"
           exit={{ opacity: 0 }}
           transition={{ duration: 0.6, ease: "easeInOut" }}
         >
@@ -52,19 +52,19 @@ export function Loader({ onDone }: { onDone: () => void }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="font-display text-2xl font-semibold uppercase tracking-[-0.02em] text-ink-on-dark md:text-3xl"
+            className="font-display text-2xl font-semibold uppercase tracking-[-0.02em] text-ink md:text-3xl"
           >
             NeeoGreen
           </motion.span>
 
-          <div className="mt-7 h-px w-40 overflow-hidden bg-line-on-dark md:w-56">
-            <div className="h-full accent-gradient" style={{ width: `${progress}%` }} />
+          <div className="mt-7 h-px w-40 overflow-hidden bg-line md:w-56">
+            <div className="h-full bg-brand" style={{ width: `${progress}%` }} />
           </div>
 
-          <span className="fixed bottom-8 left-6 font-mono text-[11px] uppercase tracking-[0.12em] text-muted-on-dark md:left-16">
+          <span className="fixed bottom-8 left-6 font-mono text-[11px] uppercase tracking-[0.12em] text-muted md:left-16">
             Loading&hellip;
           </span>
-          <span className="fixed bottom-8 right-6 font-mono text-[11px] tabular-nums text-muted-on-dark md:right-16">
+          <span className="fixed bottom-8 right-6 font-mono text-[11px] tabular-nums text-muted md:right-16">
             {progress}%
           </span>
         </motion.div>

@@ -3,9 +3,8 @@
 import Link from "next/link";
 import type { MouseEvent } from "react";
 import { Container } from "./Container";
-import { Logo } from "./Logo";
 import { scrollToHash } from "@/lib/lenis-singleton";
-import { SERVICES } from "@/lib/site";
+import { SERVICES, SITE } from "@/lib/site";
 
 function handleAnchorClick(e: MouseEvent<HTMLAnchorElement>, href: string) {
   const hashIndex = href.indexOf("#");
@@ -13,134 +12,90 @@ function handleAnchorClick(e: MouseEvent<HTMLAnchorElement>, href: string) {
   if (scrollToHash(href.slice(hashIndex))) e.preventDefault();
 }
 
-const SITEMAP = [
-  ...SERVICES.map((s) => ({ href: `/services/${s.slug}`, label: s.title })),
+const PAGES = [
   { href: "/about", label: "About" },
   { href: "/approach", label: "Approach" },
-  { href: "/contact", label: "Contact" },
+  { href: "/contact", label: "Get in touch" },
 ];
 
 const SOCIALS = [
-  {
-    label: "Instagram",
-    href: "https://instagram.com",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
-        <rect x="3" y="3" width="18" height="18" rx="5" />
-        <circle cx="12" cy="12" r="4" />
-        <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
-      </svg>
-    ),
-  },
-  {
-    label: "LinkedIn",
-    href: "https://linkedin.com",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
-        <rect x="3" y="3" width="18" height="18" rx="3" />
-        <line x1="7.5" y1="10" x2="7.5" y2="16.5" />
-        <circle cx="7.5" cy="7" r="0.9" fill="currentColor" stroke="none" />
-        <path d="M11.5 16.5V10M11.5 12.5c0-1.4 1-2.5 2.5-2.5s2.5 1.1 2.5 2.5v4" />
-      </svg>
-    ),
-  },
-  {
-    label: "X (Twitter)",
-    href: "https://x.com",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-        <path d="M18.9 2H22l-7.6 8.7L23 22h-7l-5.5-6.6L4.1 22H1l8.1-9.3L1 2h7.2l5 6.1zm-1.2 18h1.7L7.4 4H5.6z" />
-      </svg>
-    ),
-  },
+  { href: SITE.social.instagram, label: "Instagram" },
+  { href: SITE.social.linkedin, label: "LinkedIn" },
+  { href: SITE.social.twitter, label: "X (Twitter)" },
 ];
 
 export function Footer() {
+  const otherCities = SITE.serviceCities.filter((c) => c !== SITE.locality);
+
   return (
-    <footer className="border-t border-line-on-dark pb-8 pt-20 md:pt-28">
-      <Container>
-        <div className="grid gap-14 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
-          <div className="flex flex-col gap-5">
-            <Logo />
-            <p className="max-w-xs text-sm text-muted-on-dark">
-              Web development, web design, and software engineering for
-              businesses across Surat, Ahmedabad, Vadodara, Rajkot, and
-              Gandhinagar — plus managed IT and cloud support.
-            </p>
+    <footer className="relative overflow-hidden bg-brand text-white">
+      <Container className="relative z-10 pb-10 pt-24 md:pt-32">
+        <div className="grid gap-16 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
+          <div className="flex flex-col items-start gap-8">
+            <h2 className="max-w-[12ch] font-heading text-[clamp(36px,4vw,64px)] font-medium leading-[1.02] tracking-[-0.04em]">
+              Let&rsquo;s build what&rsquo;s next.
+            </h2>
+            <Link
+              href="/contact"
+              className="label-mono rounded-md bg-white px-6 py-4 text-brand transition-colors hover:bg-white/90"
+            >
+              Contact us
+            </Link>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <span className="text-xs uppercase tracking-[0.14em] text-muted-on-dark">
-              Sitemap
-            </span>
-            <ul className="flex flex-col gap-3">
-              {SITEMAP.map((item) => (
-                <li key={item.href}>
-                  <a
-                    href={item.href}
-                    onClick={(e) => handleAnchorClick(e, item.href)}
-                    className="text-sm text-ink-on-dark transition-colors hover:accent-gradient-text"
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <nav className="flex flex-col gap-3">
+            <span className="label-mono mb-2 text-white/60">Services</span>
+            {SERVICES.map((s) => (
+              <Link key={s.slug} href={`/services/${s.slug}`} className="text-[15px] hover:underline">
+                {s.title}
+              </Link>
+            ))}
+          </nav>
 
-          <div className="flex flex-col gap-4">
-            <span className="text-xs uppercase tracking-[0.14em] text-muted-on-dark">
-              Contact
-            </span>
-            <ul className="flex flex-col gap-3 text-sm text-ink-on-dark">
-              <li>
-                <a href="mailto:hello@neeogreen.com" className="hover:accent-gradient-text">
-                  hello@neeogreen.com
-                </a>
-              </li>
-              <li>
-                <a href="tel:+917567936593" className="hover:accent-gradient-text">
-                  +91 75679 36593
-                </a>
-              </li>
-              <li className="text-muted-on-dark">Surat, Gujarat, India</li>
-            </ul>
-          </div>
+          <nav className="flex flex-col gap-3">
+            <span className="label-mono mb-2 text-white/60">Studio</span>
+            {PAGES.map((p) => (
+              <Link key={p.href} href={p.href} className="text-[15px] hover:underline">
+                {p.label}
+              </Link>
+            ))}
+            {SOCIALS.map((s) => (
+              <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="text-[15px] hover:underline">
+                {s.label}
+              </a>
+            ))}
+          </nav>
 
-          <div className="flex flex-col gap-4">
-            <span className="text-xs uppercase tracking-[0.14em] text-muted-on-dark">
-              Social
+          <address className="flex flex-col gap-3 not-italic">
+            <span className="label-mono mb-2 text-white/60">
+              {SITE.locality}, {SITE.region}
             </span>
-            <ul className="flex flex-col gap-3">
-              {SOCIALS.map((s) => (
-                <li key={s.label}>
-                  <a
-                    href={s.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2.5 text-sm text-ink-on-dark transition-colors hover:accent-gradient-text"
-                  >
-                    {s.icon}
-                    {s.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+            <a href={`mailto:${SITE.email}`} className="text-[15px] hover:underline">
+              {SITE.email}
+            </a>
+            <a href={`tel:${SITE.phone.replace(/\s/g, "")}`} className="text-[15px] hover:underline">
+              {SITE.phone}
+            </a>
+            <span className="mt-3 text-[15px] text-white/70">
+              Also serving {otherCities.join(", ")}.
+            </span>
+          </address>
         </div>
 
-        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-line-on-dark pt-8 text-xs text-muted-on-dark md:flex-row">
-          <span>&copy; NeeoGreen {new Date().getFullYear()}</span>
-          <Link
-            href="/#top"
-            onClick={(e) => handleAnchorClick(e, "/#top")}
-            className="inline-flex items-center gap-2 uppercase tracking-[0.1em] transition-colors hover:text-ink-on-dark"
-          >
-            Back to top
-            <span aria-hidden="true">&uarr;</span>
+        <div className="mt-20 flex items-center justify-between border-t border-white/20 pt-6 text-white/70">
+          <span className="label-mono">&copy; {SITE.name} {new Date().getFullYear()}</span>
+          <Link href="/#top" onClick={(e) => handleAnchorClick(e, "/#top")} className="label-mono hover:text-white">
+            Back to top &uarr;
           </Link>
         </div>
       </Container>
+
+      <div
+        aria-hidden="true"
+        className="pointer-events-none -mb-[3.5vw] select-none whitespace-nowrap text-center font-display text-[15.5vw] font-semibold uppercase leading-[0.8] tracking-[-0.04em] text-white/15"
+      >
+        NeeoGreen
+      </div>
     </footer>
   );
 }

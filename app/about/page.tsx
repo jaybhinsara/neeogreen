@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Container } from "@/components/Container";
 import { Reveal } from "@/components/Reveal";
+import { Process } from "@/components/Process";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -14,28 +14,11 @@ export const metadata: Metadata = {
   openGraph: { url: `${SITE.url}/about`, title: `About — ${SITE.name}` },
 };
 
-const PROCESS = [
-  {
-    n: "01",
-    title: "Assess",
-    desc: "A real audit of your systems, network, and risk — before we recommend a single fix.",
-  },
-  {
-    n: "02",
-    title: "Plan",
-    desc: "A prioritized roadmap matched to your budget and growth plan, not a generic checklist.",
-  },
-  {
-    n: "03",
-    title: "Implement",
-    desc: "Migrations, setup, and rollouts scheduled around your business hours, not ours.",
-  },
-  {
-    n: "04",
-    title: "Support",
-    desc: "Ongoing monitoring and a help desk that answers, so problems get caught before they cost you.",
-  },
-] as const;
+const COMMITMENTS = [
+  { value: "< 1hr", label: "Typical support response time" },
+  { value: "Fixed", label: "Price agreed before work starts" },
+  { value: "1 team", label: "Design, build, and support" },
+];
 
 const pageJsonLd = {
   "@context": "https://schema.org",
@@ -55,84 +38,60 @@ export default function AboutPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(pageJsonLd) }}
       />
       <Header />
-      <main className="pb-24 pt-40 md:pb-40 md:pt-48">
-        <Container>
-          <Reveal>
-            <span className="font-accent text-2xl italic text-muted-on-dark md:text-3xl">
-              Who we are
-            </span>
-          </Reveal>
-          <Reveal delay={0.05}>
-            <h1 className="mt-4 max-w-3xl font-display text-[clamp(36px,7vw,96px)] font-semibold uppercase leading-[0.96] tracking-[-0.02em] text-ink-on-dark">
-              A team, not a stack of vendors
-              <span className="accent-gradient-text">.</span>
-            </h1>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <p className="mt-8 max-w-2xl text-lg text-muted-on-dark md:text-xl">
-              NeeoGreen is a web development, web design, and software
-              engineering team based in Surat, Gujarat. We work with
-              businesses and individuals across Surat, Ahmedabad, Vadodara,
-              Rajkot, and Gandhinagar who&rsquo;d rather have one team own
-              their technology than juggle a different vendor for every
-              problem.
-            </p>
-          </Reveal>
-
-          <div className="mt-20 border-t border-line-on-dark pt-16">
+      <main>
+        <section className="bg-page pb-24 pt-40 md:pb-32 md:pt-52">
+          <Container>
             <Reveal>
-              <p className="max-w-4xl font-display text-[clamp(24px,3.6vw,44px)] font-medium leading-[1.2] tracking-[-0.01em] text-ink-on-dark">
-                Downtime, a breach, and a system that can&rsquo;t scale
-                aren&rsquo;t three separate problems.{" "}
-                <span className="accent-gradient-text">
-                  One team should own all three — not three vendors
-                  who&rsquo;ve never spoken.
-                </span>
+              <span className="label-mono text-brand">About us</span>
+            </Reveal>
+            <Reveal delay={0.05}>
+              <h1 className="mt-6 max-w-[14ch] font-heading text-[clamp(44px,7vw,112px)] font-medium leading-[0.98] tracking-[-0.045em]">
+                A team, not a stack of vendors.
+              </h1>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <p className="mt-12 max-w-[50ch] text-lg leading-relaxed text-muted md:text-xl">
+                NeeoGreen is a web development, web design, and software
+                engineering team based in Surat, Gujarat. We work with
+                businesses and individuals across Surat, Ahmedabad, Vadodara,
+                Rajkot, and Gandhinagar who&rsquo;d rather have one team own
+                their technology than juggle a different vendor for every
+                problem.
               </p>
             </Reveal>
-          </div>
+          </Container>
+        </section>
 
-          <div className="mt-20 border-t border-line-on-dark pt-16">
-            <Reveal>
-              <span className="font-accent text-2xl italic text-muted-on-dark md:text-3xl">
-                How we work
-              </span>
-            </Reveal>
-            <div className="mt-10 grid gap-10 md:grid-cols-4 md:gap-8">
-              {PROCESS.map((step, i) => (
-                <Reveal key={step.n} delay={0.08 * i}>
-                  <div className="flex flex-col gap-3">
-                    <span className="font-display text-sm font-medium tracking-[-0.01em] accent-gradient-text">
-                      {step.n}
-                    </span>
-                    <h3 className="font-display text-lg font-semibold uppercase tracking-[-0.01em] text-ink-on-dark">
-                      {step.title}
-                    </h3>
-                    <p className="text-sm leading-relaxed text-muted-on-dark">
-                      {step.desc}
-                    </p>
+        <section className="bg-brand py-28 text-white md:py-40">
+          <Container className="grid gap-16 md:grid-cols-2 md:gap-20">
+            <div>
+              <Reveal>
+                <span className="label-mono text-white/70">Our philosophy</span>
+              </Reveal>
+              <Reveal delay={0.05}>
+                <p className="mt-8 max-w-[30ch] font-heading text-[clamp(26px,2.6vw,40px)] font-medium leading-[1.2] tracking-[-0.03em]">
+                  Technology should make running your business simpler, not
+                  more complicated. So we build fast, clear, maintainable
+                  products, and stay around to keep them that way.
+                </p>
+              </Reveal>
+            </div>
+            <dl className="md:pt-24">
+              {COMMITMENTS.map((c, i) => (
+                <Reveal key={c.value} delay={0.06 * i}>
+                  <div className="flex items-baseline justify-between gap-6 border-t border-white/25 py-6">
+                    <dt className="font-heading text-[clamp(44px,5vw,80px)] font-medium leading-none tracking-[-0.045em]">
+                      {c.value}
+                    </dt>
+                    <dd className="max-w-[18ch] text-right text-[15px] text-white/80">{c.label}</dd>
                   </div>
                 </Reveal>
               ))}
-            </div>
-          </div>
+            </dl>
+          </Container>
+        </section>
 
-          <div className="mt-20 flex flex-col items-start gap-8 border-t border-line-on-dark pt-16 md:flex-row md:items-center md:justify-between">
-            <Reveal>
-              <h2 className="max-w-lg font-display text-[clamp(26px,3.6vw,44px)] font-semibold uppercase leading-[1.05] tracking-[-0.01em] text-ink-on-dark">
-                See how an engagement actually runs
-              </h2>
-            </Reveal>
-            <Reveal delay={0.05}>
-              <Link
-                href="/approach"
-                className="inline-flex items-center rounded-full accent-gradient px-8 py-4 text-sm font-medium uppercase tracking-[0.1em] text-bg-primary transition-opacity hover:opacity-90"
-              >
-                Our approach
-              </Link>
-            </Reveal>
-          </div>
-        </Container>
+        <Process />
       </main>
       <Footer />
     </>

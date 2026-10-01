@@ -1,101 +1,94 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
-import { motion } from "framer-motion";
-import { Container } from "./Container";
+import { motion, useReducedMotion, useScroll, useTransform, type MotionStyle } from "framer-motion";
+
+// Frame insets (as % of the viewport) before the zoom starts. The frame
+// sits centered with room below for the headline, and opens to full-bleed
+// as you scroll through the pinned section.
+const FRAME_INSETS =
+  "[--frame-t:13%] [--frame-x:5%] [--frame-b:32%] md:[--frame-t:12%] md:[--frame-x:19%] md:[--frame-b:25%]";
 
 export function Hero({ ready }: { ready: boolean }) {
   const sectionRef = useRef<HTMLElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
 
-  function handleMouseMove(e: React.MouseEvent<HTMLElement>) {
-    if (!glowRef.current || !sectionRef.current) return;
-    const rect = sectionRef.current.getBoundingClientRect();
-    glowRef.current.style.setProperty("--x", `${e.clientX - rect.left}px`);
-    glowRef.current.style.setProperty("--y", `${e.clientY - rect.top}px`);
-    glowRef.current.style.opacity = "1";
-  }
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+  const progress = useTransform(scrollYProgress, [0, 0.8], [0, reduced ? 0 : 1]);
+  const mediaScale = useTransform(scrollYProgress, [0, 0.8], [1, reduced ? 1 : 1.3]);
+  // A function mapping, not a range: Framer Motion hands range-mapped
+  // scroll opacity to a native ScrollTimeline, which measured against the
+  // whole page instead of this pinned section and left the headline
+  // visible over the fully zoomed media.
+  const headlineOpacity = useTransform(scrollYProgress, (v) => 1 - Math.min(v / 0.18, 1));
+  const headlineY = useTransform(scrollYProgress, [0, 0.18], [0, -32]);
+
+  const frameStyle = {
+    "--p": progress,
+    clipPath:
+      "inset(calc(var(--frame-t) * (1 - var(--p))) calc(var(--frame-x) * (1 - var(--p))) calc(var(--frame-b) * (1 - var(--p))) calc(var(--frame-x) * (1 - var(--p))) round calc(6px * (1 - var(--p))))",
+  } as MotionStyle;
 
   return (
-    <section
-      id="top"
-      ref={sectionRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={() => glowRef.current && (glowRef.current.style.opacity = "0")}
-      className="relative flex min-h-svh flex-col justify-end overflow-hidden pb-20 pt-32"
-    >
-      <Image
-        src="/hero/hero-workspace.jpg"
-        alt=""
-        aria-hidden="true"
-        fill
-        priority
-        fetchPriority="high"
-        sizes="100vw"
-        className="pointer-events-none absolute inset-0 z-0 object-cover"
-      />
-      {/* Scrim: solid dark base + a stronger gradient low-left where the
-          headline sits, so the photo stays legible without flattening it
-          into a plain dark background. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0 bg-bg-primary/55"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-t from-bg-primary via-bg-primary/60 to-transparent"
-      />
-
-      <div
-        ref={glowRef}
-        aria-hidden="true"
-        className="pointer-events-none absolute z-0 hidden h-[480px] w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 blur-[70px] transition-opacity duration-300 md:block"
-        style={{
-          left: "var(--x, 50%)",
-          top: "var(--y, 50%)",
-          background:
-            "radial-gradient(circle, rgba(52,211,153,0.22) 0%, rgba(34,211,238,0.10) 55%, transparent 72%)",
-        }}
-      />
-
-      <Container className="relative z-10 flex flex-col gap-8 md:gap-10">
-        <h1 className="font-display text-[clamp(26px,5vw,80px)] font-semibold uppercase leading-[0.96] tracking-[-0.03em] text-ink-on-dark [overflow-wrap:anywhere]">
-          {["Web development.", "Software engineering.", "Built in Gujarat."].map((line, i) => (
-            <span key={line} className="block overflow-hidden">
-              <motion.span
-                initial={{ y: "110%" }}
-                animate={ready ? { y: "0%" } : { y: "110%" }}
-                transition={{ duration: 0.8, delay: 0.15 + i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                className={i === 2 ? "block accent-gradient-text" : "block text-ink-on-dark"}
-              >
-                {line}
-              </motion.span>
-            </span>
-          ))}
-        </h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-          transition={{ duration: 0.6, delay: 0.45 }}
-          className="max-w-xl text-lg text-muted-on-dark md:text-xl"
+    <section id="top" ref={sectionRef} className="relative h-[230svh] bg-page">
+      <div className="sticky top-0 h-svh overflow-hidden">
+        <motion.div
+          className={`absolute inset-0 overflow-hidden bg-night ${FRAME_INSETS}`}
+          style={frameStyle}
         >
-          Web development, web design, and software engineering &mdash; plus
-          managed IT, cloud, and cybersecurity &mdash; for businesses and
-          individuals across Surat and Gujarat.
-        </motion.p>
+          <motion.video
+            aria-hidden="true"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            poster="/video/hero-leaf-poster.jpg"
+            className="h-full w-full object-cover"
+            style={{ scale: mediaScale }}
+          >
+            <source src="/video/hero-leaf.mp4" type="video/mp4" />
+          </motion.video>
+        </motion.div>
 
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={ready ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
-          className="flex items-center gap-3 text-xs uppercase tracking-[0.14em] text-muted-on-dark"
+          className="absolute inset-x-0 bottom-0 px-6 pb-10 md:px-10 md:pb-12"
+          style={{ opacity: headlineOpacity, y: headlineY }}
         >
-          <span className="inline-block h-px w-8 bg-muted-on-dark" />
-          Scroll to explore
+          <div className="mx-auto flex max-w-[1440px] flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <h1 className="font-heading text-[clamp(30px,3.4vw,56px)] font-medium leading-[1.04] tracking-[-0.035em]">
+              {[
+                { text: "Web Development &", tone: "text-ink" },
+                { text: "Software Engineering", tone: "text-ink" },
+                { text: "for Growing Businesses.", tone: "text-muted" },
+              ].map((line, i) => (
+                <span key={line.text} className="block overflow-hidden">
+                  <motion.span
+                    initial={{ y: "110%" }}
+                    animate={ready ? { y: "0%" } : { y: "110%" }}
+                    transition={{ duration: 0.8, delay: 0.1 + i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                    className={`block ${line.tone}`}
+                  >
+                    {line.text}
+                  </motion.span>
+                </span>
+              ))}
+            </h1>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={ready ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="label-mono text-muted"
+            >
+              Surat &middot; Ahmedabad &middot; Vadodara &middot; Rajkot &middot; Gandhinagar
+            </motion.p>
+          </div>
         </motion.div>
-      </Container>
+      </div>
     </section>
   );
 }

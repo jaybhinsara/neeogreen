@@ -23,110 +23,113 @@ export function ServicePage({ content }: { content: ServiceContent }) {
   return (
     <>
       <Header />
-      <main className="pb-24 pt-40 md:pb-40 md:pt-48">
-        <Container>
-          <Reveal>
-            <span className="font-display text-sm font-medium tracking-[-0.01em] accent-gradient-text">
-              {n}
-            </span>
-          </Reveal>
-          <Reveal delay={0.05}>
-            <span className="mt-4 block text-xs uppercase tracking-[0.14em] text-muted-on-dark">
-              {content.eyebrow}
-            </span>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <h1 className="mt-4 max-w-3xl font-display text-[clamp(36px,7vw,96px)] font-semibold uppercase leading-[0.96] tracking-[-0.02em] text-ink-on-dark">
-              {content.title}
-            </h1>
-          </Reveal>
-          <Reveal delay={0.12}>
-            <p className="mt-8 max-w-2xl text-lg text-muted-on-dark md:text-xl">
-              {content.intro}
-            </p>
-          </Reveal>
-
-          <div className="mt-20 grid gap-16 border-t border-line-on-dark pt-16 md:grid-cols-2">
+      <main>
+        <section className="bg-page pb-24 pt-40 md:pb-32 md:pt-52">
+          <Container>
             <Reveal>
-              <h2 className="font-display text-2xl font-semibold uppercase tracking-[-0.01em] text-ink-on-dark md:text-3xl">
-                What&rsquo;s included
-              </h2>
-              <ul className="mt-8 flex flex-col gap-4">
-                {content.deliverables.map((d) => (
-                  <li key={d} className="flex items-start gap-3 text-[15px] leading-relaxed text-muted-on-dark md:text-base">
-                    <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full accent-gradient" />
+              <span className="label-mono text-brand">
+                {n} &mdash; {content.eyebrow}
+              </span>
+            </Reveal>
+            <Reveal delay={0.05}>
+              <h1 className="mt-6 max-w-[14ch] font-heading text-[clamp(44px,7vw,112px)] font-medium leading-[0.98] tracking-[-0.045em]">
+                {content.title}
+              </h1>
+            </Reveal>
+            <div className="mt-12 flex flex-col items-start gap-8 md:flex-row md:items-end md:justify-between">
+              <Reveal delay={0.1}>
+                <p className="max-w-[46ch] text-lg leading-relaxed text-muted md:text-xl">{content.intro}</p>
+              </Reveal>
+              <Reveal delay={0.15}>
+                <Link
+                  href="/contact"
+                  className="label-mono inline-flex rounded-md bg-brand px-6 py-4 text-white transition-colors hover:bg-brand-deep"
+                >
+                  Book a call
+                </Link>
+              </Reveal>
+            </div>
+          </Container>
+        </section>
+
+        <section className="bg-paper py-24 md:py-32">
+          <Container className="grid gap-12 md:grid-cols-[1fr_1.4fr] md:gap-20">
+            <Reveal>
+              <span className="label-mono text-brand">What&rsquo;s included</span>
+            </Reveal>
+            <ul>
+              {content.deliverables.map((d, i) => (
+                <Reveal key={d} delay={0.05 * i}>
+                  <li className="flex gap-6 border-t border-line py-6 text-lg leading-snug">
+                    <span className="label-mono pt-1.5 text-faint">{String(i + 1).padStart(2, "0")}</span>
                     {d}
                   </li>
-                ))}
-              </ul>
-            </Reveal>
+                </Reveal>
+              ))}
+            </ul>
+          </Container>
+        </section>
 
-            <Reveal delay={0.05}>
-              <h2 className="font-display text-2xl font-semibold uppercase tracking-[-0.01em] text-ink-on-dark md:text-3xl">
-                {content.whyTitle}
-              </h2>
-              <p className="mt-8 text-[15px] leading-relaxed text-muted-on-dark md:text-base">
-                {content.whyBody}
-              </p>
-            </Reveal>
-          </div>
-
-          <div className="mt-20 border-t border-line-on-dark pt-16">
+        <section className="bg-brand py-28 text-white md:py-40">
+          <Container className="grid gap-10 md:grid-cols-[1fr_1.4fr] md:gap-20">
             <Reveal>
-              <h2 className="font-display text-2xl font-semibold uppercase tracking-[-0.01em] text-ink-on-dark md:text-3xl">
-                How it runs
-              </h2>
+              <span className="label-mono text-white/70">Why it matters</span>
             </Reveal>
-            <div className="mt-10 grid gap-10 md:grid-cols-4 md:gap-8">
+            <div>
+              <Reveal>
+                <h2 className="max-w-[20ch] font-heading text-[clamp(30px,3.4vw,52px)] font-medium leading-[1.08] tracking-[-0.035em]">
+                  {content.whyTitle}
+                </h2>
+              </Reveal>
+              <Reveal delay={0.05}>
+                <p className="mt-8 max-w-[52ch] text-lg leading-relaxed text-white/80">{content.whyBody}</p>
+              </Reveal>
+            </div>
+          </Container>
+        </section>
+
+        <section className="bg-page py-24 md:py-32">
+          <Container>
+            <Reveal>
+              <span className="label-mono text-brand">How it runs</span>
+            </Reveal>
+            <div className="mt-12 grid gap-10 md:grid-cols-4 md:gap-8">
               {content.process.map((step, i) => (
                 <Reveal key={step.title} delay={0.08 * i}>
-                  <div className="flex flex-col gap-3">
-                    <span className="font-display text-sm font-medium tracking-[-0.01em] accent-gradient-text">
-                      0{i + 1}
-                    </span>
-                    <h3 className="font-display text-lg font-semibold uppercase tracking-[-0.01em] text-ink-on-dark">
-                      {step.title}
-                    </h3>
-                    <p className="text-sm leading-relaxed text-muted-on-dark">{step.desc}</p>
+                  <div className="flex flex-col gap-4 border-t border-line pt-6">
+                    <span className="label-mono text-brand">0{i + 1}</span>
+                    <h3 className="font-heading text-2xl font-medium tracking-[-0.03em]">{step.title}</h3>
+                    <p className="text-[15px] leading-relaxed text-muted">{step.desc}</p>
                   </div>
                 </Reveal>
               ))}
             </div>
-          </div>
+          </Container>
+        </section>
 
-          <div className="mt-20 flex flex-col items-start gap-8 border-t border-line-on-dark pt-16 md:flex-row md:items-center md:justify-between">
+        <section className="bg-paper py-24 md:py-32">
+          <Container>
             <Reveal>
-              <h2 className="max-w-lg font-display text-[clamp(26px,3.6vw,44px)] font-semibold uppercase leading-[1.05] tracking-[-0.01em] text-ink-on-dark">
-                Let&rsquo;s talk about your {content.title.toLowerCase()}
-              </h2>
+              <span className="label-mono text-brand">Also see</span>
             </Reveal>
-            <Reveal delay={0.05}>
-              <Link
-                href="/contact"
-                className="inline-flex items-center rounded-full accent-gradient px-8 py-4 text-sm font-medium uppercase tracking-[0.1em] text-bg-primary transition-opacity hover:opacity-90"
-              >
-                Get a free consultation
-              </Link>
-            </Reveal>
-          </div>
-
-          <div className="mt-16 border-t border-line-on-dark pt-10">
-            <span className="text-xs uppercase tracking-[0.14em] text-muted-on-dark">
-              Also see
-            </span>
-            <div className="mt-4 flex flex-wrap gap-x-8 gap-y-3">
+            <div className="mt-8">
               {others.map((s) => (
                 <Link
                   key={s.slug}
                   href={`/services/${s.slug}`}
-                  className="font-display text-lg uppercase tracking-[-0.01em] text-ink-on-dark transition-colors hover:accent-gradient-text"
+                  className="group flex items-center justify-between border-b border-line py-5"
                 >
-                  {s.title} &rarr;
+                  <span className="font-heading text-[clamp(26px,3.2vw,48px)] leading-none tracking-[-0.04em] text-faint transition-colors duration-300 group-hover:text-ink">
+                    {s.title}
+                  </span>
+                  <span className="label-mono text-faint transition-colors duration-300 group-hover:text-ink">
+                    &rarr;
+                  </span>
                 </Link>
               ))}
             </div>
-          </div>
-        </Container>
+          </Container>
+        </section>
       </main>
       <Footer />
     </>

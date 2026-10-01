@@ -78,18 +78,14 @@ float snoise(vec3 v) {
 
 // ── Tune the leaf's scale here ──────────────────────────────────────────
 // The model is authored at its own arbitrary size; scale it to roughly this
-// tall. Sized as a large, full-bleed right-side centerpiece per direct
-// feedback (a marked-up screenshot showing the leaf should fill roughly the
-// right half of the hero, top to bottom) — not a small corner accent.
-const LEAF_LENGTH = 3.3;
+// tall. It floats centered behind a full-width statement, so it stays a bit
+// smaller than the frustum height to keep the text over it readable.
+const LEAF_LENGTH = 2.5;
 const LEAF_MODEL_URL = "/models/leaf.glb";
 // The model has a long stem trailing below the main blade, so its bounding-
-// box center (used to recenter it) sits well below the blade's own visual
-// center of mass. Direct feedback on a real screenshot (marked with a line
-// near the bottom of the fold) asked for the whole leaf pushed further down
-// than -0.55 — the stem now trails off past the bottom edge, which is fine,
-// it matches where the base-hugging dust particles already concentrate.
-const LEAF_Y_OFFSET = -1.0;
+// box center (used to recenter it) sits below the blade's own visual center
+// of mass — nudge the whole mesh down so the blade reads as centered.
+const LEAF_Y_OFFSET = -0.8;
 
 // ---------------------------------------------------------------------------
 // Glowing dust particles — fully GPU-driven drift and twinkle, no per-frame
@@ -207,24 +203,10 @@ export default function LeafScene({ className }: { className?: string }) {
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
     camera.position.set(0, 0, 5.2);
 
-    // The leaf sits toward the right edge, but a FIXED x offset only works
-    // for wide desktop aspect ratios: the camera's horizontal field of view
-    // shrinks with a narrow (tall/mobile) aspect, so a fixed offset tuned
-    // for desktop can land entirely outside the frustum on a phone — the
-    // leaf renders, just off-screen. Scale the offset to the actual visible
-    // width instead, so it stays on-screen (and reads as "near the edge")
-    // at every viewport size.
-    function computeLeafX(aspect: number) {
-      const vFov = (camera.fov * Math.PI) / 180;
-      const halfHeight = Math.tan(vFov / 2) * camera.position.z;
-      const halfWidth = halfHeight * aspect;
-      return Math.min(2.2, halfWidth * 0.5);
-    }
-
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    // Capped lower than the usual 2x: this canvas now covers roughly half
-    // the hero at full size, so the retina-resolution fragment cost adds up
-    // fast. 1.5x is still sharp enough for a soft, glowing shape like this.
+    // Capped lower than the usual 2x: this canvas covers a full-viewport
+    // section, so the retina-resolution fragment cost adds up fast. 1.5x is
+    // still sharp enough for a soft, glowing shape like this.
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.appendChild(renderer.domElement);
@@ -235,9 +217,8 @@ export default function LeafScene({ className }: { className?: string }) {
     // it in a persistent Group added to the scene immediately: rotation/tilt
     // below always targets this group, whether or not the model has finished
     // loading yet, instead of scattering null-checks through animate()/resize().
-    const initialAspect = container.clientWidth / Math.max(container.clientHeight, 1);
     const mesh = new THREE.Group();
-    const BASE_POSITION = new THREE.Vector3(computeLeafX(initialAspect), LEAF_Y_OFFSET, 0);
+    const BASE_POSITION = new THREE.Vector3(0, LEAF_Y_OFFSET, 0);
     const BASE_ROTATION_Z = -0.15;
     mesh.position.copy(BASE_POSITION);
     mesh.rotation.z = BASE_ROTATION_Z;
@@ -422,7 +403,6 @@ export default function LeafScene({ className }: { className?: string }) {
       blending: THREE.AdditiveBlending,
     });
     const dust = new THREE.Points(dustGeometry, dustMaterial);
-    dust.position.x = BASE_POSITION.x;
     scene.add(dust);
 
     const ambient = new THREE.AmbientLight(0x3a4a43, 1.1);
@@ -480,10 +460,6 @@ export default function LeafScene({ className }: { className?: string }) {
       camera.aspect = w / Math.max(h, 1);
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
-
-      BASE_POSITION.x = computeLeafX(camera.aspect);
-      mesh.position.x = BASE_POSITION.x;
-      dust.position.x = BASE_POSITION.x;
     }
     resize();
     const resizeObserver = new ResizeObserver(resize);

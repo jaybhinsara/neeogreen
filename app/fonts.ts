@@ -1,5 +1,5 @@
 import localFont from "next/font/local";
-import { Inter, Instrument_Serif } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 
 export const clashDisplay = localFont({
   src: [
@@ -20,10 +20,8 @@ export const inter = Inter({
   display: "swap",
 });
 
-export const instrumentSerif = Instrument_Serif({
+export const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  weight: "400",
-  style: "italic",
-  variable: "--font-accent-serif",
+  variable: "--font-jetbrains-mono",
   display: "swap",
 });

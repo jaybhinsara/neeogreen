@@ -17,30 +17,30 @@ export default function ContactPage() {
   return (
     <>
       <Header />
-      <main className="pb-24 pt-40 md:pb-40 md:pt-48">
+      <main className="bg-page pb-24 pt-40 md:pb-40 md:pt-52">
         <Container>
-          <div className="grid gap-16 md:grid-cols-[1fr_1.3fr] md:gap-10">
+          <div className="grid gap-16 md:grid-cols-[1fr_1.2fr] md:gap-20">
             <div className="flex flex-col gap-8">
-              <span className="text-xs uppercase tracking-[0.14em] text-muted-on-dark">
-                Free consultation
-              </span>
-              <h1 className="max-w-md font-display text-[clamp(36px,5.5vw,64px)] font-semibold uppercase leading-[0.98] tracking-[-0.02em] text-ink-on-dark">
-                Let&rsquo;s talk IT
+              <span className="label-mono text-brand">Book a call</span>
+              <h1 className="max-w-[12ch] font-heading text-[clamp(44px,6vw,96px)] font-medium leading-[0.98] tracking-[-0.045em]">
+                Let&rsquo;s build what&rsquo;s next.
               </h1>
-              <p className="max-w-sm text-base text-muted-on-dark">
-                Tell us what you&rsquo;re dealing with — support, security,
-                cloud, or something else entirely. We reply to every inquiry
-                within two business days.
+              <p className="max-w-[40ch] text-lg leading-relaxed text-muted">
+                Tell us what you&rsquo;re building, a website, a web app,
+                custom software, or IT that just needs to work. We reply to
+                every inquiry within two business days.
               </p>
 
-              <div className="flex flex-col gap-3 border-t border-line-on-dark pt-8 text-sm">
-                <a href="mailto:hello@neeogreen.com" className="text-ink-on-dark hover:accent-gradient-text">
-                  hello@neeogreen.com
+              <div className="flex flex-col gap-3 border-t border-line pt-8 text-[15px]">
+                <a href={`mailto:${SITE.email}`} className="hover:text-brand">
+                  {SITE.email}
                 </a>
-                <a href="tel:+917567936593" className="text-ink-on-dark hover:accent-gradient-text">
-                  +91 75679 36593
+                <a href={`tel:${SITE.phone.replace(/\s/g, "")}`} className="hover:text-brand">
+                  {SITE.phone}
                 </a>
-                <span className="text-muted-on-dark">Surat, Gujarat, India</span>
+                <span className="text-muted">
+                  {SITE.locality}, {SITE.region}, India
+                </span>
               </div>
             </div>
 

@@ -1,67 +1,53 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-bg-primary: #0b0f0d;
-  --color-bg-inverse: #ffffff;
-  --color-ink-on-dark: #f4f7f5;
-  --color-ink-on-light: #10241a;
-  --color-muted-on-dark: #9ca9a3;
-  --color-muted-on-light: #5b6b63;
-  --color-line-on-dark: rgba(244, 247, 245, 0.12);
-  --color-line-on-light: rgba(16, 36, 26, 0.1);
+  /* Light-first palette: a warm cream page with white "paper" sections, and
+     two full-bleed punctuation blocks — vivid brand emerald and near-black
+     night — used sparingly as you scroll. */
+  --color-page: #eeebe2;
+  --color-paper: #ffffff;
+  --color-ink: #0b0f0d;
+  --color-muted: #6b7069;
+  --color-faint: #b5b8b2;
+  --color-line: rgba(11, 15, 13, 0.12);
+  --color-night: #050706;
+  --color-brand: #0a9a65;
+  --color-brand-deep: #077a50;
+  /* Bright accents — only legible on the night/brand blocks, not on cream. */
   --color-accent-1: #34d399;
   --color-accent-2: #22d3ee;
 
-  /* Full-bleed color-block section backgrounds — paired with ink-on-dark/
-     muted-on-dark text (same tokens used on --color-bg-primary) so no new
-     text-color tokens are needed. */
-  --color-block-emerald: #0a4a35;
-  --color-block-cyan: #083344;
-
   --font-display: var(--font-clash-display), ui-sans-serif, sans-serif;
+  --font-heading: var(--font-inter), ui-sans-serif, sans-serif;
   --font-body: var(--font-inter), ui-sans-serif, sans-serif;
-  --font-accent: var(--font-accent-serif), ui-serif, serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 
   --container-max: 1440px;
 }
 
 html {
-  background: var(--color-bg-primary);
+  background: var(--color-page);
 }
 
 body {
-  background: var(--color-bg-primary);
-  color: var(--color-ink-on-dark);
+  background: var(--color-page);
+  color: var(--color-ink);
   font-family: var(--font-body);
 }
 
 ::selection {
-  background: var(--color-accent-1);
-  color: var(--color-bg-primary);
+  background: var(--color-brand);
+  color: #ffffff;
 }
 
-@utility accent-gradient {
-  background-image: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-2) 100%);
-}
-
-@utility accent-gradient-text {
-  background-image: linear-gradient(135deg, var(--color-accent-1) 0%, var(--color-accent-2) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-@utility animate-marquee {
-  animation: marquee 28s linear infinite;
+/* The small uppercase monospace labels ("FOCUS AREAS", service tags, CTA
+   buttons) that recur across every section. */
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 @media (prefers-reduced-motion: reduce) {

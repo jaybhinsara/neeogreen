@@ -43,11 +43,9 @@ export function ContactForm() {
 
   if (status === "sent") {
     return (
-      <div className="flex flex-col gap-3 border border-line-on-dark px-8 py-12 text-center">
-        <span className="font-display text-2xl font-semibold uppercase tracking-[-0.01em] text-ink-on-dark">
-          Message sent
-        </span>
-        <p className="text-sm text-muted-on-dark">
+      <div className="flex flex-col gap-3 rounded-lg bg-paper px-8 py-12 text-center">
+        <span className="font-heading text-3xl font-medium tracking-[-0.03em]">Message sent.</span>
+        <p className="text-[15px] text-muted">
           We reply to every inquiry within two business days.
         </p>
       </div>
@@ -63,14 +61,12 @@ export function ContactForm() {
       <Field label="Company (optional)" name="company" type="text" />
 
       <div className="flex flex-col gap-3">
-        <span className="text-xs uppercase tracking-[0.12em] text-muted-on-dark">
-          What do you need?
-        </span>
+        <span className="label-mono text-muted">What do you need?</span>
         <div className="flex flex-wrap gap-3">
           {PROJECT_TYPES.map((type) => (
             <label
               key={type}
-              className="cursor-pointer rounded-full border border-line-on-dark px-4 py-2 text-xs uppercase tracking-[0.06em] text-muted-on-dark transition-colors has-checked:border-transparent has-checked:accent-gradient has-checked:text-bg-primary"
+              className="label-mono cursor-pointer rounded-md border border-line px-4 py-2.5 text-muted transition-colors hover:border-ink hover:text-ink has-checked:border-brand has-checked:bg-brand has-checked:text-white"
             >
               <input type="radio" name="projectType" value={type} className="sr-only" />
               {type}
@@ -80,20 +76,18 @@ export function ContactForm() {
       </div>
 
       <label className="flex flex-col gap-2">
-        <span className="text-xs uppercase tracking-[0.12em] text-muted-on-dark">
-          How can we help?
-        </span>
+        <span className="label-mono text-muted">How can we help?</span>
         <textarea
           name="message"
           required
           rows={5}
-          className="resize-none border-b border-line-on-dark bg-transparent py-3 text-base text-ink-on-dark outline-none transition-colors placeholder:text-muted-on-dark focus:border-accent-1"
-          placeholder="Tell us what's going on with your systems, and how soon you need help."
+          className="resize-none border-b border-line bg-transparent py-3 text-lg outline-none transition-colors placeholder:text-faint focus:border-brand"
+          placeholder="Tell us what you're building, and roughly when you need it."
         />
       </label>
 
       {status === "error" && error && (
-        <p className="text-sm text-red-400" role="alert">
+        <p className="text-sm text-red-600" role="alert">
           {error}
         </p>
       )}
@@ -101,7 +95,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={status === "sending"}
-        className="inline-flex w-fit items-center rounded-full accent-gradient px-8 py-4 text-sm font-medium uppercase tracking-[0.1em] text-bg-primary transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+        className="label-mono inline-flex w-fit items-center rounded-md bg-brand px-8 py-4 text-white transition-colors hover:bg-brand-deep disabled:cursor-not-allowed disabled:opacity-60"
       >
         {status === "sending" ? "Sending…" : "Send message"}
       </button>
@@ -122,12 +116,12 @@ function Field({
 }) {
   return (
     <label className="flex flex-col gap-2">
-      <span className="text-xs uppercase tracking-[0.12em] text-muted-on-dark">{label}</span>
+      <span className="label-mono text-muted">{label}</span>
       <input
         type={type}
         name={name}
         required={required}
-        className="border-b border-line-on-dark bg-transparent py-3 text-base text-ink-on-dark outline-none transition-colors placeholder:text-muted-on-dark focus:border-accent-1"
+        className="border-b border-line bg-transparent py-3 text-lg outline-none transition-colors focus:border-brand"
       />
     </label>
   );

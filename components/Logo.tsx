@@ -15,7 +15,7 @@ export function Logo({
       <LeafIcon className={cn("h-6 w-auto", iconClassName)} />
       <span
         className={cn(
-          "font-display text-lg font-semibold uppercase tracking-[-0.02em] text-ink-on-dark",
+          "font-display text-lg font-semibold uppercase tracking-[-0.02em]",
           textClassName
         )}
       >

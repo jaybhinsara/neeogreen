@@ -1,7 +1,10 @@
 export const SITE = {
   name: "NeeoGreen",
   tagline: "Web Development, Design & Software Engineering Studio",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://neeogreen.com",
+  // The apex is the primary domain on Vercel (www 308-redirects to it), so
+  // canonicals and the sitemap must use it. Not read from an env var: a
+  // stale www value there pointed every canonical at a redirect.
+  url: "https://neeogreen.com",
   description:
     "NeeoGreen is a web development, web design, and software engineering studio based in Surat, Gujarat — serving businesses and individuals across Surat, Ahmedabad, Vadodara, Rajkot, and Gandhinagar, plus managed IT, cloud, and cybersecurity support.",
   email: "hello@neeogreen.com",
@@ -13,11 +16,9 @@ export const SITE = {
   // locality above. Used in metadata keywords and the LocalBusiness JSON-LD
   // areaServed list.
   serviceCities: ["Surat", "Ahmedabad", "Vadodara", "Rajkot", "Gandhinagar"],
-  social: {
-    instagram: "https://instagram.com",
-    linkedin: "https://linkedin.com",
-    twitter: "https://x.com",
-  },
+  // Real profile URLs only: these feed the footer and the structured-data
+  // sameAs list, where a generic homepage would confuse the brand entity.
+  social: [] as { label: string; href: string }[],
 } as const;
 
 export const SERVICES = [

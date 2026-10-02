@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { ServicePage } from "@/components/ServicePage";
 import { SITE } from "@/lib/site";
 
@@ -26,13 +27,12 @@ const content = {
     "Security bolted on after the fact leaves gaps — the firewall vendor doesn't talk to the backup vendor, and nobody owns the whole picture. We handle your infrastructure and your security together, so nothing falls through a seam between two contracts.",
 };
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: content.title,
   description:
     "Cybersecurity and data protection for businesses and individuals across Surat, Ahmedabad, Vadodara, Rajkot, and Gandhinagar — endpoint protection, tested backups, and disaster recovery planning that actually works.",
-  alternates: { canonical: "/services/cybersecurity" },
-  openGraph: { url: `${SITE.url}/services/cybersecurity`, title: `${content.title} — ${SITE.name}` },
-};
+  path: "/services/cybersecurity",
+});
 
 const serviceJsonLd = {
   "@context": "https://schema.org",

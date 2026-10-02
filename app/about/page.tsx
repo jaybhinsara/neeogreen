@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Container } from "@/components/Container";
@@ -6,13 +7,12 @@ import { Reveal } from "@/components/Reveal";
 import { Process } from "@/components/Process";
 import { SITE } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "About",
   description:
     "NeeoGreen is a web development, web design, and software engineering team based in Surat, Gujarat — serving Surat, Ahmedabad, Vadodara, Rajkot, and Gandhinagar, plus managed IT and cloud support.",
-  alternates: { canonical: "/about" },
-  openGraph: { url: `${SITE.url}/about`, title: `About — ${SITE.name}` },
-};
+  path: "/about",
+});
 
 const COMMITMENTS = [
   { value: "< 1hr", label: "Typical support response time" },

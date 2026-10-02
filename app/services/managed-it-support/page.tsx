@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { ServicePage } from "@/components/ServicePage";
 import { SITE } from "@/lib/site";
 
@@ -26,13 +27,12 @@ const content = {
     "A break-fix technician shows up after something's already broken. We'd rather catch the failing hard drive or the expiring certificate before it takes your systems down — that's the difference between an IT bill and an IT partner.",
 };
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: content.title,
   description:
     "Managed IT support for businesses and individuals across Surat, Ahmedabad, Vadodara, Rajkot, and Gandhinagar — 24/7 monitoring, a help desk that answers, and proactive maintenance instead of a break-fix bill.",
-  alternates: { canonical: "/services/managed-it-support" },
-  openGraph: { url: `${SITE.url}/services/managed-it-support`, title: `${content.title} — ${SITE.name}` },
-};
+  path: "/services/managed-it-support",
+});
 
 const serviceJsonLd = {
   "@context": "https://schema.org",

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { ServicePage } from "@/components/ServicePage";
 import { SITE } from "@/lib/site";
 
@@ -26,13 +27,12 @@ const content = {
     "Off-the-shelf software is built for everyone, which means it's really built for no one. When the workaround becomes the workflow, it's usually cheaper in the long run to build the tool that fits — and we build it to last past the first year.",
 };
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: content.title,
   description:
     "Software engineering for businesses across Surat, Ahmedabad, Vadodara, Rajkot, and Gandhinagar — custom software and internal tools built around your actual workflow.",
-  alternates: { canonical: "/services/software-engineering" },
-  openGraph: { url: `${SITE.url}/services/software-engineering`, title: `${content.title} — ${SITE.name}` },
-};
+  path: "/services/software-engineering",
+});
 
 const serviceJsonLd = {
   "@context": "https://schema.org",

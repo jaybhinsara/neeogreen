@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    url: SITE.url,
+    url: "/",
     siteName: SITE.name,
     title: `${SITE.name} — ${SITE.tagline}`,
     description: SITE.description,
@@ -64,7 +64,7 @@ const organizationJsonLd = {
     addressCountry: SITE.country,
   },
   areaServed: SITE.serviceCities.map((city) => ({ "@type": "City", name: city })),
-  sameAs: Object.values(SITE.social),
+  ...(SITE.social.length > 0 && { sameAs: SITE.social.map((s) => s.href) }),
   makesOffer: [
     { "@type": "Offer", itemOffered: { "@type": "Service", name: "Web Development" } },
     { "@type": "Offer", itemOffered: { "@type": "Service", name: "Web Design" } },

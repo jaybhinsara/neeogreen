@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Container } from "@/components/Container";
@@ -6,13 +7,12 @@ import { Reveal } from "@/components/Reveal";
 import { BookCallBand } from "@/components/BookCallBand";
 import { SITE } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Approach",
   description:
     "How a NeeoGreen project actually runs — discover, plan, build, and support — for web development, web design, and software engineering clients across Gujarat.",
-  alternates: { canonical: "/approach" },
-  openGraph: { url: `${SITE.url}/approach`, title: `Approach — ${SITE.name}` },
-};
+  path: "/approach",
+});
 
 const STEPS = [
   {

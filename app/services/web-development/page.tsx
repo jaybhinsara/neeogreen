@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { ServicePage } from "@/components/ServicePage";
 import { SITE } from "@/lib/site";
 
@@ -26,13 +27,12 @@ const content = {
     "A freelancer disappears after the invoice clears, and a big agency hands you to a junior after the pitch. We're one studio that designs, builds, and supports what we ship — reachable in your working hours, and still here next year.",
 };
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: content.title,
   description:
     "Web development for businesses across Surat, Ahmedabad, Vadodara, Rajkot, and Gandhinagar — fast, mobile-ready websites and web applications, built and supported locally.",
-  alternates: { canonical: "/services/web-development" },
-  openGraph: { url: `${SITE.url}/services/web-development`, title: `${content.title} — ${SITE.name}` },
-};
+  path: "/services/web-development",
+});
 
 const serviceJsonLd = {
   "@context": "https://schema.org",

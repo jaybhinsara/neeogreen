@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Container } from "@/components/Container";
 import { ContactForm } from "@/components/ContactForm";
 import { SITE } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Contact",
   description:
     "Get a free consultation with NeeoGreen — web development, web design, and software engineering, plus managed IT and cloud support. Serving Surat, Ahmedabad, Vadodara, Rajkot, and Gandhinagar.",
-  alternates: { canonical: "/contact" },
-  openGraph: { url: `${SITE.url}/contact`, title: `Contact — ${SITE.name}` },
-};
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (

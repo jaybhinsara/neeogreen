@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { ServicePage } from "@/components/ServicePage";
 import { SITE } from "@/lib/site";
 
@@ -26,13 +27,12 @@ const content = {
     "A migration that ends the day you go live is half a job — the other half is watching for cost creep, misconfigured access, and the updates that break something two months later. We stay on it after the migration is done.",
 };
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: content.title,
   description:
     "Cloud migration and management for businesses across Surat, Ahmedabad, Vadodara, Rajkot, and Gandhinagar — Microsoft 365, Google Workspace, AWS, and Azure, migrated and then monitored and cost-optimized.",
-  alternates: { canonical: "/services/cloud-solutions" },
-  openGraph: { url: `${SITE.url}/services/cloud-solutions`, title: `${content.title} — ${SITE.name}` },
-};
+  path: "/services/cloud-solutions",
+});
 
 const serviceJsonLd = {
   "@context": "https://schema.org",

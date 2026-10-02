@@ -18,12 +18,6 @@ const PAGES = [
   { href: "/contact", label: "Get in touch" },
 ];
 
-const SOCIALS = [
-  { href: SITE.social.instagram, label: "Instagram" },
-  { href: SITE.social.linkedin, label: "LinkedIn" },
-  { href: SITE.social.twitter, label: "X (Twitter)" },
-];
-
 export function Footer() {
   return (
     <footer className="relative overflow-hidden bg-brand text-white">
@@ -57,7 +51,7 @@ export function Footer() {
                 {p.label}
               </Link>
             ))}
-            {SOCIALS.map((s) => (
+            {SITE.social.map((s) => (
               <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="text-[15px] hover:underline">
                 {s.label}
               </a>

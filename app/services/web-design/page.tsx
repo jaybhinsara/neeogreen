@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { ServicePage } from "@/components/ServicePage";
 import { SITE } from "@/lib/site";
 
@@ -26,13 +27,12 @@ const content = {
     "A design that doesn't account for how it'll actually be built either gets watered down in development or blows the budget. We design and build together, so what you approve is what ships.",
 };
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: content.title,
   description:
     "Web design for businesses across Surat, Ahmedabad, Vadodara, Rajkot, and Gandhinagar — UI/UX design, design systems, and prototypes, researched and tested before launch.",
-  alternates: { canonical: "/services/web-design" },
-  openGraph: { url: `${SITE.url}/services/web-design`, title: `${content.title} — ${SITE.name}` },
-};
+  path: "/services/web-design",
+});
 
 const serviceJsonLd = {
   "@context": "https://schema.org",

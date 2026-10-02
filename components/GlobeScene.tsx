@@ -155,10 +155,11 @@ export default function GlobeScene({ className }: { className?: string }) {
       return d;
     };
 
-    // Glossy emerald sphere.
+    // Satin finish: rough enough that the lights spread into a soft sheen
+    // rather than tight specular hotspots, which read as stray markers.
     const sphere = new THREE.Mesh(
       track(new THREE.SphereGeometry(1, 96, 64)),
-      track(new THREE.MeshStandardMaterial({ color: 0x0fa36b, roughness: 0.32, metalness: 0.1 }))
+      track(new THREE.MeshStandardMaterial({ color: 0x0fa36b, roughness: 0.7, metalness: 0.05 }))
     );
     spin.add(sphere);
 
@@ -261,22 +262,31 @@ export default function GlobeScene({ className }: { className?: string }) {
       return points;
     });
 
-    const pulsePositions = new Float32Array(DESTINATIONS.length * 3);
-    const pulseGeometry = track(new THREE.BufferGeometry());
-    pulseGeometry.setAttribute("position", new THREE.BufferAttribute(pulsePositions, 3));
-    spin.add(
-      new THREE.Points(
-        pulseGeometry,
-        track(
-          new THREE.PointsMaterial({
-            map: glowMap,
-            size: 0.09,
-            transparent: true,
-            depthWrite: false,
-            blending: THREE.AdditiveBlending,
-          })
-        )
-      )
+    // Each pulse is a small comet (a head and two fading trail sprites)
+    // that fades in leaving Surat and fades out arriving, so it reads as a
+    // signal traveling its arc rather than a stray glow on the surface.
+    const COMET = [
+      { lag: 0, size: 0.055, alpha: 1 },
+      { lag: 0.025, size: 0.04, alpha: 0.5 },
+      { lag: 0.05, size: 0.03, alpha: 0.25 },
+    ];
+    const comets = arcPaths.map(() =>
+      COMET.map((part) => {
+        const sprite = new THREE.Sprite(
+          track(
+            new THREE.SpriteMaterial({
+              map: glowMap,
+              transparent: true,
+              opacity: 0,
+              depthWrite: false,
+              blending: THREE.AdditiveBlending,
+            })
+          )
+        );
+        sprite.scale.setScalar(part.size);
+        spin.add(sprite);
+        return { sprite, ...part };
+      })
     );
 
     const cityGeometry = track(
@@ -364,11 +374,17 @@ export default function GlobeScene({ className }: { className?: string }) {
 
       if (!reduced) {
         arcPaths.forEach((points, i) => {
-          const t = (seconds * 0.25 + i / arcPaths.length) % 1;
-          const p = points[Math.round(t * ARC_SAMPLES)];
-          pulsePositions.set([p.x, p.y, p.z], i * 3);
+          const head = (seconds * 0.22 + i / arcPaths.length) % 1;
+          for (const part of comets[i]) {
+            const t = head - part.lag;
+            if (t < 0) {
+              part.sprite.material.opacity = 0;
+              continue;
+            }
+            part.sprite.position.copy(points[Math.round(t * ARC_SAMPLES)]);
+            part.sprite.material.opacity = part.alpha * Math.sin(Math.PI * t);
+          }
         });
-        pulseGeometry.attributes.position.needsUpdate = true;
         hqGlow.scale.setScalar(0.16 + 0.05 * Math.sin(seconds * 3));
       } else {
         hqGlow.scale.setScalar(0.18);

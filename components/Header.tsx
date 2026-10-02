@@ -28,7 +28,7 @@ const LEAF_BUTTON = "rounded-[12px_3px_12px_3px]";
 
 function NavLink({ href, label, active }: { href: string; label: string; active: boolean }) {
   return (
-    <a
+    <Link
       href={href}
       onClick={(e) => handleAnchorClick(e, href)}
       aria-current={active ? "page" : undefined}
@@ -44,7 +44,7 @@ function NavLink({ href, label, active }: { href: string; label: string; active:
           active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
         )}
       />
-    </a>
+    </Link>
   );
 }
 
@@ -74,6 +74,20 @@ export function Header() {
   const pathname = usePathname();
   const { scrollYProgress } = useScroll();
   const isActive = (href: string) => !href.includes("#") && pathname === href;
+
+  // Close the menu first. Page links then swap client-side (no full reload
+  // leaving the open menu frozen on screen), and an in-page section link
+  // waits two frames so the scroll starts after the menu has released the
+  // page's scroll lock instead of stalling against it.
+  function handleMenuLink(e: MouseEvent<HTMLAnchorElement>, href: string) {
+    setMenuOpen(false);
+    const hashIndex = href.indexOf("#");
+    if (hashIndex === -1) return;
+    const hash = href.slice(hashIndex);
+    if (!document.querySelector(hash)) return;
+    e.preventDefault();
+    requestAnimationFrame(() => requestAnimationFrame(() => scrollToHash(hash)));
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -176,20 +190,21 @@ export function Header() {
           >
             <nav className="flex flex-col">
               {ALL_LINKS.map((link, i) => (
-                <motion.a
+                <motion.div
                   key={link.href}
-                  href={link.href}
-                  onClick={(e) => {
-                    handleAnchorClick(e, link.href);
-                    setMenuOpen(false);
-                  }}
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 0.05 * i }}
-                  className="border-b border-line py-5 font-heading text-4xl font-medium tracking-[-0.03em] text-ink"
+                  className="border-b border-line"
                 >
-                  {link.label}
-                </motion.a>
+                  <Link
+                    href={link.href}
+                    onClick={(e) => handleMenuLink(e, link.href)}
+                    className="block py-5 font-heading text-4xl font-medium tracking-[-0.03em] text-ink"
+                  >
+                    {link.label}
+                  </Link>
+                </motion.div>
               ))}
             </nav>
             <BookCallButton onClick={() => setMenuOpen(false)} className="justify-center px-5 py-4" />

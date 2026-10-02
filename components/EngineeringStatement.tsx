@@ -8,18 +8,15 @@ const LeafScene = dynamic(() => import("./LeafScene"), { ssr: false });
 
 let can3d: boolean | undefined;
 
-// The leaf's MeshPhysicalMaterial (clearcoat + iridescence) is heavy enough
-// to hang low-end mobile GPUs, so touch devices skip it.
 function canRender3d() {
   if (can3d === undefined) {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
     let webgl = false;
     try {
       const canvas = document.createElement("canvas");
       webgl = Boolean(canvas.getContext("webgl2") || canvas.getContext("webgl"));
     } catch {}
-    can3d = !reduced && !coarsePointer && webgl;
+    can3d = !reduced && webgl;
   }
   return can3d;
 }

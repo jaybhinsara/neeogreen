@@ -203,11 +203,14 @@ export default function LeafScene({ className }: { className?: string }) {
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
     camera.position.set(0, 0, 5.2);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    // Phones get a lighter pass: no MSAA, a lower pixel ratio, and no
+    // clearcoat/iridescence layers, which together keep the full-screen
+    // canvas within a mobile GPU's budget while scrolling.
+    const lite = window.matchMedia("(pointer: coarse)").matches;
+    const renderer = new THREE.WebGLRenderer({ antialias: !lite, alpha: true });
     // Capped lower than the usual 2x: this canvas covers a full-viewport
-    // section, so the retina-resolution fragment cost adds up fast. 1.5x is
-    // still sharp enough for a soft, glowing shape like this.
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    // section, so the retina-resolution fragment cost adds up fast.
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, lite ? 1.25 : 1.5));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.appendChild(renderer.domElement);
 
@@ -272,17 +275,13 @@ export default function LeafScene({ className }: { className?: string }) {
           normalMap: normalMap ?? undefined,
           metalness: 0.1,
           roughness: 0.3,
-          clearcoat: 1.0,
+          clearcoat: lite ? 0 : 1.0,
           clearcoatRoughness: 0.15,
-          // `transmission` forces Three to render the whole scene a second
-          // time into an offscreen buffer every frame (the same cost that
-          // crashed the mobile tab a few commits back — see the comment on
-          // the `(pointer: coarse)` gate in Hero.tsx). It was cheap while
-          // this mesh was a small corner accent; now that it fills half the
-          // hero at full desktop size, that extra full-screen pass was
-          // dragging down scroll smoothness. The fresnel glow already baked
-          // into the shader below covers the "glassy" look without it.
-          iridescence: 0.5,
+          // No `transmission`: it renders the whole scene a second time into
+          // an offscreen buffer every frame, which crashed mobile tabs and
+          // dragged scroll smoothness at full-screen size. The fresnel glow
+          // in the shader below covers the glassy look without it.
+          iridescence: lite ? 0 : 0.5,
           iridescenceIOR: 1.3,
           ior: 1.4,
           side: THREE.DoubleSide,

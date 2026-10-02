@@ -1,17 +1,77 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useReducedMotion, useScroll, useTransform, type MotionStyle } from "framer-motion";
+import { useRef, useSyncExternalStore } from "react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  type MotionValue,
+} from "framer-motion";
 
-// Frame insets (as % of the viewport) before the zoom starts. The frame
-// sits centered with room below for the headline, and opens to full-bleed
-// as you scroll through the pinned section.
-const FRAME_INSETS =
-  "[--frame-t:13%] [--frame-x:5%] [--frame-b:32%] md:[--frame-t:12%] md:[--frame-x:19%] md:[--frame-b:25%]";
+// Frame insets (fraction of the viewport) before the zoom starts. The frame
+// leaves room below for the headline and opens to full-bleed on scroll.
+const INSETS = {
+  mobile: { t: 0.13, x: 0.05, b: 0.32 },
+  desktop: { t: 0.12, x: 0.19, b: 0.25 },
+};
+
+const DESKTOP_QUERY = "(min-width: 768px)";
+function subscribeDesktop(onChange: () => void) {
+  const query = window.matchMedia(DESKTOP_QUERY);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+
+// The zoom is pure transform so it stays on the compositor: the frame scales
+// non-uniformly from its inset size to full-bleed, and the video inside is
+// counter-scaled so it never stretches. Animating clip-path instead forced a
+// full repaint of the video every frame and stuttered on phones.
+function HeroFrame({
+  insets,
+  progress,
+  mediaScale,
+}: {
+  insets: { t: number; x: number; b: number };
+  progress: MotionValue<number>;
+  mediaScale: MotionValue<number>;
+}) {
+  const scaleX = useTransform(progress, (p) => 1 - 2 * insets.x * (1 - p));
+  const scaleY = useTransform(progress, (p) => 1 - (insets.t + insets.b) * (1 - p));
+  const y = useTransform(progress, (p) => `${((insets.t - insets.b) / 2) * (1 - p) * 100}%`);
+  const videoScaleX = useTransform([scaleX, mediaScale], ([s, m]: number[]) => m / s);
+  const videoScaleY = useTransform([scaleY, mediaScale], ([s, m]: number[]) => m / s);
+
+  return (
+    <motion.div
+      className="absolute inset-0 overflow-hidden bg-night will-change-transform"
+      style={{ y, scaleX, scaleY }}
+    >
+      <motion.video
+        aria-hidden="true"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        poster="/video/hero-leaf-poster.jpg"
+        className="h-full w-full object-cover will-change-transform"
+        style={{ scaleX: videoScaleX, scaleY: videoScaleY }}
+      >
+        <source src="/video/hero-leaf.mp4" type="video/mp4" />
+      </motion.video>
+    </motion.div>
+  );
+}
 
 export function Hero({ ready }: { ready: boolean }) {
   const sectionRef = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
+  const isDesktop = useSyncExternalStore(
+    subscribeDesktop,
+    () => window.matchMedia(DESKTOP_QUERY).matches,
+    () => true
+  );
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -26,33 +86,15 @@ export function Hero({ ready }: { ready: boolean }) {
   const headlineOpacity = useTransform(scrollYProgress, (v) => 1 - Math.min(v / 0.18, 1));
   const headlineY = useTransform(scrollYProgress, [0, 0.18], [0, -32]);
 
-  const frameStyle = {
-    "--p": progress,
-    clipPath:
-      "inset(calc(var(--frame-t) * (1 - var(--p))) calc(var(--frame-x) * (1 - var(--p))) calc(var(--frame-b) * (1 - var(--p))) calc(var(--frame-x) * (1 - var(--p))) round calc(6px * (1 - var(--p))))",
-  } as MotionStyle;
-
   return (
     <section id="top" ref={sectionRef} className="relative h-[230svh] bg-page">
       <div className="sticky top-0 h-svh overflow-hidden">
-        <motion.div
-          className={`absolute inset-0 overflow-hidden bg-night ${FRAME_INSETS}`}
-          style={frameStyle}
-        >
-          <motion.video
-            aria-hidden="true"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            poster="/video/hero-leaf-poster.jpg"
-            className="h-full w-full object-cover"
-            style={{ scale: mediaScale }}
-          >
-            <source src="/video/hero-leaf.mp4" type="video/mp4" />
-          </motion.video>
-        </motion.div>
+        <HeroFrame
+          key={isDesktop ? "desktop" : "mobile"}
+          insets={isDesktop ? INSETS.desktop : INSETS.mobile}
+          progress={progress}
+          mediaScale={mediaScale}
+        />
 
         <motion.div
           className="absolute inset-x-0 bottom-0 px-6 pb-10 md:px-10 md:pb-12"

@@ -8,10 +8,13 @@ const R = 300;
 const TILT = 0.38;
 const MERIDIANS = 18;
 const LATITUDES = [-60, -30, 0, 30, 60];
-const SAMPLES = 64;
+const SAMPLES = 40;
 const ARC_SAMPLES = 48;
 const SPIN = 0.07;
 const DEG = Math.PI / 180;
+const VIEWBOX = "-380 -380 760 760";
+// Phones get half the frame rate; the slow spin still reads as smooth.
+const MOBILE_FRAME_MS = 1000 / 30;
 
 type Vec = [number, number, number];
 
@@ -102,14 +105,14 @@ function seeded(seed: number) {
 }
 
 const rand = seeded(2026);
-const STARS = Array.from({ length: 170 }, () => {
+const STARS = Array.from({ length: 140 }, () => {
   const bright = rand() > 0.9;
   return {
     left: rand() * 100,
     top: rand() * 100,
     size: bright ? 2 : 1 + rand() * 0.6,
     opacity: bright ? 0.9 : 0.2 + rand() * 0.5,
-    twinkle: rand() < 0.35,
+    twinkle: rand() < 0.2,
     duration: 2.5 + rand() * 4,
     delay: rand() * 6,
   };
@@ -119,6 +122,7 @@ export function GlobeSection() {
   const svgRef = useRef<SVGSVGElement>(null);
   const meridianRefs = useRef<(SVGPathElement | null)[]>([]);
   const arcRefs = useRef<(SVGPathElement | null)[]>([]);
+  const arcGlowRefs = useRef<(SVGPathElement | null)[]>([]);
   const pulseRefs = useRef<(SVGCircleElement | null)[]>([]);
   const cityRefs = useRef<(SVGCircleElement | null)[]>([]);
   const hqRef = useRef<SVGGElement>(null);
@@ -142,7 +146,9 @@ export function GlobeSection() {
 
       ARCS.forEach((arc, i) => {
         const projected = arc.points.map((p) => project(p.v, rot, p.h));
-        arcRefs.current[i]?.setAttribute("d", visiblePath(projected));
+        const d = visiblePath(projected);
+        arcRefs.current[i]?.setAttribute("d", d);
+        arcGlowRefs.current[i]?.setAttribute("d", d);
 
         const t = (seconds * 0.22 + arc.offset) % 1;
         const p = projected[Math.round(t * ARC_SAMPLES)];
@@ -169,8 +175,14 @@ export function GlobeSection() {
       }
     }
 
+    const frameMs = window.matchMedia("(pointer: coarse)").matches ? MOBILE_FRAME_MS : 0;
+    let lastDraw = 0;
+
     function tick(now: number) {
-      draw(now);
+      if (now - lastDraw >= frameMs) {
+        lastDraw = now;
+        draw(now);
+      }
       raf = requestAnimationFrame(tick);
     }
 
@@ -250,69 +262,81 @@ export function GlobeSection() {
         </div>
 
         <Reveal delay={0.1}>
-          <svg
-            ref={svgRef}
-            viewBox="-380 -380 760 760"
-            aria-hidden="true"
-            className="mx-auto block h-auto w-full max-w-[640px]"
-          >
-            <defs>
-              <radialGradient id="globe-sphere" cx="38%" cy="32%" r="75%">
-                <stop offset="0%" stopColor="#0f3a29" />
-                <stop offset="55%" stopColor="#06170f" />
-                <stop offset="100%" stopColor="#020604" />
-              </radialGradient>
-              <radialGradient id="globe-atmosphere" gradientUnits="userSpaceOnUse" cx="0" cy="0" r={R * 1.24}>
-                <stop offset="0.79" stopColor="#34d399" stopOpacity="0" />
-                <stop offset="0.81" stopColor="#34d399" stopOpacity="0.35" />
-                <stop offset="0.9" stopColor="#0a9a65" stopOpacity="0.12" />
-                <stop offset="1" stopColor="#0a9a65" stopOpacity="0" />
-              </radialGradient>
-              <filter id="globe-glow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="3" result="blur" />
-                <feMerge>
-                  <feMergeNode in="blur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-            </defs>
+          {/* Two stacked layers: the sphere, glow and latitude rings never
+              change, so they sit in their own SVG and paint once. Only the
+              lightweight strokes in the top layer redraw each frame. */}
+          <div className="relative mx-auto aspect-square w-full max-w-[640px]">
+            <svg viewBox={VIEWBOX} aria-hidden="true" className="absolute inset-0 h-full w-full">
+              <defs>
+                <radialGradient id="globe-sphere" cx="38%" cy="32%" r="75%">
+                  <stop offset="0%" stopColor="#0f3a29" />
+                  <stop offset="55%" stopColor="#06170f" />
+                  <stop offset="100%" stopColor="#020604" />
+                </radialGradient>
+                <radialGradient id="globe-atmosphere" gradientUnits="userSpaceOnUse" cx="0" cy="0" r={R * 1.24}>
+                  <stop offset="0.79" stopColor="#34d399" stopOpacity="0" />
+                  <stop offset="0.81" stopColor="#34d399" stopOpacity="0.35" />
+                  <stop offset="0.9" stopColor="#0a9a65" stopOpacity="0.12" />
+                  <stop offset="1" stopColor="#0a9a65" stopOpacity="0" />
+                </radialGradient>
+              </defs>
+              <circle r={R * 1.24} fill="url(#globe-atmosphere)" />
+              <circle r={R} fill="url(#globe-sphere)" />
+              <g fill="none" stroke="#0a9a65" strokeWidth="1" strokeOpacity="0.75">
+                {LATITUDE_PATHS.map((d, i) => (
+                  <path
+                    key={LATITUDES[i]}
+                    d={d}
+                    stroke={LATITUDES[i] === 0 ? "#34d399" : undefined}
+                    strokeOpacity={LATITUDES[i] === 0 ? 0.6 : undefined}
+                  />
+                ))}
+              </g>
+              <circle r={R} fill="none" stroke="#34d399" strokeOpacity="0.45" strokeWidth="1.25" />
+            </svg>
 
-            <circle r={R * 1.24} fill="url(#globe-atmosphere)" />
-            <circle r={R} fill="url(#globe-sphere)" />
+            <svg
+              ref={svgRef}
+              viewBox={VIEWBOX}
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full"
+            >
+              <g fill="none" stroke="#0a9a65" strokeWidth="1" strokeOpacity="0.75">
+                {MERIDIAN_VECS.map((_, m) => (
+                  <path
+                    key={m}
+                    ref={(el) => {
+                      meridianRefs.current[m] = el;
+                    }}
+                  />
+                ))}
+              </g>
 
-            <g fill="none" stroke="#0a9a65" strokeWidth="1" strokeOpacity="0.75">
-              {LATITUDE_PATHS.map((d, i) => (
-                <path
-                  key={LATITUDES[i]}
-                  d={d}
-                  stroke={LATITUDES[i] === 0 ? "#34d399" : undefined}
-                  strokeOpacity={LATITUDES[i] === 0 ? 0.6 : undefined}
-                />
-              ))}
-              {MERIDIAN_VECS.map((_, m) => (
-                <path
-                  key={m}
-                  ref={(el) => {
-                    meridianRefs.current[m] = el;
-                  }}
-                />
-              ))}
-            </g>
-            <circle r={R} fill="none" stroke="#34d399" strokeOpacity="0.45" strokeWidth="1.25" />
-
-            <g filter="url(#globe-glow)">
-              {ARCS.map((_, i) => (
-                <path
-                  key={i}
-                  ref={(el) => {
-                    arcRefs.current[i] = el;
-                  }}
-                  fill="none"
-                  stroke="#34d399"
-                  strokeOpacity="0.55"
-                  strokeWidth="1.25"
-                />
-              ))}
+              {/* Glow without an SVG filter: a wide, faint stroke under each
+                  arc. A blur filter re-rasterized every frame and stalled
+                  mobile GPUs. */}
+              <g fill="none" stroke="#34d399" strokeLinecap="round">
+                {ARCS.map((_, i) => (
+                  <path
+                    key={i}
+                    ref={(el) => {
+                      arcGlowRefs.current[i] = el;
+                    }}
+                    strokeOpacity="0.14"
+                    strokeWidth="6"
+                  />
+                ))}
+                {ARCS.map((_, i) => (
+                  <path
+                    key={i}
+                    ref={(el) => {
+                      arcRefs.current[i] = el;
+                    }}
+                    strokeOpacity="0.6"
+                    strokeWidth="1.25"
+                  />
+                ))}
+              </g>
               {ARCS.map((_, i) => (
                 <circle
                   key={i}
@@ -321,6 +345,9 @@ export function GlobeSection() {
                   }}
                   r="3"
                   fill="#ffffff"
+                  stroke="#34d399"
+                  strokeOpacity="0.35"
+                  strokeWidth="5"
                   style={{ opacity: 0 }}
                 />
               ))}
@@ -332,19 +359,18 @@ export function GlobeSection() {
                   }}
                   r="3.5"
                   fill="#34d399"
+                  stroke="#34d399"
+                  strokeOpacity="0.25"
+                  strokeWidth="6"
                   style={{ opacity: 0 }}
                 />
               ))}
               <g ref={hqRef} style={{ opacity: 0 }}>
-                <circle
-                  r="6"
-                  fill="#34d399"
-                  className="origin-center [transform-box:fill-box] motion-safe:animate-ping"
-                />
+                <circle r="13" fill="#34d399" opacity="0.18" />
                 <circle r="6" fill="#34d399" />
                 <circle r="2.5" fill="#ffffff" />
                 <text
-                  x="14"
+                  x="16"
                   y="-12"
                   fontSize="14"
                   fill="#ffffff"
@@ -353,8 +379,8 @@ export function GlobeSection() {
                   Surat · HQ
                 </text>
               </g>
-            </g>
-          </svg>
+            </svg>
+          </div>
         </Reveal>
       </Container>
     </section>

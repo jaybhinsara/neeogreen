@@ -23,6 +23,7 @@ export const SITE = {
   social: [
     { label: "LinkedIn", href: "https://www.linkedin.com/company/neeogreen/" },
     { label: "Instagram", href: "https://www.instagram.com/neeo.green/" },
+    { label: "X", href: "https://x.com/Neeogreen" },
   ] as { label: SocialNetwork; href: string }[],
 } as const;
 

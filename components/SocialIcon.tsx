@@ -1,6 +1,6 @@
 import { useId } from "react";
 
-export type SocialNetwork = "LinkedIn" | "Instagram";
+export type SocialNetwork = "LinkedIn" | "Instagram" | "X";
 
 // Frosted-glass social marks in the site's style: leaf-cut corners (two
 // rounded, two nearly square, like the buttons), a translucent white fill,
@@ -42,6 +42,12 @@ export function SocialIcon({ network, className }: { network: SocialNetwork; cla
           <circle cx="32.2" cy="31.6" r="5.4" />
           <rect x="27" y="41.7" width="10.5" height="29.1" rx="1.2" />
           <path d="M46.2 41.7H56.4V45.9C58 43.4 60.9 41.2 65.6 41.2C71.3 41.2 75.2 45 75.2 53.8V70.8H64.8V55.4C64.8 51.4 63.2 49.4 60.3 49.4C57.6 49.4 56.6 51.4 56.6 55.4V70.8H46.2Z" />
+        </g>
+      ) : network === "X" ? (
+        <g fill={`url(#${mark})`}>
+          <path d="M29 29H40.5L71 71H59.5Z" />
+          <path d="M66.6 29H71.2L55.4 46.6L52.9 43.3Z" />
+          <path d="M44.4 54.2L46.9 57.5L33.4 71H28.8Z" />
         </g>
       ) : (
         <g>

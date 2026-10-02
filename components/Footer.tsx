@@ -7,6 +7,7 @@ import { scrollToHash } from "@/lib/lenis-singleton";
 import { SERVICES, SITE } from "@/lib/site";
 import { Emphasis } from "./Emphasis";
 import { CookieSettingsButton } from "./CookieSettingsButton";
+import { LinkedInIcon } from "./LinkedInIcon";
 
 function handleAnchorClick(e: MouseEvent<HTMLAnchorElement>, href: string) {
   const hashIndex = href.indexOf("#");
@@ -44,6 +45,29 @@ export function Footer() {
             >
               Contact us
             </Link>
+            {SITE.social.length > 0 && (
+              <div className="flex flex-col gap-3">
+                <span className="label-mono text-white/80">Follow us</span>
+                <div className="flex gap-3">
+                  {SITE.social.map((s) => (
+                    <a
+                      key={s.label}
+                      href={s.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`${SITE.name} on ${s.label}`}
+                      className="group"
+                    >
+                      {s.label === "LinkedIn" ? (
+                        <LinkedInIcon className="h-12 w-12 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105" />
+                      ) : (
+                        <span className="label-mono">{s.label}</span>
+                      )}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <nav className="flex flex-col gap-3">
@@ -61,11 +85,6 @@ export function Footer() {
               <Link key={p.href} href={p.href} className="text-[15px] hover:underline">
                 {p.label}
               </Link>
-            ))}
-            {SITE.social.map((s) => (
-              <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="text-[15px] hover:underline">
-                {s.label}
-              </a>
             ))}
           </nav>
 

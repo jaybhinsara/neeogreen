@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
 import { Container } from "./Container";
@@ -26,20 +26,66 @@ export function FocusAreas() {
   const cardX = useSpring(x, { stiffness: 260, damping: 28 });
   const cardY = useSpring(y, { stiffness: 260, damping: 28 });
 
-  function handleMove(e: MouseEvent<HTMLDivElement>) {
+  // Places the card at a screen point, in the list's coordinates. `glue`
+  // skips the spring so the card stays locked to a cursor that isn't moving
+  // while the page scrolls underneath it.
+  function place(clientX: number, clientY: number, glue: boolean) {
     const rect = listRef.current?.getBoundingClientRect();
     if (!rect) return;
-    const nx = e.clientX - rect.left;
-    const ny = e.clientY - rect.top;
+    const nx = clientX - rect.left;
+    const ny = clientY - rect.top;
     x.set(nx);
     y.set(ny);
     // While the card is hidden, keep it glued to the cursor so it appears in
     // place instead of springing in from the list's top-left corner.
-    if (active === null) {
+    if (glue || active === null) {
       cardX.jump(nx);
       cardY.jump(ny);
     }
   }
+
+  function handleMove(e: MouseEvent<HTMLDivElement>) {
+    place(e.clientX, e.clientY, false);
+  }
+
+  // Scrolling moves the list under a still cursor without firing any mouse
+  // events, so on scroll re-place the card under the last known cursor
+  // position and re-pick the row beneath it (or hide the card if the cursor
+  // is no longer over the list).
+  const activeRef = useRef(active);
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
+  useEffect(() => {
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+    let pointer: { x: number; y: number } | null = null;
+    const onPointerMove = (e: PointerEvent) => {
+      pointer = { x: e.clientX, y: e.clientY };
+    };
+    const onScroll = () => {
+      const list = listRef.current;
+      if (!pointer || !list) return;
+      const rect = list.getBoundingClientRect();
+      const inside =
+        pointer.x >= rect.left && pointer.x <= rect.right && pointer.y >= rect.top && pointer.y <= rect.bottom;
+      if (!inside) {
+        if (activeRef.current !== null) setActive(null);
+        return;
+      }
+      const row = document.elementFromPoint(pointer.x, pointer.y)?.closest<HTMLElement>("[data-focus-index]");
+      const index = row ? Number(row.dataset.focusIndex) : null;
+      if (index !== activeRef.current) setActive(index);
+      place(pointer.x, pointer.y, true);
+    };
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("scroll", onScroll);
+    };
+    // place/setters are stable for this component's lifetime.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const activeService = active === null ? null : SERVICES[active];
 
@@ -60,6 +106,7 @@ export function FocusAreas() {
             <Reveal key={s.slug} delay={0.04 * i}>
               <Link
                 href={`/services/${s.slug}`}
+                data-focus-index={i}
                 onMouseEnter={() => setActive(i)}
                 className="grid gap-4 border-b border-line py-5 md:grid-cols-[1fr_auto] md:items-center md:gap-10 md:py-6"
               >

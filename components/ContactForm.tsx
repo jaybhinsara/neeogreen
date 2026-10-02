@@ -34,7 +34,7 @@ export function ContactForm() {
 
       if (!res.ok) {
         const payload = await res.json().catch(() => null);
-        throw new Error(payload?.error ?? "Something went wrong. Please try again.");
+        throw new Error(payload?.error ?? "We couldn't send your message just now. Please email hello@neeogreen.com or call/WhatsApp +91 75679 36593.");
       }
 
       setStatus("sent");
@@ -43,7 +43,7 @@ export function ContactForm() {
       router.push("/thank-you");
     } catch (err) {
       setStatus("error");
-      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setError(err instanceof Error ? err.message : "We couldn't send your message just now. Please email hello@neeogreen.com or call/WhatsApp +91 75679 36593.");
     }
   }
 

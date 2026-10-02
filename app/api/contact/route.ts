@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ensureContactTable, getSql } from "@/lib/db";
+import { SITE } from "@/lib/site";
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -59,7 +60,13 @@ export async function POST(request: Request) {
     `;
   } catch (err) {
     console.error("Failed to store contact submission:", err);
-    return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
+    // Never strand a lead: if saving fails, point them at a direct channel.
+    return NextResponse.json(
+      {
+        error: `We couldn't send your message just now. Please email ${SITE.email} or call/WhatsApp ${SITE.phone}.`,
+      },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ ok: true });

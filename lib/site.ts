@@ -1,3 +1,5 @@
+import type { SocialNetwork } from "@/components/SocialIcon";
+
 export const SITE = {
   name: "NeeoGreen",
   tagline: "Web Development, Design & Software Engineering Studio",
@@ -18,10 +20,10 @@ export const SITE = {
   serviceCities: ["Surat", "Ahmedabad", "Vadodara", "Rajkot", "Gandhinagar"],
   // Real profile URLs only: these feed the footer and the structured-data
   // sameAs list, where a generic homepage would confuse the brand entity.
-  social: [{ label: "LinkedIn", href: "https://www.linkedin.com/company/neeogreen/" }] as {
-    label: string;
-    href: string;
-  }[],
+  social: [
+    { label: "LinkedIn", href: "https://www.linkedin.com/company/neeogreen/" },
+    { label: "Instagram", href: "https://www.instagram.com/neeo.green/" },
+  ] as { label: SocialNetwork; href: string }[],
 } as const;
 
 export const SERVICES = [

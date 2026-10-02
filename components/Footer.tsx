@@ -7,7 +7,7 @@ import { scrollToHash } from "@/lib/lenis-singleton";
 import { SERVICES, SITE } from "@/lib/site";
 import { Emphasis } from "./Emphasis";
 import { CookieSettingsButton } from "./CookieSettingsButton";
-import { LinkedInIcon } from "./LinkedInIcon";
+import { SocialIcon } from "./SocialIcon";
 
 function handleAnchorClick(e: MouseEvent<HTMLAnchorElement>, href: string) {
   const hashIndex = href.indexOf("#");
@@ -58,11 +58,10 @@ export function Footer() {
                       aria-label={`${SITE.name} on ${s.label}`}
                       className="group"
                     >
-                      {s.label === "LinkedIn" ? (
-                        <LinkedInIcon className="h-12 w-12 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105" />
-                      ) : (
-                        <span className="label-mono">{s.label}</span>
-                      )}
+                      <SocialIcon
+                        network={s.label}
+                        className="h-12 w-12 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105"
+                      />
                     </a>
                   ))}
                 </div>

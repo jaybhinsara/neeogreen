@@ -1,4 +1,5 @@
 import { ensureContactTable, getSql, type ContactSubmission } from "@/lib/db";
+import { toWhatsAppNumber } from "@/lib/phone";
 
 export const dynamic = "force-dynamic";
 
@@ -6,12 +7,8 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-// wa.me needs the number in international form with no symbols. Numbers
-// typed without a country code are assumed to be Indian (10 digits).
 function whatsappHref(phone: string) {
-  const digits = phone.replace(/\D/g, "");
-  const international = !phone.trim().startsWith("+") && digits.length === 10 ? `91${digits}` : digits;
-  return `https://wa.me/${international}`;
+  return `https://wa.me/${toWhatsAppNumber(phone)}`;
 }
 
 export default async function SubmissionsPage() {
@@ -63,9 +60,11 @@ export default async function SubmissionsPage() {
                 </span>
               </div>
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
-                <a href={`mailto:${s.email}`} className="underline decoration-line hover:text-ink">
-                  {s.email}
-                </a>
+                {s.email && (
+                  <a href={`mailto:${s.email}`} className="underline decoration-line hover:text-ink">
+                    {s.email}
+                  </a>
+                )}
                 {s.phone && (
                   <>
                     <a href={`tel:${s.phone.replace(/[^\d+]/g, "")}`} className="underline decoration-line hover:text-ink">

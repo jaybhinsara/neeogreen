@@ -5,6 +5,7 @@ import { Container } from "./Container";
 import { Reveal } from "./Reveal";
 import { SERVICES } from "@/lib/site";
 import { Emphasis, type EmphasisTone } from "./Emphasis";
+import { BookCallTrigger } from "./BookCallTrigger";
 
 export type ServiceContent = {
   slug: (typeof SERVICES)[number]["slug"];
@@ -53,12 +54,9 @@ export function ServicePage({ content }: { content: ServiceContent }) {
                 <p className="max-w-[46ch] text-lg leading-relaxed text-muted md:text-xl">{content.intro}</p>
               </Reveal>
               <Reveal delay={0.15}>
-                <Link
-                  href="/contact"
-                  className="label-mono inline-flex rounded-md bg-brand px-6 py-4 text-white transition-colors hover:bg-brand-deep"
-                >
+                <BookCallTrigger className="label-mono inline-flex rounded-md bg-brand px-6 py-4 text-white transition-colors hover:bg-brand-deep">
                   Book a call
-                </Link>
+                </BookCallTrigger>
               </Reveal>
             </div>
           </Container>

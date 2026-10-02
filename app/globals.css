@@ -55,6 +55,16 @@ textarea:-webkit-autofill {
   transition: background-color 600000s 0s, color 600000s 0s;
 }
 
+/* Autofill inside dark surfaces (the Book a call dialog). */
+input.autofill-dark:-webkit-autofill,
+input.autofill-dark:-webkit-autofill:hover,
+input.autofill-dark:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff;
+  -webkit-box-shadow: 0 0 0 1000px #06140e inset;
+  box-shadow: 0 0 0 1000px #06140e inset;
+  caret-color: #ffffff;
+}
+
 ::selection {
   background: var(--color-brand);
   color: #ffffff;

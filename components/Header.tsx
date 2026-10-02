@@ -7,6 +7,7 @@ import { motion, AnimatePresence, useScroll } from "framer-motion";
 import { Logo } from "./Logo";
 import { cn } from "@/lib/cn";
 import { scrollToHash } from "@/lib/lenis-singleton";
+import { BookCallTrigger } from "./BookCallTrigger";
 
 const LEFT_LINKS = [
   { href: "/#services", label: "Services" },
@@ -50,8 +51,7 @@ function NavLink({ href, label, active }: { href: string; label: string; active:
 
 function BookCallButton({ className, onClick }: { className?: string; onClick?: () => void }) {
   return (
-    <Link
-      href="/contact"
+    <BookCallTrigger
       onClick={onClick}
       className={cn(
         "label-mono inline-flex items-center gap-2.5 whitespace-nowrap bg-brand text-white transition-colors hover:bg-brand-deep",
@@ -64,7 +64,7 @@ function BookCallButton({ className, onClick }: { className?: string; onClick?: 
         <span className="relative h-1.5 w-1.5 rounded-full bg-accent-1" />
       </span>
       Book a call
-    </Link>
+    </BookCallTrigger>
   );
 }
 

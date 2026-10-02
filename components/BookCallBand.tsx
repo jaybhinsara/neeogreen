@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { BookCallTrigger } from "./BookCallTrigger";
 import { Container } from "./Container";
 import { Reveal } from "./Reveal";
 import { Emphasis } from "./Emphasis";
@@ -20,12 +20,9 @@ export function BookCallBand() {
             </h2>
           </Reveal>
           <Reveal delay={0.05}>
-            <Link
-              href="/contact"
-              className="label-mono inline-flex items-center rounded-md bg-brand px-6 py-4 text-white transition-colors hover:bg-brand-deep"
-            >
+            <BookCallTrigger className="label-mono inline-flex items-center rounded-md bg-brand px-6 py-4 text-white transition-colors hover:bg-brand-deep">
               Book a call
-            </Link>
+            </BookCallTrigger>
           </Reveal>
         </div>
 

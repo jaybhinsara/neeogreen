@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ensureContactTable, getSql } from "@/lib/db";
 import { SITE } from "@/lib/site";
+import { isValidPhone } from "@/lib/phone";
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -37,10 +38,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
   }
 
-  // International numbers: optional leading +, then digits with common
-  // separators, 7 to 15 digits in total (the E.164 maximum).
-  const phoneDigits = phone.replace(/\D/g, "");
-  if (!/^\+?[\d\s().-]+$/.test(phone.trim()) || phoneDigits.length < 7 || phoneDigits.length > 15) {
+  if (!isValidPhone(phone)) {
     return NextResponse.json({ error: "Enter a valid mobile number." }, { status: 400 });
   }
 

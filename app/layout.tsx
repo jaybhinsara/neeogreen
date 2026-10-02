@@ -4,6 +4,7 @@ import { SmoothScroll } from "@/components/SmoothScroll";
 import { CustomCursor } from "@/components/CustomCursor";
 import { ScrollThumb } from "@/components/ScrollThumb";
 import { CookieConsent } from "@/components/CookieConsent";
+import { BookCallDialog } from "@/components/BookCallDialog";
 import { SITE } from "@/lib/site";
 import "./globals.css";
 
@@ -92,6 +93,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <CustomCursor />
         <ScrollThumb />
         <CookieConsent />
+        <BookCallDialog />
         {children}
       </body>
     </html>

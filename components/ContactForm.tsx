@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 
 const PROJECT_TYPES = ["Web development", "Web design", "Software engineering", "Managed IT & cloud", "Not sure yet"];
 
 export function ContactForm() {
+  const router = useRouter();
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -36,6 +38,9 @@ export function ContactForm() {
       }
 
       setStatus("sent");
+      // A dedicated URL that only loads after a successful send, so ad
+      // platforms can count it as a conversion.
+      router.push("/thank-you");
     } catch (err) {
       setStatus("error");
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
@@ -47,7 +52,7 @@ export function ContactForm() {
       <div className="flex flex-col gap-3 rounded-lg bg-paper px-8 py-12 text-center">
         <span className="font-heading text-3xl font-medium tracking-[-0.03em]">Message sent.</span>
         <p className="text-[15px] text-muted">
-          We reply to every inquiry within two business days.
+          Taking you to the next step&hellip;
         </p>
       </div>
     );

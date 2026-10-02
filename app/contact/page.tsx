@@ -32,7 +32,7 @@ export default function ContactPage() {
               <p className="max-w-[40ch] text-lg leading-relaxed text-muted">
                 Tell us what you&rsquo;re building, a website, a web app,
                 custom software, or IT that just needs to work. We reply to
-                every inquiry within two business days.
+                every inquiry within one business day.
               </p>
 
               <div className="flex flex-col gap-3 border-t border-line pt-8 text-[15px]">

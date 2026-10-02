@@ -42,7 +42,7 @@ export function Footer() {
           </div>
 
           <nav className="flex flex-col gap-3">
-            <span className="label-mono mb-2 text-white/60">Services</span>
+            <span className="mb-3 border-b border-white/30 pb-3 font-serif text-[28px] italic leading-none text-white">Services</span>
             {SERVICES.map((s) => (
               <Link key={s.slug} href={`/services/${s.slug}`} className="text-[15px] hover:underline">
                 {s.title}
@@ -51,7 +51,7 @@ export function Footer() {
           </nav>
 
           <nav className="flex flex-col gap-3">
-            <span className="label-mono mb-2 text-white/60">Studio</span>
+            <span className="mb-3 border-b border-white/30 pb-3 font-serif text-[28px] italic leading-none text-white">Studio</span>
             {PAGES.map((p) => (
               <Link key={p.href} href={p.href} className="text-[15px] hover:underline">
                 {p.label}
@@ -65,14 +65,14 @@ export function Footer() {
           </nav>
 
           <address className="flex flex-col gap-3 not-italic">
-            <span className="label-mono mb-2 text-white/60">HQ &mdash; {SITE.locality}, India</span>
+            <span className="mb-3 border-b border-white/30 pb-3 font-serif text-[28px] italic leading-none text-white">{SITE.locality}, India</span>
             <a href={`mailto:${SITE.email}`} className="text-[15px] hover:underline">
               {SITE.email}
             </a>
             <a href={`tel:${SITE.phone.replace(/\s/g, "")}`} className="text-[15px] hover:underline">
               {SITE.phone}
             </a>
-            <span className="mt-3 text-[15px] text-white/70">Working with teams worldwide.</span>
+            <span className="mt-3 text-[15px] text-white/85">Working with teams worldwide.</span>
           </address>
         </div>
 

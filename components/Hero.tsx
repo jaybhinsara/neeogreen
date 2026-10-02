@@ -85,6 +85,9 @@ export function Hero({ ready }: { ready: boolean }) {
   // visible over the fully zoomed media.
   const headlineOpacity = useTransform(scrollYProgress, (v) => 1 - Math.min(v / 0.18, 1));
   const headlineY = useTransform(scrollYProgress, [0, 0.18], [0, -32]);
+  // Once the video is full-bleed it sinks into black, so it meets the black
+  // opening of the statement section below with no visible seam.
+  const fadeOut = useTransform(scrollYProgress, (v) => (reduced ? 0 : Math.min(Math.max((v - 0.8) / 0.2, 0), 1)));
 
   return (
     <section id="top" ref={sectionRef} className="relative h-[230svh] bg-page">
@@ -94,6 +97,11 @@ export function Hero({ ready }: { ready: boolean }) {
           insets={isDesktop ? INSETS.desktop : INSETS.mobile}
           progress={progress}
           mediaScale={mediaScale}
+        />
+        <motion.div
+          aria-hidden="true"
+          style={{ opacity: fadeOut }}
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(5,7,6,0.35)_0%,rgba(5,7,6,0.85)_55%,#050706_100%)]"
         />
 
         <motion.div

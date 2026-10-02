@@ -42,8 +42,17 @@ const WORDS: Word[] = [
 const ENTER_END = 0.2; // quote zooms out from huge and fades in
 const SUCK_START = 0.48; // hole starts pulling words in
 const SUCK_END = 0.84;
-const WORD_DURATION = 0.2; // each word's own spiral, staggered across the suck
-const SPIRAL_TURNS = 1.35;
+const WORD_DURATION = 0.26; // each word's own fall, staggered across the suck
+
+// How a word falls in, as fractions of its own WORD_DURATION: it melts and
+// drifts out to the glowing ring, orbits along the tilted disk while being
+// stretched thin, then drops through the edge into the center.
+const MELT_END = 0.22;
+const ORBIT_END = 0.8;
+const ORBIT_TURNS = 1.15;
+const ORBIT_RADIUS = 0.34; // fraction of the hole's width: just outside the photon ring
+const ORBIT_SQUASH = 0.42; // how flat the orbit looks (the disk itself is 0.24)
+const DISK_TILT = (-9 * Math.PI) / 180; // matches the disk's rotate(-9deg)
 
 const clamp01 = (v: number) => Math.min(Math.max(v, 0), 1);
 const range = (v: number, a: number, b: number) => clamp01((v - a) / (b - a));
@@ -70,11 +79,92 @@ const DISK_FRONT_MASK: CSSProperties = {
 const DISK_GRADIENT =
   "conic-gradient(from 0deg, rgba(52,211,153,0) 0deg, rgba(52,211,153,0.85) 50deg, #effff8 95deg, rgba(52,211,153,0.7) 150deg, rgba(10,154,101,0.15) 220deg, rgba(34,211,238,0.55) 290deg, rgba(52,211,153,0) 360deg)";
 
+type Pose = { x: number; y: number; rotate: number; scaleX: number; scaleY: number; opacity: number };
+const REST: Pose = { x: 0, y: 0, rotate: 0, scaleX: 1, scaleY: 1, opacity: 1 };
+
+const smooth = (t: number) => t * t * (3 - 2 * t);
+
+// A point on the words' orbit: an ellipse squashed and tilted like the disk.
+function orbitPoint(angle: number, radius: number) {
+  const lx = radius * Math.cos(angle);
+  const ly = radius * Math.sin(angle) * ORBIT_SQUASH;
+  return {
+    x: lx * Math.cos(DISK_TILT) - ly * Math.sin(DISK_TILT),
+    y: lx * Math.sin(DISK_TILT) + ly * Math.cos(DISK_TILT),
+  };
+}
+
+// Direction of travel along the orbit, in degrees, so words face along it.
+function orbitTangent(angle: number) {
+  const dx = -Math.sin(angle);
+  const dy = Math.cos(angle) * ORBIT_SQUASH;
+  const tx = dx * Math.cos(DISK_TILT) - dy * Math.sin(DISK_TILT);
+  const ty = dx * Math.sin(DISK_TILT) + dy * Math.cos(DISK_TILT);
+  return (Math.atan2(ty, tx) * 180) / Math.PI;
+}
+
+// The far half of the orbit (upper half before tilting) passes behind the
+// hole, so words there dim as if the shadow is covering them.
+const behindDim = (angle: number) => 1 - 0.7 * Math.max(0, -Math.sin(angle));
+
+function wordPose(k: number, offset: { x: number; y: number }, orbitRadius: number): Pose {
+  if (k <= 0) return REST;
+  const a0 = Math.atan2(offset.y, offset.x);
+
+  if (k < MELT_END) {
+    // Melt: the word sags and drips (taller, narrower, dropping slightly)
+    // while drifting out to the ring at its own angle from the center.
+    const m = smooth(k / MELT_END);
+    const target = orbitPoint(a0, orbitRadius);
+    return {
+      x: (target.x - offset.x) * m,
+      y: (target.y - offset.y) * m + 14 * Math.sin(Math.PI * m),
+      rotate: orbitTangent(a0) * m,
+      scaleX: 1 - 0.15 * m,
+      scaleY: 1 + 0.45 * m,
+      opacity: 1,
+    };
+  }
+
+  if (k < ORBIT_END) {
+    // Orbit: carried around the disk, tightening, and stretched thin along
+    // the direction of travel as tidal forces take hold.
+    const u = (k - MELT_END) / (ORBIT_END - MELT_END);
+    const angle = a0 + u * ORBIT_TURNS * Math.PI * 2;
+    const p = orbitPoint(angle, orbitRadius * (1 - 0.45 * u));
+    const shrink = 1 - 0.45 * u;
+    return {
+      x: p.x - offset.x,
+      y: p.y - offset.y,
+      rotate: orbitTangent(angle),
+      scaleX: (0.85 + 1.2 * u) * shrink,
+      scaleY: (1.45 - 1.05 * u) * shrink,
+      opacity: behindDim(angle) * (1 - 0.25 * u),
+    };
+  }
+
+  // Plunge: the last loop collapses into the center and the word is gone.
+  const w = (k - ORBIT_END) / (1 - ORBIT_END);
+  const angle = a0 + (ORBIT_TURNS + 0.6 * w) * Math.PI * 2;
+  const p = orbitPoint(angle, orbitRadius * 0.55 * Math.pow(1 - w, 1.5));
+  const shrink = 0.55 * (1 - w);
+  return {
+    x: p.x - offset.x,
+    y: p.y - offset.y,
+    rotate: orbitTangent(angle),
+    scaleX: Math.max(0.02, 2.05 * shrink),
+    scaleY: Math.max(0.02, 0.4 * shrink),
+    opacity: behindDim(angle) * 0.75 * (1 - w),
+  };
+}
+
 function SpiralWord({
   word,
   index,
   progress,
   offsets,
+  holeWidth,
+  holeScale,
   reduced,
   registerRef,
 }: {
@@ -82,44 +172,35 @@ function SpiralWord({
   index: number;
   progress: MotionValue<number>;
   offsets: RefObject<{ x: number; y: number }[]>;
+  holeWidth: RefObject<number>;
+  holeScale: MotionValue<number>;
   reduced: boolean;
   registerRef: (el: HTMLSpanElement | null) => void;
 }) {
   const stagger = ((SUCK_END - SUCK_START - WORD_DURATION) * index) / (WORDS.length - 1);
   const start = SUCK_START + stagger;
-  const t = useTransform(progress, (v) => (reduced ? 0 : easeIn(range(v, start, start + WORD_DURATION))));
 
-  // Spiral toward the quote's center, which sits on the hole: the angle
-  // winds on while the radius collapses, so each word orbits as it falls.
-  const pos = useTransform(t, (k) => {
-    if (k === 0) return { x: 0, y: 0 };
-    const o = offsets.current[index] ?? { x: 0, y: 0 };
-    const r0 = Math.hypot(o.x, o.y);
-    const a0 = Math.atan2(o.y, o.x);
-    const r = r0 * Math.pow(1 - k, 1.6);
-    const a = a0 + k * SPIRAL_TURNS * Math.PI * 2;
-    return { x: r * Math.cos(a) - o.x, y: r * Math.sin(a) - o.y };
+  const pose = useTransform(progress, (v) => {
+    if (reduced) return REST;
+    const k = range(v, start, start + WORD_DURATION);
+    const orbitRadius = ORBIT_RADIUS * holeWidth.current * holeScale.get();
+    return wordPose(k, offsets.current[index] ?? { x: 0, y: 0 }, orbitRadius);
   });
-  const x = useTransform(pos, (p) => p.x);
-  const y = useTransform(pos, (p) => p.y);
-  const rotate = useTransform(t, (k) => k * 240);
-  const scale = useTransform(t, (k) => Math.max(0.02, 1 - k * 0.98));
-  const opacity = useTransform(t, (k) => (k < 0.55 ? 1 : 1 - (k - 0.55) / 0.45));
+  const x = useTransform(pose, (p) => p.x);
+  const y = useTransform(pose, (p) => p.y);
+  const rotate = useTransform(pose, (p) => p.rotate);
+  const scaleX = useTransform(pose, (p) => p.scaleX);
+  const scaleY = useTransform(pose, (p) => p.scaleY);
+  const opacity = useTransform(pose, (p) => p.opacity);
 
   return (
     <>
       <motion.span
         ref={registerRef}
-        style={{ x, y, rotate, scale, opacity }}
+        style={{ x, y, rotate, scaleX, scaleY, opacity }}
         className="inline-block whitespace-nowrap will-change-transform"
       >
-        <span
-          className={
-            word.key
-              ? EMPHASIS_CLASS
-              : "font-heading font-normal text-white/90"
-          }
-        >
+        <span className={word.key ? EMPHASIS_CLASS : "font-heading font-normal text-white/90"}>
           {word.text}
         </span>
         {word.after && <span className="font-heading font-normal text-white/90">{word.after}</span>}
@@ -177,6 +258,8 @@ export function BrandStatement() {
   const quoteRef = useRef<HTMLQuoteElement>(null);
   const wordEls = useRef<(HTMLSpanElement | null)[]>([]);
   const offsets = useRef<{ x: number; y: number }[]>([]);
+  // Unscaled width of the hole, matching BlackHole's w-[min(118vw,760px)].
+  const holeWidth = useRef(760);
   const reduced = useReducedMotion() ?? false;
 
   // Each word's resting center relative to the quote's center, read from
@@ -185,6 +268,7 @@ export function BrandStatement() {
     const quote = quoteRef.current;
     if (!quote) return;
     function measure() {
+      holeWidth.current = Math.min(window.innerWidth * 1.18, 760);
       const cx = quote!.offsetWidth / 2;
       const cy = quote!.offsetHeight / 2;
       offsets.current = wordEls.current.map((el) =>
@@ -296,6 +380,8 @@ export function BrandStatement() {
                 index={i}
                 progress={scrollYProgress}
                 offsets={offsets}
+                holeWidth={holeWidth}
+                holeScale={holeScale}
                 reduced={reduced}
                 registerRef={(el) => {
                   wordEls.current[i] = el;

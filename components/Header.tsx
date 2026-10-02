@@ -68,11 +68,15 @@ function BookCallButton({ className, onClick }: { className?: string; onClick?: 
   );
 }
 
-export function Header() {
+// `onDark` is for pages whose top sits on a dark background: the unscrolled
+// header then uses light text instead of ink.
+export function Header({ onDark = false }: { onDark?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
   const { scrollYProgress } = useScroll();
+  // Mobile bar: light text only while it's transparent over a dark page.
+  const lightBar = onDark && !scrolled && !menuOpen;
   const isActive = (href: string) => !href.includes("#") && pathname === href;
 
   // Close the menu first. Page links then swap client-side (no full reload
@@ -114,7 +118,7 @@ export function Header() {
           LEAF_PILL,
           scrolled
             ? "mt-4 max-w-[920px] bg-[#06140e]/75 px-6 py-3.5 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_0_1px_rgba(52,211,153,0.14),0_18px_40px_-18px_rgba(5,7,6,0.6)] backdrop-blur-xl"
-            : "mt-0 max-w-[1440px] px-10 py-7 text-ink"
+            : cn("mt-0 max-w-[1440px] px-10 py-7", onDark ? "text-white" : "text-ink")
         )}
       >
         <nav className="flex items-center gap-8">
@@ -152,7 +156,7 @@ export function Header() {
           menuOpen || scrolled ? "bg-page/90 backdrop-blur-md" : "bg-transparent"
         )}
       >
-        <Link href="/#top" onClick={(e) => handleAnchorClick(e, "/#top")} aria-label="NeeoGreen home" className="text-ink">
+        <Link href="/#top" onClick={(e) => handleAnchorClick(e, "/#top")} aria-label="NeeoGreen home" className={lightBar ? "text-white" : "text-ink"}>
           <Logo />
         </Link>
         <button
@@ -164,13 +168,15 @@ export function Header() {
         >
           <span
             className={cn(
-              "block h-px w-6 bg-ink transition-transform duration-300",
+              "block h-px w-6 transition-transform duration-300",
+              lightBar ? "bg-white" : "bg-ink",
               menuOpen && "translate-y-[3.5px] rotate-45"
             )}
           />
           <span
             className={cn(
-              "block h-px w-6 bg-ink transition-transform duration-300",
+              "block h-px w-6 transition-transform duration-300",
+              lightBar ? "bg-white" : "bg-ink",
               menuOpen && "-translate-y-[3.5px] -rotate-45"
             )}
           />

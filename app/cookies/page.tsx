@@ -35,13 +35,21 @@ const SECTIONS: LegalSection[] = [
           visit. It contains no personal data and expires after 12 months.
         </p>
         <p>
-          <strong>Analytics.</strong> We do not currently use analytics or advertising cookies. If we add
-          privacy-friendly analytics in the future, they will only run after you choose &ldquo;Accept all&rdquo;,
-          and this page will list them.
+          <strong>Advertising measurement (optional).</strong> Only if you choose &ldquo;Accept all&rdquo;, we
+          load the Google tag for Google Ads so we can see which of our ads lead to enquiries. Google may set
+          cookies such as <code>_gcl_au</code> (up to 90 days) on our domain, plus its own cookies on Google
+          domains, and receives information such as the pages you visit here and the ad you came from. If you
+          choose &ldquo;Essential only&rdquo;, the tag is never loaded; if you switch later, it stops storing or
+          reading cookies.
         </p>
         <p>
-          <strong>Third parties.</strong> Our fonts are served from our own domain and we embed no third-party
-          trackers, so no other company sets cookies through this website.
+          <strong>Third parties.</strong> Our fonts are served from our own domain. Google, through the tag
+          above, is the only third party that can set cookies through this website, and only with your consent.
+          See{" "}
+          <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noreferrer">
+            how Google uses information from sites that use its services
+          </a>
+          .
         </p>
       </>
     ),
@@ -87,7 +95,12 @@ export default function CookiesPage() {
         </>
       }
       updated="2 October 2026"
-      intro={<p>We keep cookies to the minimum: one essential cookie, and nothing optional without your say.</p>}
+      intro={
+        <p>
+          We keep cookies to the minimum: one essential cookie, and Google&rsquo;s ad measurement only if you say
+          yes.
+        </p>
+      }
       sections={SECTIONS}
     />
   );

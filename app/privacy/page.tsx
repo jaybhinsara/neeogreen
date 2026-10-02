@@ -44,7 +44,8 @@ const SECTIONS: LegalSection[] = [
           request. We use this only to keep the site secure and working.
         </p>
         <p>
-          <strong>Cookies.</strong> We set one essential cookie to remember your cookie choice. See our{" "}
+          <strong>Cookies.</strong> We set one essential cookie to remember your cookie choice, and, only with
+          your consent, Google&rsquo;s advertising measurement cookies. See our{" "}
           <Link href="/cookies">Cookie Policy</Link> for details.
         </p>
       </>
@@ -94,7 +95,11 @@ const SECTIONS: LegalSection[] = [
             <strong>Vercel</strong>, which hosts the website and processes request data;
           </li>
           <li>
-            <strong>Neon</strong>, which hosts the database where contact form submissions are stored.
+            <strong>Neon</strong>, which hosts the database where contact form submissions are stored;
+          </li>
+          <li>
+            <strong>Google</strong>, only if you accept optional cookies: the Google Ads tag measures which of our
+            ads lead to enquiries. See our <Link href="/cookies">Cookie Policy</Link>.
           </li>
         </ul>
         <p>

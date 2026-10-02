@@ -44,9 +44,9 @@ export function CookieConsent() {
             Cookies, <Emphasis>briefly</Emphasis>.
           </p>
           <p className="mt-3 text-[15px] leading-relaxed text-white/80">
-            We only use what the site needs to work. With your OK we may also
-            use analytics to learn how the site is used, never for ads. Read
-            our{" "}
+            We only use what the site needs to work. With your OK we also use
+            Google tools to measure which of our ads bring enquiries. We never
+            sell your data. Read our{" "}
             <Link href="/cookies" className="underline decoration-accent-1/60 underline-offset-2 hover:text-white">
               cookie policy
             </Link>

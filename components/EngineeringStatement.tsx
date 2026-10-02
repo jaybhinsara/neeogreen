@@ -41,8 +41,15 @@ export function EngineeringStatement() {
         className="relative z-10 text-center"
       >
         <p className="mx-auto max-w-[24ch] font-heading text-[clamp(30px,3.6vw,60px)] font-normal leading-[1.16] tracking-[-0.03em] text-white/90 [text-shadow:0_2px_28px_rgba(0,0,0,0.75)]">
-          Websites are where we <Emphasis>start</Emphasis>, not where we{" "}
-          <Emphasis>stop</Emphasis>. We engineer products, internal tools, and
+          Websites are where we{" "}
+          <span className="whitespace-nowrap">
+            <Emphasis>start</Emphasis>,
+          </span>{" "}
+          not where we{" "}
+          <span className="whitespace-nowrap">
+            <Emphasis>stop</Emphasis>.
+          </span>{" "}
+          We engineer products, internal tools, and
           the systems behind them, built to solve real problems and{" "}
           <Emphasis>grow</Emphasis> with your business.
         </p>

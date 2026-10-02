@@ -62,10 +62,19 @@ const SUCK_END = 0.84;
 const WORD_DURATION = 0.26; // each word's own fall, staggered across the suck
 
 // How a word is taken, as fractions of its own WORD_DURATION: it sinks onto
-// the disk's line through the hole while being stretched sideways, then is
-// torn into a thin streak of light that flows away along the disk.
-const PULL_END = 0.3;
-const FLOW_DISTANCE = 0.75; // fraction of the viewport width a streak travels
+// the disk's line and thins into a streak, slides along the disk to the edge
+// of the hole, where the shader takes over and draws it as a curved line of
+// light circling the edge and spiralling in until the shadow swallows it.
+const PULL_END = 0.25;
+const SLIDE_END = 0.38;
+const HANDOFF = 0.4; // last part of the slide, where the word fades into the arc
+const ORBIT_TURNS = 1.4;
+const STREAK_THICKNESS = 3; // px, so every streak is the same thin line
+const RING_RADIUS = 1.13; // arcs start just outside the shadow (shader radius = 1)
+// Must match BlackHoleCanvas: shadow radius is 0.42 * scale in units of
+// half the canvas's shorter side.
+const SHADER_RADIUS = 0.42;
+export const MAX_STREAKS = 16;
 
 const clamp01 = (v: number) => Math.min(Math.max(v, 0), 1);
 const range = (v: number, a: number, b: number) => clamp01((v - a) / (b - a));
@@ -94,34 +103,72 @@ const DISK_GRADIENT =
 
 type Pose = { x: number; y: number; scaleX: number; scaleY: number; opacity: number };
 const REST: Pose = { x: 0, y: 0, scaleX: 1, scaleY: 1, opacity: 1 };
+// A streak as the shader draws it (see uStreaks in BlackHoleCanvas).
+type Arc = { head: number; radius: number; length: number; alpha: number };
+const NO_ARC: Arc = { head: 0, radius: 0, length: 0, alpha: 0 };
+
+type WordBox = { x: number; y: number; w: number; h: number };
+// The hole as it is on screen right now, relative to the quote's center.
+type Hole = { cx: number; cy: number; radius: number };
 
 const smooth = (t: number) => t * t * (3 - 2 * t);
 
-function wordPose(k: number, offset: { x: number; y: number }, viewWidth: number): Pose {
-  if (k <= 0) return REST;
+function wordMotion(k: number, box: WordBox, hole: Hole): { pose: Pose; arc: Arc } {
+  if (k <= 0) return { pose: REST, arc: NO_ARC };
+  const thin = STREAK_THICKNESS / box.h;
+  const bandX = box.x * 0.85;
 
   if (k < PULL_END) {
-    // Pull: the word sinks onto the disk's line (the hole's horizontal
-    // center) and starts to smear sideways.
+    // Pull: sinks onto the disk's line through the hole and thins out.
     const m = smooth(k / PULL_END);
     return {
-      x: -offset.x * 0.15 * m,
-      y: -offset.y * m,
-      scaleX: 1 + 1.2 * m,
-      scaleY: 1 - 0.55 * m,
-      opacity: 1,
+      pose: {
+        x: (bandX - box.x + hole.cx) * m,
+        y: (hole.cy - box.y) * m,
+        scaleX: 1 + 0.8 * m,
+        scaleY: 1 + (thin - 1) * m,
+        opacity: 1,
+      },
+      arc: NO_ARC,
     };
   }
 
-  // Flow: torn into a streak that accelerates along the disk and fades into
-  // its glow, like the plasma pouring around the hole in the film.
-  const u = (k - PULL_END) / (1 - PULL_END);
+  // Streaks are caught at the side of the hole they're on (screen angle 0 is
+  // the right edge, PI the left) and all circle clockwise on screen. The
+  // shader's y axis points up, so its angles are the negatives of these.
+  const side = bandX >= 0 ? 0 : Math.PI;
+
+  if (k < SLIDE_END) {
+    // Slide: along the disk to the edge; near the end the word fades out as
+    // its arc fades in at the same point and starts to bend along the ring.
+    const c = smooth((k - PULL_END) / (SLIDE_END - PULL_END));
+    const fromX = hole.cx + bandX;
+    const edgeX = hole.cx + Math.cos(side) * hole.radius * RING_RADIUS;
+    const handoff = Math.max(0, (c - (1 - HANDOFF)) / HANDOFF);
+    return {
+      pose: {
+        x: fromX + (edgeX - fromX) * c - box.x,
+        y: hole.cy - box.y,
+        scaleX: 1.8 * (1 - 0.5 * c),
+        scaleY: thin,
+        opacity: 1 - handoff,
+      },
+      arc: { head: -side, radius: RING_RADIUS, length: 0.05 + 0.25 * handoff, alpha: handoff },
+    };
+  }
+
+  // Orbit: the arc circles the edge, lengthening as it speeds up, and
+  // spirals inward until the shadow covers it.
+  const u = (k - SLIDE_END) / (1 - SLIDE_END);
+  const angle = side + u * u * ORBIT_TURNS * Math.PI * 2;
   return {
-    x: -offset.x * 0.15 - u * u * FLOW_DISTANCE * viewWidth,
-    y: -offset.y,
-    scaleX: 2.2 + 4 * u,
-    scaleY: 0.45 - 0.33 * u,
-    opacity: 1 - Math.pow(u, 1.5),
+    pose: { ...REST, opacity: 0 },
+    arc: {
+      head: -angle,
+      radius: RING_RADIUS - 0.28 * u * u,
+      length: 0.3 + 1.5 * u,
+      alpha: 1,
+    },
   };
 }
 
@@ -129,16 +176,24 @@ function SpiralWord({
   word,
   index,
   progress,
-  offsets,
-  viewWidth,
+  boxes,
+  viewport,
+  holeScale,
+  holeX,
+  holeY,
+  streaks,
   reduced,
   registerRef,
 }: {
   word: Word;
   index: number;
   progress: MotionValue<number>;
-  offsets: RefObject<{ x: number; y: number }[]>;
-  viewWidth: RefObject<number>;
+  boxes: RefObject<WordBox[]>;
+  viewport: RefObject<{ w: number; h: number }>;
+  holeScale: MotionValue<number>;
+  holeX: MotionValue<number>;
+  holeY: MotionValue<number>;
+  streaks: RefObject<Float32Array>;
   reduced: boolean;
   registerRef: (el: HTMLSpanElement | null) => void;
 }) {
@@ -146,9 +201,22 @@ function SpiralWord({
   const start = SUCK_START + stagger;
 
   const pose = useTransform(progress, (v) => {
-    if (reduced) return REST;
-    const k = range(v, start, start + WORD_DURATION);
-    return wordPose(k, offsets.current[index] ?? { x: 0, y: 0 }, viewWidth.current);
+    const box = boxes.current[index];
+    let motion = { pose: REST, arc: NO_ARC };
+    if (!reduced && box && box.w > 0) {
+      const { w, h } = viewport.current;
+      const hole: Hole = {
+        cx: holeX.get(),
+        cy: holeY.get(),
+        radius: SHADER_RADIUS * holeScale.get() * 0.5 * Math.min(w, h),
+      };
+      motion = wordMotion(range(v, start, start + WORD_DURATION), box, hole);
+    }
+    // Hand this word's arc to the shader, which reads the array every frame.
+    if (index < MAX_STREAKS) {
+      streaks.current.set([motion.arc.head, motion.arc.radius, motion.arc.length, motion.arc.alpha], index * 4);
+    }
+    return motion.pose;
   });
   const x = useTransform(pose, (p) => p.x);
   const y = useTransform(pose, (p) => p.y);
@@ -220,8 +288,10 @@ export function BrandStatement() {
   const sectionRef = useRef<HTMLElement>(null);
   const quoteRef = useRef<HTMLQuoteElement>(null);
   const wordEls = useRef<(HTMLSpanElement | null)[]>([]);
-  const offsets = useRef<{ x: number; y: number }[]>([]);
-  const viewWidth = useRef(1280);
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const boxes = useRef<WordBox[]>([]);
+  const streaks = useRef(new Float32Array(MAX_STREAKS * 4));
+  const viewport = useRef({ w: 1280, h: 800 });
   const canUseWebGL = useSyncExternalStore(noopSubscribe, supportsWebGL, () => false);
   const reduced = useReducedMotion() ?? false;
 
@@ -231,13 +301,21 @@ export function BrandStatement() {
     const quote = quoteRef.current;
     if (!quote) return;
     function measure() {
-      viewWidth.current = window.innerWidth;
+      const sticky = stickyRef.current;
+      viewport.current = sticky
+        ? { w: sticky.clientWidth, h: sticky.clientHeight }
+        : { w: window.innerWidth, h: window.innerHeight };
       const cx = quote!.offsetWidth / 2;
       const cy = quote!.offsetHeight / 2;
-      offsets.current = wordEls.current.map((el) =>
+      boxes.current = wordEls.current.map((el) =>
         el
-          ? { x: el.offsetLeft + el.offsetWidth / 2 - cx, y: el.offsetTop + el.offsetHeight / 2 - cy }
-          : { x: 0, y: 0 }
+          ? {
+              x: el.offsetLeft + el.offsetWidth / 2 - cx,
+              y: el.offsetTop + el.offsetHeight / 2 - cy,
+              w: el.offsetWidth,
+              h: el.offsetHeight,
+            }
+          : { x: 0, y: 0, w: 0, h: 0 }
       );
     }
     measure();
@@ -300,6 +378,7 @@ export function BrandStatement() {
   return (
     <section ref={sectionRef} className={reduced ? "relative bg-night" : "relative h-[380svh] bg-night"}>
       <div
+        ref={stickyRef}
         onPointerMove={handlePointerMove}
         onPointerLeave={() => {
           pointerX.set(0);
@@ -313,6 +392,7 @@ export function BrandStatement() {
             glow={holeGlow}
             offsetX={holeX}
             offsetY={holeY}
+            streaks={streaks}
             className="pointer-events-none absolute inset-0 h-full w-full"
           />
         ) : (
@@ -352,8 +432,12 @@ export function BrandStatement() {
                 word={word}
                 index={i}
                 progress={scrollYProgress}
-                offsets={offsets}
-                viewWidth={viewWidth}
+                boxes={boxes}
+                viewport={viewport}
+                holeScale={holeScale}
+                holeX={holeX}
+                holeY={holeY}
+                streaks={streaks}
                 reduced={reduced}
                 registerRef={(el) => {
                   wordEls.current[i] = el;

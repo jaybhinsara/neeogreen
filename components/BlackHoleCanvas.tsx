@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import type { MotionValue } from "framer-motion";
 
 // A stylized, film-style black hole drawn in one full-screen fragment
@@ -22,6 +22,10 @@ uniform float uTime;
 uniform float uScale;
 uniform float uGlow;
 uniform vec2 uOffset;
+// Light streaks circling the edge: x = head angle (radians, y up),
+// y = radius as a multiple of the shadow radius, z = arc length (radians),
+// w = brightness. Unused slots have w = 0.
+uniform vec4 uStreaks[16];
 
 const vec3 NIGHT = vec3(0.012, 0.018, 0.015);
 const vec3 EMERALD = vec3(0.039, 0.604, 0.396);
@@ -84,7 +88,25 @@ void main() {
     float ring = (d - R * 1.012) / (R * 0.006 + 0.0015);
     halo += exp(-ring * ring) * 2.4;
   }
-  col += ramp(halo * uGlow);
+  // Streaks of matter caught by the hole: hairline arcs bending along the
+  // edge, brightest at the head and fading along the tail.
+  float streak = 0.0;
+  if (d > R * 0.8 && d < R * 1.3) {
+    float px = 2.0 / m;
+    for (int i = 0; i < 16; i++) {
+      vec4 s = uStreaks[i];
+      if (s.w > 0.0) {
+        float dr = (d - s.y * R) / (px * 2.1);
+        float behind = mod(ang - s.x, 6.2831853);
+        if (behind < s.z) {
+          float along = 1.0 - behind / s.z;
+          streak += exp(-dr * dr) * along * along * s.w;
+        }
+      }
+    }
+  }
+
+  col += ramp(halo * uGlow + streak * 4.5);
 
   // The shadow: pure black with a crisp edge.
   float shadow = 1.0 - smoothstep(R * 0.996, R * 1.004, d);
@@ -118,12 +140,14 @@ export default function BlackHoleCanvas({
   glow,
   offsetX,
   offsetY,
+  streaks,
   className,
 }: {
   scale: MotionValue<number>;
   glow: MotionValue<number>;
   offsetX: MotionValue<number>;
   offsetY: MotionValue<number>;
+  streaks: RefObject<Float32Array>;
   className?: string;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -163,6 +187,7 @@ export default function BlackHoleCanvas({
     const uScale = gl.getUniformLocation(program, "uScale");
     const uGlow = gl.getUniformLocation(program, "uGlow");
     const uOffset = gl.getUniformLocation(program, "uOffset");
+    const uStreaks = gl.getUniformLocation(program, "uStreaks");
 
     function resize() {
       const w = Math.max(1, Math.round(canvas!.clientWidth * dpr));
@@ -183,6 +208,7 @@ export default function BlackHoleCanvas({
       gl!.uniform1f(uGlow, glow.get());
       // CSS pixels (y down) to device pixels (y up).
       gl!.uniform2f(uOffset, offsetX.get() * dpr, -offsetY.get() * dpr);
+      gl!.uniform4fv(uStreaks, streaks.current);
       gl!.drawArrays(gl!.TRIANGLES, 0, 3);
     }
 
@@ -219,7 +245,7 @@ export default function BlackHoleCanvas({
       gl.deleteBuffer(buffer);
       gl.deleteProgram(program);
     };
-  }, [scale, glow, offsetX, offsetY]);
+  }, [scale, glow, offsetX, offsetY, streaks]);
 
   return <canvas ref={canvasRef} aria-hidden="true" className={className} />;
 }

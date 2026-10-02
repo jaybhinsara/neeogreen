@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { clashDisplay, inter, jetbrainsMono } from "./fonts";
+import { clashDisplay, instrumentSerif, inter, jetbrainsMono } from "./fonts";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { CustomCursor } from "@/components/CustomCursor";
 import { ScrollThumb } from "@/components/ScrollThumb";
@@ -79,7 +79,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${clashDisplay.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${clashDisplay.variable} ${inter.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-page text-ink">
         <script

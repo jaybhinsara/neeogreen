@@ -21,6 +21,7 @@
   --font-heading: var(--font-inter), ui-sans-serif, sans-serif;
   --font-body: var(--font-inter), ui-sans-serif, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
 
   --container-max: 1440px;
 }
@@ -74,6 +75,15 @@ body {
 @keyframes glass-shine {
   0%, 35% { background-position: 150% 0, 0 0; }
   100% { background-position: -60% 0, 0 0; }
+}
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer-text {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 @keyframes twinkle {

@@ -155,8 +155,8 @@ function BlackHole({ glow }: { glow: MotionValue<number> }) {
         />
       </motion.div>
 
-      {/* Event horizon. */}
-      <div className="absolute inset-[30%] rounded-full bg-black shadow-[0_0_70px_24px_rgba(0,0,0,0.9)]" />
+      {/* Event horizon: solid black that feathers out over its outer edge. */}
+      <div className="absolute inset-[22%] rounded-full bg-[radial-gradient(circle_closest-side,#000_70%,rgba(0,0,0,0.85)_80%,rgba(0,0,0,0.4)_90%,transparent_100%)]" />
 
       {/* Accretion disk, front half: crosses in front of the shadow. */}
       <motion.div

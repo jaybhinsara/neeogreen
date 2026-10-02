@@ -55,6 +55,18 @@ function ring(inner: number, outer: number): CSSProperties {
   return { maskImage: mask, WebkitMaskImage: mask };
 }
 
+// The disk is drawn twice, once behind the shadow and once in front. Each
+// copy fades out across the middle with complementary soft masks, so the
+// halves blend into one ring with no seam or doubled band where they meet.
+const DISK_BACK_MASK: CSSProperties = {
+  maskImage: "linear-gradient(to bottom, #000 40%, transparent 60%)",
+  WebkitMaskImage: "linear-gradient(to bottom, #000 40%, transparent 60%)",
+};
+const DISK_FRONT_MASK: CSSProperties = {
+  maskImage: "linear-gradient(to bottom, transparent 40%, #000 60%)",
+  WebkitMaskImage: "linear-gradient(to bottom, transparent 40%, #000 60%)",
+};
+
 const DISK_GRADIENT =
   "conic-gradient(from 0deg, rgba(52,211,153,0) 0deg, rgba(52,211,153,0.85) 50deg, #effff8 95deg, rgba(52,211,153,0.7) 150deg, rgba(10,154,101,0.15) 220deg, rgba(34,211,238,0.55) 290deg, rgba(52,211,153,0) 360deg)";
 
@@ -133,7 +145,10 @@ function BlackHole({ glow }: { glow: MotionValue<number> }) {
       </motion.div>
 
       {/* Accretion disk, back half: tucked behind the shadow. */}
-      <motion.div style={{ opacity: glow }} className="absolute inset-0 [transform:rotate(-9deg)_scaleY(0.24)]">
+      <motion.div
+        style={{ opacity: glow, ...DISK_BACK_MASK }}
+        className="absolute inset-0 [transform:rotate(-9deg)_scaleY(0.24)]"
+      >
         <div
           className="h-full w-full rounded-full blur-[3px] motion-safe:animate-[spin-slow_16s_linear_infinite]"
           style={{ background: DISK_GRADIENT, ...ring(46, 86) }}
@@ -145,8 +160,8 @@ function BlackHole({ glow }: { glow: MotionValue<number> }) {
 
       {/* Accretion disk, front half: crosses in front of the shadow. */}
       <motion.div
-        style={{ opacity: glow }}
-        className="absolute inset-0 [clip-path:inset(50%_0_0_0)] [transform:rotate(-9deg)_scaleY(0.24)]"
+        style={{ opacity: glow, ...DISK_FRONT_MASK }}
+        className="absolute inset-0 [transform:rotate(-9deg)_scaleY(0.24)]"
       >
         <div
           className="h-full w-full rounded-full blur-[3px] motion-safe:animate-[spin-slow_16s_linear_infinite]"

@@ -23,6 +23,7 @@ export function ContactForm() {
         body: JSON.stringify({
           name: data.get("name"),
           email: data.get("email"),
+          phone: data.get("phone"),
           company: data.get("company"),
           projectType: data.get("projectType"),
           message: data.get("message"),
@@ -55,10 +56,19 @@ export function ContactForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-8">
       <div className="grid gap-8 md:grid-cols-2">
-        <Field label="Name" name="name" type="text" required />
-        <Field label="Email" name="email" type="email" required />
+        <Field label="Name" name="name" type="text" autoComplete="name" required />
+        <Field label="Email" name="email" type="email" autoComplete="email" required />
+        <Field
+          label="Mobile number"
+          name="phone"
+          type="tel"
+          autoComplete="tel"
+          inputMode="tel"
+          placeholder="+91 98765 43210"
+          required
+        />
+        <Field label="Company (optional)" name="company" type="text" autoComplete="organization" />
       </div>
-      <Field label="Company (optional)" name="company" type="text" />
 
       <div className="flex flex-col gap-3">
         <span className="label-mono text-muted">What do you need?</span>
@@ -107,11 +117,17 @@ function Field({
   label,
   name,
   type,
+  autoComplete,
+  inputMode,
+  placeholder,
   required,
 }: {
   label: string;
   name: string;
   type: string;
+  autoComplete?: string;
+  inputMode?: "tel" | "email" | "text";
+  placeholder?: string;
   required?: boolean;
 }) {
   return (
@@ -120,8 +136,11 @@ function Field({
       <input
         type={type}
         name={name}
+        autoComplete={autoComplete}
+        inputMode={inputMode}
+        placeholder={placeholder}
         required={required}
-        className="border-b border-line bg-transparent py-3 text-lg outline-none transition-colors focus:border-brand"
+        className="border-b border-line bg-transparent py-3 text-lg outline-none transition-colors placeholder:text-faint focus:border-brand"
       />
     </label>
   );

@@ -22,6 +22,7 @@ export type ContactSubmission = {
   id: number;
   name: string;
   email: string;
+  phone: string | null;
   company: string | null;
   project_type: string | null;
   message: string;
@@ -32,16 +33,20 @@ let ensured: Promise<unknown> | null = null;
 
 export function ensureContactTable() {
   const sql = getSql();
-  ensured ??= sql`
-    CREATE TABLE IF NOT EXISTS contact_submissions (
-      id SERIAL PRIMARY KEY,
-      name TEXT NOT NULL,
-      email TEXT NOT NULL,
-      company TEXT,
-      project_type TEXT,
-      message TEXT NOT NULL,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-    )
-  `;
+  ensured ??= (async () => {
+    await sql`
+      CREATE TABLE IF NOT EXISTS contact_submissions (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        company TEXT,
+        project_type TEXT,
+        message TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    // Added after launch; nullable so earlier submissions stay valid.
+    await sql`ALTER TABLE contact_submissions ADD COLUMN IF NOT EXISTS phone TEXT`;
+  })();
   return ensured;
 }

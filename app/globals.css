@@ -41,6 +41,20 @@ body {
   font-family: var(--font-body);
 }
 
+/* Browser autofill (yellow on iOS Safari, blue on Chrome) paints its own
+   background and text color. An inset shadow in the page color covers the
+   fill, and the long transition keeps the native background from showing. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill {
+  -webkit-text-fill-color: var(--color-ink);
+  -webkit-box-shadow: 0 0 0 1000px var(--color-page) inset;
+  box-shadow: 0 0 0 1000px var(--color-page) inset;
+  caret-color: var(--color-ink);
+  transition: background-color 600000s 0s, color 600000s 0s;
+}
+
 ::selection {
   background: var(--color-brand);
   color: #ffffff;

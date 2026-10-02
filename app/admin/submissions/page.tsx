@@ -6,6 +6,14 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
+// wa.me needs the number in international form with no symbols. Numbers
+// typed without a country code are assumed to be Indian (10 digits).
+function whatsappHref(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  const international = !phone.trim().startsWith("+") && digits.length === 10 ? `91${digits}` : digits;
+  return `https://wa.me/${international}`;
+}
+
 export default async function SubmissionsPage() {
   let submissions: ContactSubmission[] = [];
   let dbError: string | null = null;
@@ -14,7 +22,7 @@ export default async function SubmissionsPage() {
     await ensureContactTable();
     const sql = getSql();
     submissions = (await sql`
-      SELECT id, name, email, company, project_type, message, created_at
+      SELECT id, name, email, phone, company, project_type, message, created_at
       FROM contact_submissions
       ORDER BY created_at DESC
     `) as ContactSubmission[];
@@ -58,6 +66,21 @@ export default async function SubmissionsPage() {
                 <a href={`mailto:${s.email}`} className="underline decoration-line hover:text-ink">
                   {s.email}
                 </a>
+                {s.phone && (
+                  <>
+                    <a href={`tel:${s.phone.replace(/[^\d+]/g, "")}`} className="underline decoration-line hover:text-ink">
+                      {s.phone}
+                    </a>
+                    <a
+                      href={whatsappHref(s.phone)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="underline decoration-line hover:text-ink"
+                    >
+                      WhatsApp
+                    </a>
+                  </>
+                )}
                 {s.company && <span>{s.company}</span>}
                 {s.project_type && <span>{s.project_type}</span>}
               </div>

@@ -5,6 +5,7 @@ import type { MouseEvent } from "react";
 import { Container } from "./Container";
 import { scrollToHash } from "@/lib/lenis-singleton";
 import { SERVICES, SITE } from "@/lib/site";
+import { Emphasis } from "./Emphasis";
 
 function handleAnchorClick(e: MouseEvent<HTMLAnchorElement>, href: string) {
   const hashIndex = href.indexOf("#");
@@ -25,7 +26,10 @@ export function Footer() {
         <div className="grid gap-16 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div className="flex flex-col items-start gap-8">
             <h2 className="max-w-[12ch] font-heading text-[clamp(36px,4vw,64px)] font-medium leading-[1.02] tracking-[-0.04em]">
-              Let&rsquo;s build what&rsquo;s next.
+              Let&rsquo;s build what&rsquo;s{" "}
+              <span className="whitespace-nowrap">
+                <Emphasis tone="brand">next</Emphasis>.
+              </span>
             </h2>
             <Link
               href="/contact"

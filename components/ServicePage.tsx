@@ -4,6 +4,7 @@ import { Footer } from "./Footer";
 import { Container } from "./Container";
 import { Reveal } from "./Reveal";
 import { SERVICES } from "@/lib/site";
+import { Emphasis, type EmphasisTone } from "./Emphasis";
 
 export type ServiceContent = {
   slug: (typeof SERVICES)[number]["slug"];
@@ -15,6 +16,17 @@ export type ServiceContent = {
   whyTitle: string;
   whyBody: string;
 };
+
+// Sets the final word of a headline in the italic serif accent.
+function AccentLast({ text, tone }: { text: string; tone: EmphasisTone }) {
+  const cut = text.lastIndexOf(" ");
+  if (cut === -1) return <Emphasis tone={tone}>{text}</Emphasis>;
+  return (
+    <>
+      {text.slice(0, cut)} <Emphasis tone={tone}>{text.slice(cut + 1)}</Emphasis>
+    </>
+  );
+}
 
 export function ServicePage({ content }: { content: ServiceContent }) {
   const n = SERVICES.find((s) => s.slug === content.slug)?.n ?? "01";
@@ -33,7 +45,7 @@ export function ServicePage({ content }: { content: ServiceContent }) {
             </Reveal>
             <Reveal delay={0.05}>
               <h1 className="mt-6 max-w-[14ch] font-heading text-[clamp(44px,7vw,112px)] font-medium leading-[0.98] tracking-[-0.045em]">
-                {content.title}
+                <AccentLast text={content.title} tone="light" />
               </h1>
             </Reveal>
             <div className="mt-12 flex flex-col items-start gap-8 md:flex-row md:items-end md:justify-between">
@@ -78,11 +90,11 @@ export function ServicePage({ content }: { content: ServiceContent }) {
             <div>
               <Reveal>
                 <h2 className="max-w-[20ch] font-heading text-[clamp(30px,3.4vw,52px)] font-medium leading-[1.08] tracking-[-0.035em]">
-                  {content.whyTitle}
+                  <AccentLast text={content.whyTitle} tone="brand" />
                 </h2>
               </Reveal>
               <Reveal delay={0.05}>
-                <p className="mt-8 max-w-[52ch] text-lg leading-relaxed text-white/80">{content.whyBody}</p>
+                <p className="mt-8 max-w-[52ch] text-lg leading-relaxed text-white/90">{content.whyBody}</p>
               </Reveal>
             </div>
           </Container>
@@ -98,8 +110,10 @@ export function ServicePage({ content }: { content: ServiceContent }) {
                 <Reveal key={step.title} delay={0.08 * i}>
                   <div className="flex flex-col gap-4 border-t border-line pt-6">
                     <span className="label-mono text-brand">0{i + 1}</span>
-                    <h3 className="font-heading text-2xl font-medium tracking-[-0.03em]">{step.title}</h3>
-                    <p className="text-[15px] leading-relaxed text-muted">{step.desc}</p>
+                    <h3 className="font-serif text-[clamp(34px,3vw,44px)] italic leading-none tracking-[-0.01em]">
+                      {step.title}
+                    </h3>
+                    <p className="text-base leading-relaxed text-muted">{step.desc}</p>
                   </div>
                 </Reveal>
               ))}

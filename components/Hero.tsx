@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useSyncExternalStore } from "react";
+import { Emphasis } from "./Emphasis";
 import {
   motion,
   useReducedMotion,
@@ -111,11 +112,21 @@ export function Hero({ ready }: { ready: boolean }) {
           <div className="mx-auto flex max-w-[1440px] flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <h1 className="font-heading text-[clamp(30px,3.4vw,56px)] font-medium leading-[1.04] tracking-[-0.035em]">
               {[
-                { text: "Web Development &", tone: "text-ink" },
-                { text: "Software Engineering", tone: "text-ink" },
-                { text: "for Growing Businesses.", tone: "text-muted" },
+                { key: "l1", text: "Web Development &", tone: "text-ink" },
+                { key: "l2", text: "Software Engineering", tone: "text-ink" },
+                {
+                  key: "l3",
+                  text: (
+                    <>
+                      for <Emphasis tone="light">Growing Businesses</Emphasis>.
+                    </>
+                  ),
+                  tone: "text-ink",
+                },
               ].map((line, i) => (
-                <span key={line.text} className="block overflow-hidden">
+                // Extra bottom padding keeps the serif's descenders inside the
+                // clipping mask that the line reveal slides up through.
+                <span key={line.key} className="block overflow-hidden pb-[0.08em]">
                   <motion.span
                     initial={{ y: "110%" }}
                     animate={ready ? { y: "0%" } : { y: "110%" }}

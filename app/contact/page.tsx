@@ -5,6 +5,7 @@ import { Footer } from "@/components/Footer";
 import { Container } from "@/components/Container";
 import { ContactForm } from "@/components/ContactForm";
 import { SITE } from "@/lib/site";
+import { Emphasis } from "@/components/Emphasis";
 
 export const metadata: Metadata = pageMetadata({
   title: "Contact",
@@ -23,7 +24,10 @@ export default function ContactPage() {
             <div className="flex flex-col gap-8">
               <span className="label-mono text-brand">Book a call</span>
               <h1 className="max-w-[12ch] font-heading text-[clamp(44px,6vw,96px)] font-medium leading-[0.98] tracking-[-0.045em]">
-                Let&rsquo;s build what&rsquo;s next.
+                Let&rsquo;s build what&rsquo;s{" "}
+                <span className="whitespace-nowrap">
+                  <Emphasis tone="light">next</Emphasis>.
+                </span>
               </h1>
               <p className="max-w-[40ch] text-lg leading-relaxed text-muted">
                 Tell us what you&rsquo;re building, a website, a web app,

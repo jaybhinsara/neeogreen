@@ -6,6 +6,7 @@ import { Container } from "@/components/Container";
 import { Reveal } from "@/components/Reveal";
 import { Process } from "@/components/Process";
 import { SITE } from "@/lib/site";
+import { Emphasis } from "@/components/Emphasis";
 
 export const metadata: Metadata = pageMetadata({
   title: "About",
@@ -15,9 +16,9 @@ export const metadata: Metadata = pageMetadata({
 });
 
 const COMMITMENTS = [
-  { value: "< 1hr", label: "Typical support response time" },
+  { value: "< 60 min", label: "Typical support response time" },
   { value: "Fixed", label: "Price agreed before work starts" },
-  { value: "1 team", label: "Design, build, and support" },
+  { value: "One team", label: "Design, build, and support" },
 ];
 
 const pageJsonLd = {
@@ -46,7 +47,7 @@ export default function AboutPage() {
             </Reveal>
             <Reveal delay={0.05}>
               <h1 className="mt-6 max-w-[14ch] font-heading text-[clamp(44px,7vw,112px)] font-medium leading-[0.98] tracking-[-0.045em]">
-                A team, not a stack of vendors.
+                A <Emphasis tone="light">team</Emphasis>, not a stack of vendors.
               </h1>
             </Reveal>
             <Reveal delay={0.1}>
@@ -69,8 +70,8 @@ export default function AboutPage() {
               </Reveal>
               <Reveal delay={0.05}>
                 <p className="mt-8 max-w-[30ch] font-heading text-[clamp(26px,2.6vw,40px)] font-medium leading-[1.2] tracking-[-0.03em]">
-                  Technology should make running your business simpler, not
-                  more complicated. So we build fast, clear, maintainable
+                  Technology should make running your business{" "}
+                  <Emphasis tone="brand">simpler</Emphasis>, not more complicated. So we build fast, clear, maintainable
                   products, and stay around to keep them that way.
                 </p>
               </Reveal>
@@ -78,11 +79,11 @@ export default function AboutPage() {
             <dl className="md:pt-24">
               {COMMITMENTS.map((c, i) => (
                 <Reveal key={c.value} delay={0.06 * i}>
-                  <div className="flex items-baseline justify-between gap-6 border-t border-white/25 py-6">
-                    <dt className="font-heading text-[clamp(44px,5vw,80px)] font-medium leading-none tracking-[-0.045em]">
+                  <div className="grid grid-cols-[1fr_auto] items-center gap-6 border-t border-white/25 py-7 md:py-8">
+                    <dt className="font-serif text-[clamp(52px,5.6vw,92px)] italic leading-none tracking-[-0.01em]">
                       {c.value}
                     </dt>
-                    <dd className="max-w-[18ch] text-right text-[15px] text-white/80">{c.label}</dd>
+                    <dd className="max-w-[18ch] text-right text-[15px] leading-snug text-white/90">{c.label}</dd>
                   </div>
                 </Reveal>
               ))}

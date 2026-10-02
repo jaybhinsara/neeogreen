@@ -1,5 +1,6 @@
 import { Container } from "./Container";
 import { Reveal } from "./Reveal";
+import { Emphasis } from "./Emphasis";
 
 const STEPS = [
   {
@@ -33,7 +34,10 @@ export function Process() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="mt-6 max-w-[18ch] font-heading text-[clamp(32px,4vw,64px)] font-medium leading-[1.05] tracking-[-0.035em]">
-            Four steps from first call to launch.
+            Four steps from first call to{" "}
+            <span className="whitespace-nowrap">
+              <Emphasis tone="light">launch</Emphasis>.
+            </span>
           </h2>
         </Reveal>
 
@@ -42,8 +46,10 @@ export function Process() {
             <Reveal key={step.n} delay={0.08 * i}>
               <div className="flex flex-col gap-4 border-t border-line pt-6">
                 <span className="label-mono text-brand">{step.n}</span>
-                <h3 className="font-heading text-2xl font-medium tracking-[-0.03em]">{step.title}</h3>
-                <p className="text-[15px] leading-relaxed text-muted">{step.desc}</p>
+                <h3 className="font-serif text-[clamp(34px,3vw,44px)] italic leading-none tracking-[-0.01em]">
+                  {step.title}
+                </h3>
+                <p className="text-base leading-relaxed text-muted">{step.desc}</p>
               </div>
             </Reveal>
           ))}

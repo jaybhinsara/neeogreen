@@ -6,6 +6,7 @@ import { Container } from "@/components/Container";
 import { Reveal } from "@/components/Reveal";
 import { BookCallBand } from "@/components/BookCallBand";
 import { SITE } from "@/lib/site";
+import { Emphasis } from "@/components/Emphasis";
 
 export const metadata: Metadata = pageMetadata({
   title: "Approach",
@@ -78,7 +79,7 @@ export default function ApproachPage() {
             </Reveal>
             <Reveal delay={0.05}>
               <h1 className="mt-6 max-w-[14ch] font-heading text-[clamp(44px,7vw,112px)] font-medium leading-[0.98] tracking-[-0.045em]">
-                How a project actually runs.
+                How a project <Emphasis tone="light">actually</Emphasis> runs.
               </h1>
             </Reveal>
             <Reveal delay={0.1}>
@@ -98,7 +99,7 @@ export default function ApproachPage() {
               <Reveal key={step.n} delay={0.05 * i}>
                 <div className="grid gap-4 border-t border-line py-10 md:grid-cols-[120px_1fr_1.4fr] md:gap-10 md:py-14">
                   <span className="label-mono pt-3 text-brand">{step.n}</span>
-                  <h2 className="font-heading text-[clamp(32px,4vw,64px)] font-medium leading-none tracking-[-0.04em]">
+                  <h2 className="font-serif text-[clamp(40px,4.6vw,72px)] italic leading-none tracking-[-0.01em]">
                     {step.title}
                   </h2>
                   <p className="max-w-[48ch] text-lg leading-relaxed text-muted">{step.desc}</p>
@@ -117,8 +118,10 @@ export default function ApproachPage() {
               {PRINCIPLES.map((p, i) => (
                 <Reveal key={p.title} delay={0.08 * i}>
                   <div className="flex flex-col gap-4 border-t border-white/25 pt-6">
-                    <h3 className="font-heading text-2xl font-medium tracking-[-0.03em]">{p.title}</h3>
-                    <p className="text-[15px] leading-relaxed text-white/80">{p.desc}</p>
+                    <h3 className="font-serif text-[clamp(30px,2.6vw,38px)] italic leading-tight tracking-[-0.01em]">
+                      {p.title}
+                    </h3>
+                    <p className="text-base leading-relaxed text-white/90">{p.desc}</p>
                   </div>
                 </Reveal>
               ))}

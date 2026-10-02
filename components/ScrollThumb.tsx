@@ -48,6 +48,10 @@ export function ScrollThumb() {
     }
 
     function onPointerDown(e: PointerEvent) {
+      // Fingers scroll the page natively. A touch landing on the thumb near
+      // the screen edge must never start a drag, which moves the page ~20x
+      // faster than the finger and jumped whole sections on phones.
+      if (e.pointerType === "touch") return;
       e.preventDefault();
       thumb!.setPointerCapture(e.pointerId);
       drag = { startY: e.clientY, startScroll: window.scrollY };
@@ -93,11 +97,11 @@ export function ScrollThumb() {
     <div
       ref={railRef}
       aria-hidden="true"
-      className="group fixed inset-y-0 right-0 z-[60] w-3 opacity-0 transition-opacity duration-300 hover:opacity-100 data-active:opacity-100"
+      className="group fixed inset-y-0 right-0 z-[60] w-3 opacity-0 transition-opacity duration-300 hover:opacity-100 data-active:opacity-100 pointer-coarse:pointer-events-none"
     >
       <div
         ref={thumbRef}
-        className="absolute right-[3px] top-0 w-[5px] cursor-grab touch-none rounded-full bg-[rgba(128,132,128,0.55)] backdrop-blur-sm transition-[width,background-color] duration-200 group-hover:w-[7px] group-hover:bg-[rgba(128,132,128,0.8)] active:cursor-grabbing"
+        className="absolute right-[3px] top-0 w-[5px] cursor-grab touch-none rounded-full pointer-coarse:pointer-events-none bg-[rgba(128,132,128,0.55)] backdrop-blur-sm transition-[width,background-color] duration-200 group-hover:w-[7px] group-hover:bg-[rgba(128,132,128,0.8)] active:cursor-grabbing"
       />
     </div>
   );

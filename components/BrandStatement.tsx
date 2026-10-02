@@ -139,7 +139,7 @@ function BlackHole({ glow }: { glow: MotionValue<number> }) {
       {/* Photon ring: the lensed glow hugging the shadow. */}
       <motion.div style={{ opacity: glow }} className="absolute inset-[18%]">
         <div
-          className="h-full w-full rounded-full blur-[4px] motion-safe:animate-[spin-slow_26s_linear_infinite]"
+          className="h-full w-full rounded-full motion-safe:animate-[spin-slow_26s_linear_infinite]"
           style={{ background: DISK_GRADIENT, ...ring(62, 76) }}
         />
       </motion.div>
@@ -150,7 +150,7 @@ function BlackHole({ glow }: { glow: MotionValue<number> }) {
         className="absolute inset-0 [transform:rotate(-9deg)_scaleY(0.24)]"
       >
         <div
-          className="h-full w-full rounded-full blur-[3px] motion-safe:animate-[spin-slow_16s_linear_infinite]"
+          className="h-full w-full rounded-full motion-safe:animate-[spin-slow_16s_linear_infinite]"
           style={{ background: DISK_GRADIENT, ...ring(46, 86) }}
         />
       </motion.div>
@@ -164,7 +164,7 @@ function BlackHole({ glow }: { glow: MotionValue<number> }) {
         className="absolute inset-0 [transform:rotate(-9deg)_scaleY(0.24)]"
       >
         <div
-          className="h-full w-full rounded-full blur-[3px] motion-safe:animate-[spin-slow_16s_linear_infinite]"
+          className="h-full w-full rounded-full motion-safe:animate-[spin-slow_16s_linear_infinite]"
           style={{ background: DISK_GRADIENT, ...ring(46, 86) }}
         />
       </motion.div>
@@ -219,17 +219,22 @@ export function BrandStatement() {
     if (reduced) return 0.8;
     if (v < SUCK_START) return 0.72;
     if (v < SUCK_END) return 0.72 + 0.68 * range(v, SUCK_START, SUCK_END);
-    return 1.4 + 5.6 * easeIn(range(v, SUCK_END, 1));
+    return 1.4 + 3.2 * easeIn(range(v, SUCK_END, 1));
   });
+  // The glow fades out as the final zoom begins, so only the plain black
+  // core is scaled up to fill the screen; scaling the masked, spinning
+  // rings to several times the viewport was what made the collapse stutter.
   const holeGlow = useTransform(scrollYProgress, (v) =>
-    reduced ? 0.5 : 0.35 + 0.65 * range(v, SUCK_START, SUCK_START + 0.15)
+    reduced
+      ? 0.5
+      : (0.35 + 0.65 * range(v, SUCK_START, SUCK_START + 0.15)) * (1 - range(v, SUCK_END, SUCK_END + 0.07))
   );
   // Opens fully black to continue the hero's fade, then the emerald blooms
   // in around the hole as the quote settles.
   const fadeFromBlack = useTransform(scrollYProgress, (v) =>
     reduced ? 0 : 1 - easeOut(range(v, 0.02, ENTER_END + 0.08))
   );
-  const fadeToBlack = useTransform(scrollYProgress, (v) => (reduced ? 0 : range(v, 0.9, 1)));
+  const fadeToBlack = useTransform(scrollYProgress, (v) => (reduced ? 0 : range(v, 0.88, 0.98)));
 
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
@@ -263,7 +268,7 @@ export function BrandStatement() {
 
         <motion.div
           aria-hidden="true"
-          className="pointer-events-none absolute"
+          className="pointer-events-none absolute will-change-transform"
           style={{ x: holeX, y: holeY, scale: holeScale }}
         >
           <BlackHole glow={holeGlow} />

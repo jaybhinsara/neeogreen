@@ -381,6 +381,10 @@ export default function LeafScene({ className }: { className?: string }) {
         loadedMaterial = material;
         activeMesh = loadedMesh;
         mesh.add(loadedMesh);
+        // Compile the shaders now, in the background, rather than on the
+        // first frame the section scrolls into view, where the compile
+        // stall landed right in the middle of the scroll.
+        renderer.compileAsync(scene, camera).catch(() => {});
       },
       undefined,
       (error) => {

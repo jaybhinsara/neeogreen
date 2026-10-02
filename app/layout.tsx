@@ -3,6 +3,7 @@ import { clashDisplay, instrumentSerif, inter, jetbrainsMono } from "./fonts";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { CustomCursor } from "@/components/CustomCursor";
 import { ScrollThumb } from "@/components/ScrollThumb";
+import { CookieConsent } from "@/components/CookieConsent";
 import { SITE } from "@/lib/site";
 import "./globals.css";
 
@@ -90,6 +91,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SmoothScroll />
         <CustomCursor />
         <ScrollThumb />
+        <CookieConsent />
         {children}
       </body>
     </html>

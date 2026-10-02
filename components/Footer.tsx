@@ -6,12 +6,19 @@ import { Container } from "./Container";
 import { scrollToHash } from "@/lib/lenis-singleton";
 import { SERVICES, SITE } from "@/lib/site";
 import { Emphasis } from "./Emphasis";
+import { CookieSettingsButton } from "./CookieSettingsButton";
 
 function handleAnchorClick(e: MouseEvent<HTMLAnchorElement>, href: string) {
   const hashIndex = href.indexOf("#");
   if (hashIndex === -1) return;
   if (scrollToHash(href.slice(hashIndex))) e.preventDefault();
 }
+
+const LEGAL = [
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
+  { href: "/cookies", label: "Cookies" },
+];
 
 const PAGES = [
   { href: "/about", label: "About" },
@@ -74,8 +81,16 @@ export function Footer() {
           </address>
         </div>
 
-        <div className="mt-20 flex items-center justify-between border-t border-white/20 pt-6 text-white/70">
+        <div className="mt-20 flex flex-col gap-5 border-t border-white/20 pt-6 text-white/80 md:flex-row md:items-center md:justify-between">
           <span className="label-mono">&copy; {SITE.name} {new Date().getFullYear()}</span>
+          <nav aria-label="Legal" className="flex flex-wrap gap-x-6 gap-y-3">
+            {LEGAL.map((l) => (
+              <Link key={l.href} href={l.href} className="label-mono hover:text-white">
+                {l.label}
+              </Link>
+            ))}
+            <CookieSettingsButton className="label-mono text-left hover:text-white" />
+          </nav>
           <Link href="/#top" onClick={(e) => handleAnchorClick(e, "/#top")} className="label-mono hover:text-white">
             Back to top &uarr;
           </Link>

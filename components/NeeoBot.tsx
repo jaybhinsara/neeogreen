@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { AnimatePresence, animate, motion, useReducedMotion } from "framer-motion";
 import { openBookCall } from "@/lib/book-call";
 
@@ -31,7 +31,14 @@ const HOP = 34; // px per hop
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
 
-export function NeeoBot({ range = 300 }: { range?: number }) {
+export function NeeoBot({
+  range = 300,
+  avoidRef,
+}: {
+  range?: number;
+  // Content Neeo must never walk over: it stops 24px short of its right edge.
+  avoidRef?: RefObject<HTMLElement | null>;
+}) {
   const rootRef = useRef<HTMLButtonElement>(null);
   const moverRef = useRef<HTMLDivElement>(null);
   const flipRef = useRef<HTMLDivElement>(null);
@@ -100,7 +107,14 @@ export function NeeoBot({ range = 300 }: { range?: number }) {
     };
 
     const walk = async () => {
-      const target = -Math.round(rand(0, range));
+      let maxRange = range;
+      const avoid = avoidRef?.current;
+      if (avoid) {
+        const homeLeft = root.getBoundingClientRect().left - x;
+        maxRange = Math.min(range, homeLeft - avoid.getBoundingClientRect().right - 24);
+      }
+      if (maxRange < HOP) return;
+      const target = -Math.round(rand(0, maxRange));
       if (Math.abs(target - x) < HOP) return;
       setFacing(target < x ? -1 : 1);
       while (alive && !hovering && Math.abs(target - x) >= HOP / 2) {
@@ -175,7 +189,7 @@ export function NeeoBot({ range = 300 }: { range?: number }) {
       root.removeEventListener("pointerenter", onEnter);
       root.removeEventListener("pointerleave", onLeave);
     };
-  }, [range]);
+  }, [range, avoidRef]);
 
   return (
     <button
@@ -208,8 +222,8 @@ export function NeeoBot({ range = 300 }: { range?: number }) {
               <img
                 src="/mascot/neeo.webp"
                 alt=""
-                width={285}
-                height={320}
+                width={428}
+                height={480}
                 draggable={false}
                 className="block h-auto w-full select-none"
               />

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { Container } from "./Container";
@@ -74,11 +75,12 @@ function ChatDemo() {
 }
 
 export function AiSection() {
+  const copyRef = useRef<HTMLParagraphElement>(null);
   return (
     <section id="ai" className="relative bg-page py-28 md:py-40">
-      <div className="pointer-events-none absolute right-4 top-8 z-10 md:right-[6%] md:top-24">
-        <div className="pointer-events-auto w-[76px] md:w-[124px]">
-          <NeeoBot range={240} />
+      <div className="pointer-events-none absolute right-4 top-8 z-10 md:right-[5%] md:top-28">
+        <div className="pointer-events-auto w-[100px] md:w-[200px]">
+          <NeeoBot range={240} avoidRef={copyRef} />
         </div>
       </div>
       <Container>
@@ -94,7 +96,7 @@ export function AiSection() {
           </h2>
         </Reveal>
         <Reveal delay={0.1}>
-          <p className="mt-8 max-w-[56ch] text-lg leading-relaxed text-muted md:text-xl">
+          <p ref={copyRef} className="mt-8 max-w-[56ch] text-lg leading-relaxed text-muted md:text-xl">
             We design, build, and run AI systems for businesses worldwide: chatbots that answer customers,
             assistants that know your documents, and agents that take repetitive work off your team. Grounded in
             your data, measured on results.

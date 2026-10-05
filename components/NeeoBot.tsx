@@ -4,19 +4,19 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 import { AnimatePresence, animate, motion, useReducedMotion } from "framer-motion";
 import { openBookCall } from "@/lib/book-call";
 
-// Neeo, the studio's pixel-art AI bot. The artwork is one sprite; the parts
-// that make it feel alive are layered over it: pupils that follow the cursor,
+// Neeo, the studio's 3D AI bot. The render is one sprite; the parts that
+// make it feel alive are layered over it: pupils that follow the cursor,
 // blinks, a glowing tablet, speech bubbles, and a body that breathes, hops
 // around its corner, and turns to face where it's going.
 
 // Overlay positions as % of the sprite, measured from the artwork.
+// The eyeballs are redrawn over the render so the pupils can move; boxes are
+// % of the sprite, measured from the artwork.
 const EYES = [
-  { white: { x: 24.3, y: 43.4, w: 18.6, h: 15.8 }, pupil: { x: 33.2, y: 47.8, w: 5.7, h: 7.8 } },
-  { white: { x: 53.7, y: 43.4, w: 18.5, h: 15.8 }, pupil: { x: 58.6, y: 47.8, w: 5.7, h: 7.8 } },
+  { x: 26.9, y: 40.6, w: 15.5, h: 11.7 },
+  { x: 56.2, y: 40.6, w: 14.9, h: 11.7 },
 ];
-const EYE_WHITE = "#b9eee7";
-const PUPIL = "#01092d";
-const TABLET = { x: 66, y: 66, w: 30, h: 33 };
+const TABLET = { x: 1, y: 60.5, w: 26.6, h: 22.2 };
 
 const LINES = [
   "Hi, I'm Neeo.",
@@ -80,15 +80,15 @@ export function NeeoBot({
       const w = root.offsetWidth;
       const len = Math.hypot(dx, dy) || 1;
       const reach = Math.min(1, len / 240);
-      const px = (dx / len) * reach * w * 0.026 * facing;
-      const py = (dy / len) * reach * w * 0.024;
+      const px = (dx / len) * reach * w * 0.03 * facing;
+      const py = (dy / len) * reach * w * 0.02;
       root.style.setProperty("--look-x", `${px.toFixed(2)}px`);
       root.style.setProperty("--look-y", `${py.toFixed(2)}px`);
     };
 
     const onPointerMove = (e: PointerEvent) => {
       const r = root.getBoundingClientRect();
-      look(e.clientX - (r.left + r.width * 0.48), e.clientY - (r.top + r.height * 0.52));
+      look(e.clientX - (r.left + r.width * 0.49), e.clientY - (r.top + r.height * 0.45));
     };
     if (fine) window.addEventListener("pointermove", onPointerMove, { passive: true });
 
@@ -208,7 +208,7 @@ export function NeeoBot({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 4 }}
               transition={{ duration: 0.25 }}
-              className="pointer-events-none absolute bottom-[104%] left-1/2 w-max max-w-[220px] -translate-x-1/2 rounded-[14px_14px_14px_4px] bg-night px-3.5 py-2 text-left text-[13px] font-medium leading-snug text-white shadow-[0_10px_30px_-10px_rgba(5,7,6,0.5)]"
+              className="pointer-events-none absolute right-[88%] top-[6%] w-max max-w-[180px] rounded-[14px_14px_4px_14px] bg-night px-3.5 py-2 text-left text-[13px] font-medium leading-snug text-white shadow-[0_10px_30px_-10px_rgba(5,7,6,0.5)] md:max-w-[220px]"
             >
               {bubble}
             </motion.span>
@@ -222,53 +222,52 @@ export function NeeoBot({
               <img
                 src="/mascot/neeo.webp"
                 alt=""
-                width={428}
-                height={480}
+                width={450}
+                height={560}
                 draggable={false}
                 className="block h-auto w-full select-none"
               />
 
               {EYES.map((eye, i) => (
-                <span key={i} aria-hidden="true">
-                  {/* Paint over the drawn pupil so ours can move. */}
+                <span
+                  key={i}
+                  aria-hidden="true"
+                  className="absolute overflow-hidden rounded-[50%]"
+                  style={{
+                    left: `${eye.x}%`,
+                    top: `${eye.y}%`,
+                    width: `${eye.w}%`,
+                    height: `${eye.h}%`,
+                    background:
+                      "radial-gradient(circle at 42% 34%, #ffffff 0%, #f5f7f6 42%, #dde3e1 78%, #c3cbc8 100%)",
+                    boxShadow: "inset 0 -2px 5px rgba(0,0,0,0.18), 0 0 0 1px rgba(20,40,30,0.25)",
+                  }}
+                >
+                  {/* Glossy oval pupil with the render's green floor reflection
+                      and a top-right highlight; slides with --look-x/y. */}
                   <span
-                    className="absolute"
+                    className="absolute left-1/2 top-1/2 h-[82%] w-[56%] rounded-[50%] transition-transform duration-150 ease-out"
                     style={{
-                      left: `${eye.pupil.x - 0.6}%`,
-                      top: `${eye.pupil.y - 0.6}%`,
-                      width: `${eye.pupil.w + 1.2}%`,
-                      height: `${eye.pupil.h + 1.2}%`,
-                      background: EYE_WHITE,
-                    }}
-                  />
-                  <span
-                    className="absolute transition-transform duration-150 ease-out"
-                    style={{
-                      left: `${eye.pupil.x}%`,
-                      top: `${eye.pupil.y}%`,
-                      width: `${eye.pupil.w}%`,
-                      height: `${eye.pupil.h}%`,
-                      background: PUPIL,
-                      transform: "translate(var(--look-x, 0px), var(--look-y, 0px))",
-                      opacity: blink ? 0 : 1,
+                      transform:
+                        "translate(calc(-50% + var(--look-x, 0px)), calc(-50% + var(--look-y, 0px)))",
+                      background:
+                        "radial-gradient(ellipse at 50% 92%, rgba(70,170,90,0.55) 0%, rgba(70,170,90,0) 45%), radial-gradient(circle at 40% 30%, #2a2a2a 0%, #0a0a0a 55%, #000 100%)",
                     }}
                   >
-                    <span className="absolute left-[18%] top-[14%] h-[26%] w-[30%] bg-white/90" />
+                    <span className="absolute left-[56%] top-[16%] h-[22%] w-[30%] rounded-full bg-white/95" />
                   </span>
+
                   {blink && (
                     <span
-                      className="absolute flex items-center justify-center rounded-full"
-                      style={{
-                        left: `${eye.white.x + eye.white.w * 0.12}%`,
-                        top: `${eye.white.y + eye.white.h * 0.12}%`,
-                        width: `${eye.white.w * 0.76}%`,
-                        height: `${eye.white.h * 0.76}%`,
-                        background: EYE_WHITE,
-                      }}
+                      className="absolute inset-0 flex items-center justify-center rounded-[50%]"
+                      style={{ background: "radial-gradient(circle at 50% 30%, #7bd65a, #4fbf45 70%, #3fae3c)" }}
                     >
-                      <span className="h-[12%] w-[60%] rounded-full" style={{ background: PUPIL }} />
+                      <span className="mt-[12%] h-[34%] w-[70%] rounded-b-full border-b-[3px] border-[#123321]" />
                     </span>
                   )}
+
+                  {/* Lens glare, as if behind the glasses. */}
+                  <span className="pointer-events-none absolute -left-[10%] top-[6%] h-[30%] w-[60%] -rotate-[24deg] rounded-full bg-white/25 blur-[1px]" />
                 </span>
               ))}
 

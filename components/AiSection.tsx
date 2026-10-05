@@ -78,8 +78,10 @@ export function AiSection() {
   const copyRef = useRef<HTMLParagraphElement>(null);
   return (
     <section id="ai" className="relative bg-page py-28 md:py-40">
-      <div className="pointer-events-none absolute right-4 top-8 z-10 md:right-[5%] md:top-28">
-        <div className="pointer-events-auto w-[100px] md:w-[200px]">
+      {/* Full size only where the corner is genuinely empty (xl); smaller
+          and tucked up beside the headline below that. */}
+      <div className="pointer-events-none absolute right-4 top-6 z-10 md:right-8 md:top-10 xl:right-[5%] xl:top-28">
+        <div className="pointer-events-auto w-[96px] md:w-[124px] xl:w-[200px]">
           <NeeoBot range={240} avoidRef={copyRef} />
         </div>
       </div>

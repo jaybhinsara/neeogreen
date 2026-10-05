@@ -6,6 +6,7 @@ import { Container } from "./Container";
 import { Reveal } from "./Reveal";
 import { Emphasis } from "./Emphasis";
 import { BookCallTrigger } from "./BookCallTrigger";
+import { NeeoBot } from "./NeeoBot";
 
 const CAPABILITIES = [
   { title: "AI chatbots", desc: "Assistants for your website, WhatsApp, and support that answer like your best staff member." },
@@ -74,7 +75,12 @@ function ChatDemo() {
 
 export function AiSection() {
   return (
-    <section id="ai" className="bg-page py-28 md:py-40">
+    <section id="ai" className="relative bg-page py-28 md:py-40">
+      <div className="pointer-events-none absolute right-4 top-8 z-10 md:right-[6%] md:top-24">
+        <div className="pointer-events-auto w-[76px] md:w-[124px]">
+          <NeeoBot range={240} />
+        </div>
+      </div>
       <Container>
         <Reveal>
           <span className="label-mono text-brand">AI Engineering</span>

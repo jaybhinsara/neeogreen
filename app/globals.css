@@ -110,6 +110,17 @@ input.autofill-dark:-webkit-autofill:focus {
   50% { background-position: 100% 50%; }
 }
 
+/* Neeo the AI bot: idle breathing and tablet screen flicker. */
+@keyframes neeo-breathe {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(0.99, 1.025); }
+}
+
+@keyframes neeo-glow {
+  from { filter: brightness(0.85); }
+  to { filter: brightness(1.25); }
+}
+
 @keyframes twinkle {
   0%, 100% { opacity: 0.15; }
   50% { opacity: 1; }

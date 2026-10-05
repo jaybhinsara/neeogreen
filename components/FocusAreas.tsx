@@ -9,6 +9,7 @@ import { cn } from "@/lib/cn";
 import { SERVICES } from "@/lib/site";
 
 const TAGS: Record<(typeof SERVICES)[number]["slug"], [string, string, string]> = {
+  "ai-engineering": ["AI chatbots", "LLM integration", "AI agents"],
   "web-development": ["Business websites", "Web apps", "Customer portals"],
   "web-design": ["UI/UX design", "Design systems", "Prototypes"],
   "software-engineering": ["Custom software", "Internal tools", "Integrations"],

@@ -33,7 +33,7 @@ export default async function OpengraphImage() {
             display: "flex",
           }}
         >
-          Web Development · Web Design · Software Engineering
+          AI Engineering · Web Development · Software
         </div>
         <div
           style={{
@@ -59,7 +59,7 @@ export default async function OpengraphImage() {
             display: "flex",
           }}
         >
-          A design and engineering studio building websites, software, and the IT behind them — for businesses everywhere.
+          AI chatbots, LLM integrations and automation, alongside websites and custom software, for businesses everywhere.
         </div>
       </div>
     ),

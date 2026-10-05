@@ -18,6 +18,10 @@ export const metadata: Metadata = {
   },
   description: SITE.description,
   keywords: [
+    "AI engineering company",
+    "AI chatbot development",
+    "LLM integration services",
+    "AI development company Surat",
     "web development Surat",
     "web design Surat",
     "software engineering Gujarat",
@@ -70,6 +74,7 @@ const organizationJsonLd = {
   areaServed: SITE.serviceCities.map((city) => ({ "@type": "City", name: city })),
   ...(SITE.social.length > 0 && { sameAs: SITE.social.map((s) => s.href) }),
   makesOffer: [
+    { "@type": "Offer", itemOffered: { "@type": "Service", name: "AI Engineering" } },
     { "@type": "Offer", itemOffered: { "@type": "Service", name: "Web Development" } },
     { "@type": "Offer", itemOffered: { "@type": "Service", name: "Web Design" } },
     { "@type": "Offer", itemOffered: { "@type": "Service", name: "Software Engineering" } },

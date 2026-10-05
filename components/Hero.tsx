@@ -112,8 +112,8 @@ export function Hero({ ready }: { ready: boolean }) {
           <div className="mx-auto flex max-w-[1440px] flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <h1 className="font-heading text-[clamp(30px,3.4vw,56px)] font-medium leading-[1.04] tracking-[-0.035em]">
               {[
-                { key: "l1", text: "Web Development &", tone: "text-ink" },
-                { key: "l2", text: "Software Engineering", tone: "text-ink" },
+                { key: "l1", text: "AI Engineering &", tone: "text-ink" },
+                { key: "l2", text: "Web Development", tone: "text-ink" },
                 {
                   key: "l3",
                   text: (
@@ -134,6 +134,8 @@ export function Hero({ ready }: { ready: boolean }) {
                     className={`block ${line.tone}`}
                   >
                     {line.text}
+                    {/* Keeps the lines as separate words in the page text that
+                        search engines and screen readers see. */}{" "}
                   </motion.span>
                 </span>
               ))}
@@ -145,7 +147,7 @@ export function Hero({ ready }: { ready: boolean }) {
               transition={{ duration: 0.6, delay: 0.5 }}
               className="label-mono text-muted"
             >
-              Design &middot; Engineering &middot; Software &mdash; Worldwide
+              AI &middot; Web &middot; Software &mdash; Worldwide
             </motion.p>
           </div>
         </motion.div>

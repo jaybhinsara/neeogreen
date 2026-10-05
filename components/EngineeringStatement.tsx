@@ -49,8 +49,8 @@ export function EngineeringStatement() {
           <span className="whitespace-nowrap">
             <Emphasis>stop</Emphasis>.
           </span>{" "}
-          We engineer products, internal tools, and
-          the systems behind them, built to solve real problems and{" "}
+          We engineer products, AI systems, and the
+          tools behind them, built to solve real problems and{" "}
           <Emphasis>grow</Emphasis> with your business.
         </p>
         <figcaption className="label-mono mt-12 text-white/60">&mdash; Beyond the website</figcaption>

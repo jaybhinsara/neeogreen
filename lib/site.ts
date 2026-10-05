@@ -2,13 +2,13 @@ import type { SocialNetwork } from "@/components/SocialIcon";
 
 export const SITE = {
   name: "NeeoGreen",
-  tagline: "Web Development, Design & Software Engineering Studio",
+  tagline: "AI Engineering, Web Development & Software Studio",
   // The apex is the primary domain on Vercel (www 308-redirects to it), so
   // canonicals and the sitemap must use it. Not read from an env var: a
   // stale www value there pointed every canonical at a redirect.
   url: "https://neeogreen.com",
   description:
-    "NeeoGreen is a web development, web design, and software engineering studio based in Surat, Gujarat — serving businesses and individuals across Surat, Ahmedabad, Vadodara, Rajkot, and Gandhinagar, plus managed IT, cloud, and cybersecurity support.",
+    "NeeoGreen is an AI engineering, web development, and software studio based in Surat, Gujarat. We build AI chatbots, LLM integrations, and AI automation alongside websites and custom software, for businesses across Surat, Ahmedabad, Vadodara, Rajkot, Gandhinagar, and worldwide.",
   email: "hello@neeogreen.com",
   phone: "+91 75679 36593",
   locality: "Surat",
@@ -29,8 +29,16 @@ export const SITE = {
 
 export const SERVICES = [
   {
-    slug: "web-development",
+    slug: "ai-engineering",
     n: "01",
+    title: "AI Engineering",
+    short: "AI chatbots, LLM integrations, and AI agents built into your business, grounded in your own data and measured on real results.",
+    eyebrow: "AI systems, chatbots & automation",
+    keywords: ["AI engineering company", "AI chatbot development", "LLM integration services", "AI development company Surat", "AI automation services India"],
+  },
+  {
+    slug: "web-development",
+    n: "02",
     title: "Web Development",
     short: "Business websites and web apps built fast, built right — from a marketing site to a full product, shipped and maintained.",
     eyebrow: "Websites & web applications",
@@ -38,7 +46,7 @@ export const SERVICES = [
   },
   {
     slug: "web-design",
-    n: "02",
+    n: "03",
     title: "Web Design",
     short: "Interfaces people actually want to use — researched, designed, and tested before a single line of code ships.",
     eyebrow: "UI/UX & visual design",
@@ -46,7 +54,7 @@ export const SERVICES = [
   },
   {
     slug: "software-engineering",
-    n: "03",
+    n: "04",
     title: "Software Engineering",
     short: "Custom software and internal tools engineered around how your business actually operates, not a generic template.",
     eyebrow: "Custom software & internal tools",
@@ -54,7 +62,7 @@ export const SERVICES = [
   },
   {
     slug: "managed-it-support",
-    n: "04",
+    n: "05",
     title: "Managed IT Support",
     short: "Remote and on-site support, 24/7 monitoring, and a help desk that answers — for businesses and home offices alike.",
     eyebrow: "Help desk & proactive monitoring",
@@ -62,7 +70,7 @@ export const SERVICES = [
   },
   {
     slug: "cybersecurity",
-    n: "05",
+    n: "06",
     title: "Cybersecurity & Data Protection",
     short: "Firewalls, endpoint protection, and backup and disaster recovery built around how your business actually operates.",
     eyebrow: "Endpoint security & backup",
@@ -70,7 +78,7 @@ export const SERVICES = [
   },
   {
     slug: "cloud-solutions",
-    n: "06",
+    n: "07",
     title: "Cloud Solutions",
     short: "Migration to Microsoft 365, Google Workspace, AWS, or Azure — then managed, monitored, and cost-optimized.",
     eyebrow: "Migration & cloud management",

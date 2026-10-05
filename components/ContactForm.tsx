@@ -3,7 +3,14 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
-const PROJECT_TYPES = ["Web development", "Web design", "Software engineering", "Managed IT & cloud", "Not sure yet"];
+const PROJECT_TYPES = [
+  "AI engineering",
+  "Web development",
+  "Web design",
+  "Software engineering",
+  "Managed IT & cloud",
+  "Not sure yet",
+];
 
 export function ContactForm() {
   const router = useRouter();

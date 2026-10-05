@@ -6,6 +6,7 @@ import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { BrandStatement } from "@/components/BrandStatement";
 import { EngineeringStatement } from "@/components/EngineeringStatement";
+import { AiSection } from "@/components/AiSection";
 import { FocusAreas } from "@/components/FocusAreas";
 import { GlobeSection } from "@/components/GlobeSection";
 import { Process } from "@/components/Process";
@@ -23,6 +24,7 @@ export default function Home() {
         <Hero ready={loaded} />
         <BrandStatement />
         <EngineeringStatement />
+        <AiSection />
         <FocusAreas />
         <GlobeSection />
         <Process />

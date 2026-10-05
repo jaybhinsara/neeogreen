@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
       { source: "/services/brand-identity", destination: "/services/web-design", permanent: true },
       { source: "/services/packaging-design", destination: "/", permanent: true },
       { source: "/services/digital-marketing", destination: "/", permanent: true },
+      { source: "/reviews", destination: "/", permanent: true },
     ];
   },
 };

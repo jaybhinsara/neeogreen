@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import { ServicePage } from "@/components/ServicePage";
+import { ServiceNeeo } from "@/components/ServiceNeeo";
 import { SITE } from "@/lib/site";
 
 const CAPABILITIES = [
@@ -71,7 +72,7 @@ export default function AiEngineeringPage() {
         // eslint-disable-next-line react/no-danger -- static, non-user-controlled structured data
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
       />
-      <ServicePage content={content} />
+      <ServicePage content={content} heroAside={<ServiceNeeo avoidId="service-title" />} />
     </>
   );
 }

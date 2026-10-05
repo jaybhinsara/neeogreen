@@ -46,10 +46,13 @@ const rand = (a: number, b: number) => a + Math.random() * (b - a);
 export function NeeoBot({
   range = 300,
   avoidRef,
+  bubbleClassName = "top-[6%]",
 }: {
   range?: number;
   // Content Neeo must never walk over: it stops 24px short of its right edge.
   avoidRef?: RefObject<HTMLElement | null>;
+  // Vertical placement of the speech bubble, which opens to Neeo's left.
+  bubbleClassName?: string;
 }) {
   const rootRef = useRef<HTMLButtonElement>(null);
   const moverRef = useRef<HTMLDivElement>(null);
@@ -263,7 +266,7 @@ export function NeeoBot({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 4 }}
               transition={{ duration: 0.25 }}
-              className="pointer-events-none absolute right-[88%] top-[6%] w-max max-w-[180px] rounded-[14px_14px_4px_14px] bg-night px-3.5 py-2 text-left text-[13px] font-medium leading-snug text-white shadow-[0_10px_30px_-10px_rgba(5,7,6,0.5)] md:max-w-[220px]"
+              className={`pointer-events-none absolute right-[88%] ${bubbleClassName} w-max max-w-[180px] rounded-[14px_14px_4px_14px] bg-night px-3.5 py-2 text-left text-[13px] font-medium leading-snug text-white shadow-[0_10px_30px_-10px_rgba(5,7,6,0.5)] md:max-w-[220px]`}
             >
               {bubble}
             </motion.span>

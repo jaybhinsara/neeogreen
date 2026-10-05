@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
@@ -29,7 +30,8 @@ function AccentLast({ text, tone }: { text: string; tone: EmphasisTone }) {
   );
 }
 
-export function ServicePage({ content }: { content: ServiceContent }) {
+// `heroAside` is extra decoration for the hero, such as Neeo on the AI page.
+export function ServicePage({ content, heroAside }: { content: ServiceContent; heroAside?: ReactNode }) {
   const n = SERVICES.find((s) => s.slug === content.slug)?.n ?? "01";
   const others = SERVICES.filter((s) => s.slug !== content.slug);
 
@@ -37,7 +39,8 @@ export function ServicePage({ content }: { content: ServiceContent }) {
     <>
       <Header />
       <main>
-        <section className="bg-page pb-24 pt-40 md:pb-32 md:pt-52">
+        <section className="relative bg-page pb-24 pt-40 md:pb-32 md:pt-52">
+            {heroAside}
           <Container>
             <Reveal>
               <span className="label-mono text-brand">
@@ -45,7 +48,7 @@ export function ServicePage({ content }: { content: ServiceContent }) {
               </span>
             </Reveal>
             <Reveal delay={0.05}>
-              <h1 className="mt-6 max-w-[14ch] font-heading text-[clamp(44px,7vw,112px)] font-medium leading-[0.98] tracking-[-0.045em]">
+              <h1 id="service-title" className="mt-6 max-w-[14ch] font-heading text-[clamp(44px,7vw,112px)] font-medium leading-[0.98] tracking-[-0.045em]">
                 <AccentLast text={content.title} tone="light" />
               </h1>
             </Reveal>

@@ -30,7 +30,7 @@ export function Process() {
     <section className="bg-page py-28 md:py-40">
       <Container>
         <Reveal>
-          <span className="label-mono text-brand">How we work</span>
+          <span className="eyebrow text-brand-deep">How we work</span>
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="mt-6 max-w-[18ch] font-heading text-[clamp(32px,4vw,64px)] font-medium leading-[1.05] tracking-[-0.035em]">

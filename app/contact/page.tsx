@@ -22,7 +22,7 @@ export default function ContactPage() {
         <Container>
           <div className="grid gap-16 md:grid-cols-[1fr_1.2fr] md:gap-20">
             <div className="flex flex-col gap-8">
-              <span className="label-mono text-brand">Book a call</span>
+              <span className="eyebrow text-brand-deep">Book a call</span>
               <h1 className="max-w-[12ch] font-heading text-[clamp(44px,6vw,96px)] font-medium leading-[0.98] tracking-[-0.045em]">
                 Let&rsquo;s build what&rsquo;s{" "}
                 <span className="whitespace-nowrap">

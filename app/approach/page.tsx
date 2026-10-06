@@ -75,7 +75,7 @@ export default function ApproachPage() {
         <section className="bg-page pb-24 pt-40 md:pb-32 md:pt-52">
           <Container>
             <Reveal>
-              <span className="label-mono text-brand">Our approach</span>
+              <span className="eyebrow text-brand-deep">Our approach</span>
             </Reveal>
             <Reveal delay={0.05}>
               <h1 className="mt-6 max-w-[14ch] font-heading text-[clamp(44px,7vw,112px)] font-medium leading-[0.98] tracking-[-0.045em]">
@@ -112,7 +112,7 @@ export default function ApproachPage() {
         <section className="bg-brand py-28 text-white md:py-40">
           <Container>
             <Reveal>
-              <span className="label-mono text-white/70">What this means for you</span>
+              <span className="eyebrow text-white/80">What this means for you</span>
             </Reveal>
             <div className="mt-12 grid gap-12 md:grid-cols-3 md:gap-10">
               {PRINCIPLES.map((p, i) => (

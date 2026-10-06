@@ -43,7 +43,7 @@ export default function AboutPage() {
         <section className="bg-page pb-24 pt-40 md:pb-32 md:pt-52">
           <Container>
             <Reveal>
-              <span className="label-mono text-brand">About us</span>
+              <span className="eyebrow text-brand-deep">About us</span>
             </Reveal>
             <Reveal delay={0.05}>
               <h1 className="mt-6 max-w-[14ch] font-heading text-[clamp(44px,7vw,112px)] font-medium leading-[0.98] tracking-[-0.045em]">
@@ -66,7 +66,7 @@ export default function AboutPage() {
           <Container className="grid gap-16 md:grid-cols-2 md:gap-20">
             <div>
               <Reveal>
-                <span className="label-mono text-white/70">Our philosophy</span>
+                <span className="eyebrow text-white/80">Our philosophy</span>
               </Reveal>
               <Reveal delay={0.05}>
                 <p className="mt-8 max-w-[30ch] font-heading text-[clamp(26px,2.6vw,40px)] font-medium leading-[1.2] tracking-[-0.03em]">

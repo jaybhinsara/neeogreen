@@ -21,7 +21,7 @@ export default function NotFound() {
           className="pointer-events-none absolute left-1/2 top-1/2 h-[min(120vw,900px)] w-[min(120vw,900px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle_closest-side,#000_34%,rgba(0,0,0,0.6)_44%,rgba(10,154,101,0.28)_58%,transparent_100%)]"
         />
         <Container className="relative flex min-h-svh flex-col justify-center py-40">
-          <span className="label-mono text-accent-1">Error 404</span>
+          <span className="eyebrow text-accent-1">Error 404</span>
           <h1 className="mt-6 max-w-[12ch] font-heading text-[clamp(48px,7vw,112px)] font-medium leading-[0.98] tracking-[-0.045em]">
             Lost in <Emphasis>space</Emphasis>.
           </h1>
@@ -45,7 +45,7 @@ export default function NotFound() {
           </div>
 
           <nav aria-label="Services" className="mt-16 max-w-xl border-t border-white/15 pt-6">
-            <span className="label-mono text-white/60">Our services</span>
+            <span className="eyebrow text-white/75">Our services</span>
             <ul className="mt-4 grid gap-x-8 gap-y-3 sm:grid-cols-2">
               {SERVICES.map((s) => (
                 <li key={s.slug}>

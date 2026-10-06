@@ -145,7 +145,7 @@ export function Hero({ ready }: { ready: boolean }) {
               initial={{ opacity: 0 }}
               animate={ready ? { opacity: 1 } : { opacity: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="label-mono text-muted"
+              className="eyebrow text-muted"
             >
               AI &middot; Web &middot; Software &mdash; Worldwide
             </motion.p>

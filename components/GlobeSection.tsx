@@ -94,7 +94,7 @@ export function GlobeSection() {
       <Container className="relative grid items-center gap-12 md:grid-cols-[1fr_1.1fr] md:gap-16">
         <div>
           <Reveal>
-            <span className="label-mono text-accent-1">Worldwide</span>
+            <span className="eyebrow text-accent-1">Worldwide</span>
           </Reveal>
           <Reveal delay={0.05}>
             <h2 className="mt-6 max-w-[14ch] font-heading text-[clamp(36px,4.4vw,72px)] font-medium leading-[1.06] tracking-[-0.04em]">

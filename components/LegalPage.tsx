@@ -26,7 +26,7 @@ export function LegalPage({
         <section className="bg-page pb-16 pt-40 md:pb-24 md:pt-52">
           <Container>
             <Reveal>
-              <span className="label-mono text-brand">{eyebrow}</span>
+              <span className="eyebrow text-brand-deep">{eyebrow}</span>
             </Reveal>
             <Reveal delay={0.05}>
               <h1 className="mt-6 max-w-[14ch] font-heading text-[clamp(44px,6.4vw,104px)] font-medium leading-[0.98] tracking-[-0.045em]">

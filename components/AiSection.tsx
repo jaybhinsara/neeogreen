@@ -87,7 +87,7 @@ export function AiSection() {
       </div>
       <Container>
         <Reveal>
-          <span className="label-mono text-brand">AI Engineering</span>
+          <span className="eyebrow text-brand-deep">AI Engineering</span>
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="mt-6 max-w-[16ch] font-heading text-[clamp(36px,4.6vw,76px)] font-medium leading-[1.02] tracking-[-0.04em]">

@@ -80,6 +80,34 @@ input.autofill-dark:-webkit-autofill:focus {
   text-transform: uppercase;
 }
 
+/* Section intro headings (the kicker above a title): bigger and heavier
+   than label-mono so they read as a quiet subheading, led by a small leaf
+   in the text colour as the brand mark. */
+@utility eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75em;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.35;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+
+  &::before {
+    content: "";
+    flex: none;
+    width: 0.62em;
+    height: 0.62em;
+    border-radius: 0 100% 0 100%;
+    background: currentColor;
+  }
+
+  @media (width >= 48rem) {
+    font-size: 0.9375rem;
+  }
+}
+
 /* Glass lettering: white that fades down into the surface, a hairline
    edge, and a slow diagonal shine sweeping across. */
 @utility text-glass {

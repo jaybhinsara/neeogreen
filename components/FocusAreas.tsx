@@ -94,7 +94,7 @@ export function FocusAreas() {
     <section id="services" className="bg-paper py-28 md:py-40">
       <Container>
         <Reveal>
-          <span className="label-mono text-brand">Focus areas</span>
+          <span className="eyebrow text-brand-deep">Focus areas</span>
         </Reveal>
 
         <div

@@ -33,7 +33,7 @@ export default async function ThankYouPage({ searchParams }: PageProps<"/thank-y
       <Header />
       <main className="bg-page pb-24 pt-40 md:pb-32 md:pt-52">
         <Container>
-          <span className="label-mono text-brand">{viaWhatsApp ? "Almost there" : "Message received"}</span>
+          <span className="eyebrow text-brand-deep">{viaWhatsApp ? "Almost there" : "Message received"}</span>
           <h1 className="mt-6 max-w-[14ch] font-heading text-[clamp(44px,7vw,112px)] font-medium leading-[0.98] tracking-[-0.045em]">
             Thank <Emphasis tone="light">you</Emphasis>.
           </h1>

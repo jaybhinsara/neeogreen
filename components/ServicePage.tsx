@@ -43,7 +43,7 @@ export function ServicePage({ content, heroAside }: { content: ServiceContent; h
             {heroAside}
           <Container>
             <Reveal>
-              <span className="label-mono text-brand">
+              <span className="eyebrow text-brand-deep">
                 {n} &mdash; {content.eyebrow}
               </span>
             </Reveal>
@@ -68,7 +68,7 @@ export function ServicePage({ content, heroAside }: { content: ServiceContent; h
         <section className="bg-paper py-24 md:py-32">
           <Container className="grid gap-12 md:grid-cols-[1fr_1.4fr] md:gap-20">
             <Reveal>
-              <span className="label-mono text-brand">What&rsquo;s included</span>
+              <span className="eyebrow text-brand-deep">What&rsquo;s included</span>
             </Reveal>
             <ul>
               {content.deliverables.map((d, i) => (
@@ -86,7 +86,7 @@ export function ServicePage({ content, heroAside }: { content: ServiceContent; h
         <section className="bg-brand py-28 text-white md:py-40">
           <Container className="grid gap-10 md:grid-cols-[1fr_1.4fr] md:gap-20">
             <Reveal>
-              <span className="label-mono text-white/70">Why it matters</span>
+              <span className="eyebrow text-white/85">Why it matters</span>
             </Reveal>
             <div>
               <Reveal>
@@ -104,7 +104,7 @@ export function ServicePage({ content, heroAside }: { content: ServiceContent; h
         <section className="bg-page py-24 md:py-32">
           <Container>
             <Reveal>
-              <span className="label-mono text-brand">How it runs</span>
+              <span className="eyebrow text-brand-deep">How it runs</span>
             </Reveal>
             <div className="mt-12 grid gap-10 md:grid-cols-4 md:gap-8">
               {content.process.map((step, i) => (
@@ -125,7 +125,7 @@ export function ServicePage({ content, heroAside }: { content: ServiceContent; h
         <section className="bg-paper py-24 md:py-32">
           <Container>
             <Reveal>
-              <span className="label-mono text-brand">Also see</span>
+              <span className="eyebrow text-brand-deep">Also see</span>
             </Reveal>
             <div className="mt-8">
               {others.map((s) => (

@@ -4,11 +4,13 @@ import { useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { CONSENT_EVENT, readConsent, type Consent } from "@/lib/consent";
 
-// Google Ads tag, loaded only for visitors who chose "Accept all" (see the
-// cookie policy). Page views are sent manually on every route change: the
-// site navigates client-side (e.g. contact form → /thank-you), which the
-// standard snippet would miss, and /thank-you is the conversion URL.
+// Google tag for Google Ads and Google Analytics 4, loaded only for visitors
+// who chose "Accept all" (see the cookie policy). Page views are sent
+// manually on every route change: the site navigates client-side (e.g.
+// contact form → /thank-you), which the standard snippet would miss, and
+// /thank-you is the conversion URL.
 const GOOGLE_ADS_ID = "AW-18490191953";
+const GA4_ID = "G-7G3XVKBFN1";
 
 type Gtag = (...args: unknown[]) => void;
 declare global {
@@ -42,6 +44,7 @@ function loadTag() {
   window.gtag("consent", "default", GRANTED);
   window.gtag("js", new Date());
   window.gtag("config", GOOGLE_ADS_ID, { send_page_view: false });
+  window.gtag("config", GA4_ID, { send_page_view: false });
 
   const script = document.createElement("script");
   script.async = true;
@@ -49,13 +52,14 @@ function loadTag() {
   document.head.appendChild(script);
 }
 
-// Google Ads' first-party cookies (_gcl_au etc.), set on this host or the
-// registrable domain depending on the browser.
+// Google's first-party cookies: Ads (_gcl_au etc.) and Analytics (_ga,
+// _ga_<id>), set on this host or the registrable domain depending on the
+// browser.
 function clearGoogleCookies() {
   const domain = window.location.hostname.replace(/^www\./, "");
   for (const part of document.cookie.split(";")) {
     const name = part.split("=")[0].trim();
-    if (!name.startsWith("_gcl_")) continue;
+    if (!name.startsWith("_gcl_") && name !== "_ga" && !name.startsWith("_ga_")) continue;
     document.cookie = `${name}=; Max-Age=0; Path=/`;
     document.cookie = `${name}=; Max-Age=0; Path=/; Domain=.${domain}`;
   }
@@ -66,7 +70,7 @@ function sendPageView() {
     page_location: window.location.href,
     page_path: window.location.pathname + window.location.search,
     page_title: document.title,
-    send_to: GOOGLE_ADS_ID,
+    send_to: [GOOGLE_ADS_ID, GA4_ID],
   });
 }
 

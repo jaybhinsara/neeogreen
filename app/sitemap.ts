@@ -3,8 +3,11 @@ import { SITE, SERVICES } from "@/lib/site";
 
 // Legal pages change only when the policy text does, so they carry the
 // date shown on the pages rather than the build time. Update both together.
-const LEGAL_UPDATED = new Date("2026-10-02");
-const LEGAL_PATHS = ["/privacy", "/terms", "/cookies"];
+const LEGAL_UPDATED: Record<string, string> = {
+  "/privacy": "2026-10-19",
+  "/terms": "2026-10-02",
+  "/cookies": "2026-10-19",
+};
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -20,9 +23,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.9,
     })),
-    ...LEGAL_PATHS.map((path) => ({
+    ...Object.entries(LEGAL_UPDATED).map(([path, updated]) => ({
       url: `${SITE.url}${path}`,
-      lastModified: LEGAL_UPDATED,
+      lastModified: new Date(updated),
       changeFrequency: "yearly" as const,
       priority: 0.3,
     })),

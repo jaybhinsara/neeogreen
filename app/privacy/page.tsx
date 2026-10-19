@@ -45,7 +45,7 @@ const SECTIONS: LegalSection[] = [
         </p>
         <p>
           <strong>Cookies.</strong> We set one essential cookie to remember your cookie choice, and, only with
-          your consent, Google&rsquo;s advertising measurement cookies. See our{" "}
+          your consent, Google&rsquo;s analytics and advertising measurement cookies. See our{" "}
           <Link href="/cookies">Cookie Policy</Link> for details.
         </p>
       </>
@@ -98,8 +98,9 @@ const SECTIONS: LegalSection[] = [
             <strong>Neon</strong>, which hosts the database where contact form submissions are stored;
           </li>
           <li>
-            <strong>Google</strong>, only if you accept optional cookies: the Google Ads tag measures which of our
-            ads lead to enquiries. See our <Link href="/cookies">Cookie Policy</Link>.
+            <strong>Google</strong>, only if you accept optional cookies: Google Analytics measures how the site
+            is used, and the Google Ads tag measures which of our ads lead to enquiries. See our{" "}
+            <Link href="/cookies">Cookie Policy</Link>.
           </li>
         </ul>
         <p>
@@ -195,7 +196,7 @@ export default function PrivacyPage() {
           Privacy <Emphasis tone="light">policy</Emphasis>
         </>
       }
-      updated="2 October 2026"
+      updated="19 October 2026"
       intro={
         <p>
           What we collect when you visit this website or contact us, why we collect it, and the control you have

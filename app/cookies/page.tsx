@@ -35,12 +35,14 @@ const SECTIONS: LegalSection[] = [
           visit. It contains no personal data and expires after 12 months.
         </p>
         <p>
-          <strong>Advertising measurement (optional).</strong> Only if you choose &ldquo;Accept all&rdquo;, we
-          load the Google tag for Google Ads so we can see which of our ads lead to enquiries. Google may set
-          cookies such as <code>_gcl_au</code> (up to 90 days) on our domain, plus its own cookies on Google
-          domains, and receives information such as the pages you visit here and the ad you came from. If you
-          choose &ldquo;Essential only&rdquo;, the tag is never loaded; if you switch later, it stops storing or
-          reading cookies.
+          <strong>Analytics and advertising measurement (optional).</strong> Only if you choose &ldquo;Accept
+          all&rdquo;, we load the Google tag for Google Analytics and Google Ads, so we can see how visitors use
+          the site and which of our ads lead to enquiries. Google may set cookies on our domain such as{" "}
+          <code>_ga</code> and <code>_ga_&lt;id&gt;</code> (Analytics, up to 2 years) and <code>_gcl_au</code>{" "}
+          (Ads, up to 90 days), plus its own cookies on Google domains. It receives information such as the
+          pages you visit here, your device and approximate location, and the ad you came from. If you choose
+          &ldquo;Essential only&rdquo;, the tag is never loaded; if you switch later, it stops storing or reading
+          cookies and we remove the ones it set.
         </p>
         <p>
           <strong>Third parties.</strong> Our fonts are served from our own domain. Google, through the tag
@@ -94,11 +96,11 @@ export default function CookiesPage() {
           Cookie <Emphasis tone="light">policy</Emphasis>
         </>
       }
-      updated="2 October 2026"
+      updated="19 October 2026"
       intro={
         <p>
-          We keep cookies to the minimum: one essential cookie, and Google&rsquo;s ad measurement only if you say
-          yes.
+          We keep cookies to the minimum: one essential cookie, and Google&rsquo;s analytics and ad measurement
+          only if you say yes.
         </p>
       }
       sections={SECTIONS}

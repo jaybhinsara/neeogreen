@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { AnimatePresence, animate, motion, useReducedMotion } from "framer-motion";
 import { openBookCall } from "@/lib/book-call";
+import { usePauseOffscreen } from "@/lib/use-pause-offscreen";
 
 // Neeo, the studio's 3D AI bot. The render is one sprite; the parts that
 // make it feel alive are layered over it: pupils that follow the cursor,
@@ -55,6 +56,7 @@ export function NeeoBot({
   bubbleClassName?: string;
 }) {
   const rootRef = useRef<HTMLButtonElement>(null);
+  usePauseOffscreen(rootRef);
   const moverRef = useRef<HTMLDivElement>(null);
   const flipRef = useRef<HTMLDivElement>(null);
   const squashRef = useRef<HTMLDivElement>(null);

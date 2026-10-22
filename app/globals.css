@@ -124,6 +124,12 @@ input.autofill-dark:-webkit-autofill:focus {
   animation: glass-shine 7s ease-in-out infinite;
 }
 
+/* Set by usePauseOffscreen: loops stop while their section is out of view. */
+[data-offscreen],
+[data-offscreen] * {
+  animation-play-state: paused !important;
+}
+
 @keyframes glass-shine {
   0%, 35% { background-position: 150% 0, 0 0; }
   100% { background-position: -60% 0, 0 0; }

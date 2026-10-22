@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { LAND_MASK_BASE64, LAND_MASK_HEIGHT, LAND_MASK_WIDTH } from "@/lib/land-mask";
 
 const DEG = Math.PI / 180;
 const TILT = 0.32;
@@ -19,20 +18,6 @@ const DESTINATIONS = [
 ];
 const ARC_SAMPLES = 64;
 
-function decodeMask() {
-  const bin = atob(LAND_MASK_BASE64);
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-  return bytes;
-}
-
-function isLand(mask: Uint8Array, lat: number, lon: number) {
-  const x = Math.min(LAND_MASK_WIDTH - 1, Math.floor(((lon + 180) / 360) * LAND_MASK_WIDTH));
-  const y = Math.min(LAND_MASK_HEIGHT - 1, Math.max(0, Math.floor(((90 - lat) / 180) * LAND_MASK_HEIGHT)));
-  const i = y * LAND_MASK_WIDTH + x;
-  return ((mask[i >> 3] >> (i & 7)) & 1) === 1;
-}
-
 // lon 0 faces +z (the camera), y is up.
 function toVec(lat: number, lon: number, r = 1) {
   const phi = lat * DEG;
@@ -40,56 +25,40 @@ function toVec(lat: number, lon: number, r = 1) {
   return new THREE.Vector3(r * Math.cos(phi) * Math.sin(theta), r * Math.sin(phi), r * Math.cos(phi) * Math.cos(theta));
 }
 
-function latLonOf(x: number, y: number, z: number) {
-  const len = Math.hypot(x, y, z);
-  return { lat: Math.asin(y / len) / DEG, lon: Math.atan2(x, z) / DEG };
-}
+// The land/ocean wireframe never changes, so it's computed once at build
+// time (scripts/build-globe-mesh.mjs) and shipped as a small binary instead
+// of splitting ~44k triangles on the main thread, which froze scrolling.
+type GlobeMesh = {
+  verts: Int16Array;
+  landTris: Uint16Array;
+  landEdges: Uint16Array;
+  oceanEdges: Int16Array;
+  oceanDots: Int16Array;
+};
 
-// Splits an icosphere's triangles into land and ocean by testing each
-// triangle's center against the mask, and returns deduplicated edges (so
-// shared edges aren't drawn twice) plus the land triangles for a soft fill.
-function partition(detail: number, mask: Uint8Array) {
-  const geometry = new THREE.IcosahedronGeometry(1, detail);
-  const pos = geometry.getAttribute("position").array as Float32Array;
-  const landEdges = new Map<string, number[]>();
-  const oceanEdges = new Map<string, number[]>();
-  const oceanVertices = new Map<string, number[]>();
-  const landTriangles: number[] = [];
-  const key = (x: number, y: number, z: number) => `${x.toFixed(4)},${y.toFixed(4)},${z.toFixed(4)}`;
-
-  for (let i = 0; i < pos.length; i += 9) {
-    const cx = pos[i] + pos[i + 3] + pos[i + 6];
-    const cy = pos[i + 1] + pos[i + 4] + pos[i + 7];
-    const cz = pos[i + 2] + pos[i + 5] + pos[i + 8];
-    const { lat, lon } = latLonOf(cx, cy, cz);
-    const land = isLand(mask, lat, lon);
-    if (land) for (let k = 0; k < 9; k++) landTriangles.push(pos[i + k]);
-    const edges = land ? landEdges : oceanEdges;
-    for (const [a, b] of [
-      [0, 1],
-      [1, 2],
-      [2, 0],
-    ]) {
-      const ia = i + a * 3;
-      const ib = i + b * 3;
-      const ka = key(pos[ia], pos[ia + 1], pos[ia + 2]);
-      const kb = key(pos[ib], pos[ib + 1], pos[ib + 2]);
-      const k = ka < kb ? `${ka}|${kb}` : `${kb}|${ka}`;
-      if (!edges.has(k)) edges.set(k, [pos[ia], pos[ia + 1], pos[ia + 2], pos[ib], pos[ib + 1], pos[ib + 2]]);
-      if (!land) {
-        oceanVertices.set(ka, [pos[ia], pos[ia + 1], pos[ia + 2]]);
-      }
-    }
-  }
-  geometry.dispose();
-  const flat = (m: Map<string, number[]>) => new Float32Array([...m.values()].flat());
+async function loadGlobeMesh(detail: number, signal: AbortSignal): Promise<GlobeMesh> {
+  const res = await fetch(`/globe/mesh-${detail}.bin`, { signal });
+  if (!res.ok) throw new Error(`globe mesh ${res.status}`);
+  const buffer = await res.arrayBuffer();
+  const [vertCount, landTriCount, landEdgeCount, oceanEdgeCount, oceanDotCount] = new Uint32Array(buffer, 0, 5);
+  let offset = 20;
+  const take = <T extends Int16Array | Uint16Array>(Type: { new (b: ArrayBuffer, o: number, l: number): T }, length: number) => {
+    const view = new Type(buffer, offset, length);
+    offset += length * 2;
+    return view;
+  };
   return {
-    landEdges: flat(landEdges),
-    oceanEdges: flat(oceanEdges),
-    oceanVertices: flat(oceanVertices),
-    landTriangles: new Float32Array(landTriangles),
+    verts: take(Int16Array, vertCount * 3),
+    landTris: take(Uint16Array, landTriCount),
+    landEdges: take(Uint16Array, landEdgeCount),
+    oceanEdges: take(Int16Array, oceanEdgeCount * 3),
+    oceanDots: take(Int16Array, oceanDotCount * 3),
   };
 }
+
+// Int16 positions are unit-sphere coordinates scaled by 32767; a normalized
+// attribute lets the GPU read them as-is.
+const unitPositions = (array: Int16Array) => new THREE.BufferAttribute(array, 3, true);
 
 function dotTexture(soft: boolean) {
   const size = 64;
@@ -191,53 +160,72 @@ export default function GlobeScene({ className }: { className?: string }) {
     );
     tilt.add(atmosphere);
 
-    // Land: dense white mesh with a soft fill. Ocean: sparse mesh and dots.
-    const mask = decodeMask();
-    const dense = partition(lite ? 34 : 46, mask);
-    const sparse = partition(7, mask);
-
-    const landFillGeometry = track(new THREE.BufferGeometry());
-    landFillGeometry.setAttribute("position", new THREE.BufferAttribute(dense.landTriangles, 3));
-    const landFill = new THREE.Mesh(
-      landFillGeometry,
-      track(new THREE.MeshBasicMaterial({ color: 0xe9fff5, transparent: true, opacity: 0.16, depthWrite: false }))
-    );
-    landFill.scale.setScalar(1.002);
-    spin.add(landFill);
-
-    const lines = (array: Float32Array, opacity: number, radius: number) => {
-      const geometry = track(new THREE.BufferGeometry());
-      geometry.setAttribute("position", new THREE.BufferAttribute(array, 3));
-      const segments = new THREE.LineSegments(
-        geometry,
-        track(new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity, depthWrite: false }))
-      );
-      segments.scale.setScalar(radius);
-      spin.add(segments);
-    };
-    lines(dense.landEdges, 0.5, 1.004);
-    lines(sparse.oceanEdges, 0.26, 1.004);
-
     const dotMap = track(dotTexture(false));
     const glowMap = track(dotTexture(true));
 
-    const oceanDotsGeometry = track(new THREE.BufferGeometry());
-    oceanDotsGeometry.setAttribute("position", new THREE.BufferAttribute(sparse.oceanVertices, 3));
-    const oceanDots = new THREE.Points(
-      oceanDotsGeometry,
-      track(
-        new THREE.PointsMaterial({
-          map: dotMap,
-          color: 0xffffff,
-          size: 0.026,
-          transparent: true,
-          opacity: 0.9,
-          depthWrite: false,
-        })
-      )
-    );
-    oceanDots.scale.setScalar(1.005);
-    spin.add(oceanDots);
+    // Land: dense white mesh with a soft fill. Ocean: sparse mesh and dots.
+    // They arrive from the network a moment after the globe itself, so they
+    // fade in rather than pop.
+    const wireframe = new THREE.Group();
+    const fadeIns: { material: THREE.Material; opacity: number }[] = [];
+    let wireframeShownAt = 0;
+    const fading = <M extends THREE.Material>(material: M, opacity: number) => {
+      material.opacity = 0;
+      fadeIns.push({ material, opacity });
+      return track(material);
+    };
+    const meshAbort = new AbortController();
+    loadGlobeMesh(lite ? 34 : 46, meshAbort.signal)
+      .then((mesh) => {
+        const landGeometry = track(new THREE.BufferGeometry());
+        landGeometry.setAttribute("position", unitPositions(mesh.verts));
+        landGeometry.setIndex(new THREE.BufferAttribute(mesh.landTris, 1));
+        const landFill = new THREE.Mesh(
+          landGeometry,
+          fading(new THREE.MeshBasicMaterial({ color: 0xe9fff5, transparent: true, depthWrite: false }), 0.16)
+        );
+        landFill.scale.setScalar(1.002);
+        wireframe.add(landFill);
+
+        const landEdgeGeometry = track(new THREE.BufferGeometry());
+        landEdgeGeometry.setAttribute("position", unitPositions(mesh.verts));
+        landEdgeGeometry.setIndex(new THREE.BufferAttribute(mesh.landEdges, 1));
+        const landLines = new THREE.LineSegments(
+          landEdgeGeometry,
+          fading(new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, depthWrite: false }), 0.5)
+        );
+        landLines.scale.setScalar(1.004);
+        wireframe.add(landLines);
+
+        const oceanEdgeGeometry = track(new THREE.BufferGeometry());
+        oceanEdgeGeometry.setAttribute("position", unitPositions(mesh.oceanEdges));
+        const oceanLines = new THREE.LineSegments(
+          oceanEdgeGeometry,
+          fading(new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, depthWrite: false }), 0.26)
+        );
+        oceanLines.scale.setScalar(1.004);
+        wireframe.add(oceanLines);
+
+        const oceanDotsGeometry = track(new THREE.BufferGeometry());
+        oceanDotsGeometry.setAttribute("position", unitPositions(mesh.oceanDots));
+        const oceanDots = new THREE.Points(
+          oceanDotsGeometry,
+          fading(
+            new THREE.PointsMaterial({ map: dotMap, color: 0xffffff, size: 0.026, transparent: true, depthWrite: false }),
+            0.9
+          )
+        );
+        oceanDots.scale.setScalar(1.005);
+        wireframe.add(oceanDots);
+        // Compile its shaders off the main thread before it's first drawn.
+        return renderer.compileAsync(wireframe, camera, scene);
+      })
+      .then(() => {
+        if (meshAbort.signal.aborted) return;
+        spin.add(wireframe);
+        wireframeShownAt = performance.now();
+      })
+      .catch(() => {});
 
     // Arcs from the HQ to cities worldwide, each with a traveling pulse.
     const hqVec = toVec(HQ.lat, HQ.lon);
@@ -372,6 +360,12 @@ export default function GlobeScene({ className }: { className?: string }) {
       spin.rotation.y = rotation;
       tilt.rotation.x = TILT + tiltOffset;
 
+      if (wireframeShownAt && fadeIns.length) {
+        const k = reduced ? 1 : Math.min((now - wireframeShownAt) / 700, 1);
+        for (const f of fadeIns) f.material.opacity = f.opacity * k;
+        if (k === 1) fadeIns.length = 0;
+      }
+
       if (!reduced) {
         arcPaths.forEach((points, i) => {
           const head = (seconds * 0.22 + i / arcPaths.length) % 1;
@@ -416,13 +410,35 @@ export default function GlobeScene({ className }: { className?: string }) {
       cancelAnimationFrame(raf);
     }
 
-    const intersection = new IntersectionObserver(([entry]) => (entry.isIntersecting ? startLoop() : stopLoop()));
+    // Drawing the first frame used to compile every shader right then, on
+    // the main thread, freezing the scroll for a few hundred ms. Compile in
+    // the background first and only start drawing once that's done.
+    let ready = false;
+    let inView = false;
+    const maybeStart = () => {
+      if (meshAbort.signal.aborted) return; // unmounted while compiling
+      if (ready && inView && !document.hidden) startLoop();
+      else stopLoop();
+    };
+    renderer
+      .compileAsync(scene, camera)
+      .catch(() => {})
+      .then(() => {
+        ready = true;
+        maybeStart();
+      });
+
+    const intersection = new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+      maybeStart();
+    });
     intersection.observe(container);
-    const onVisibility = () => (document.hidden ? stopLoop() : startLoop());
+    const onVisibility = () => maybeStart();
     document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
       stopLoop();
+      meshAbort.abort();
       intersection.disconnect();
       resizeObserver.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);

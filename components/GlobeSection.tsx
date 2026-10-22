@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { Container } from "./Container";
 import { Emphasis } from "./Emphasis";
 import { Reveal } from "./Reveal";
+import { usePauseOffscreen } from "@/lib/use-pause-offscreen";
 
 const GlobeScene = dynamic(() => import("./GlobeScene"), { ssr: false });
 
@@ -48,6 +49,9 @@ const noopSubscribe = () => () => {};
 
 export function GlobeSection() {
   const globeRef = useRef<HTMLDivElement>(null);
+  // The twinkling stars only animate while the section is in view.
+  const sectionRef = useRef<HTMLElement>(null);
+  usePauseOffscreen(sectionRef);
   const canUseWebGL = useSyncExternalStore(noopSubscribe, supportsWebGL, () => false);
   // The globe builds its meshes on mount, so it waits until the section is
   // close to the viewport instead of competing with the hero on page load.
@@ -56,21 +60,34 @@ export function GlobeSection() {
   useEffect(() => {
     const el = globeRef.current;
     if (!el) return;
+    // Building the scene is a burst of work, so once the section is within
+    // a couple of screens it's scheduled for a moment the browser is idle
+    // (a pause in scrolling) rather than run mid-scroll.
+    let idle = 0;
+    // Safari has no requestIdleCallback; a short timeout stands in.
+    const whenIdle = (fn: () => void) =>
+      typeof window.requestIdleCallback === "function"
+        ? window.requestIdleCallback(fn, { timeout: 1500 })
+        : window.setTimeout(fn, 200);
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setNear(true);
           observer.disconnect();
+          idle = whenIdle(() => setNear(true));
         }
       },
-      { rootMargin: "600px 0px" }
+      { rootMargin: "1600px 0px" }
     );
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idle);
+      window.clearTimeout(idle);
+    };
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-night py-28 text-white md:py-36">
+    <section ref={sectionRef} className="relative overflow-hidden bg-night py-28 text-white md:py-36">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         {STARS.map((star, i) => (
           <span

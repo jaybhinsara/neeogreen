@@ -8,6 +8,7 @@ import { Reveal } from "./Reveal";
 import { Emphasis } from "./Emphasis";
 import { BookCallTrigger } from "./BookCallTrigger";
 import { NeeoBot } from "./NeeoBot";
+import { usePauseOffscreen } from "@/lib/use-pause-offscreen";
 
 const CAPABILITIES = [
   { title: "AI chatbots", desc: "Assistants for your website, WhatsApp, and support that answer like your best staff member." },
@@ -76,8 +77,10 @@ function ChatDemo() {
 
 export function AiSection() {
   const copyRef = useRef<HTMLParagraphElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  usePauseOffscreen(sectionRef);
   return (
-    <section id="ai" className="relative bg-page py-28 md:py-40">
+    <section ref={sectionRef} id="ai" className="relative bg-page py-28 md:py-40">
       {/* Full size only where the corner is genuinely empty (xl); smaller
           and tucked up beside the headline below that. */}
       <div className="pointer-events-none absolute right-4 top-6 z-10 md:right-8 md:top-10 xl:right-[5%] xl:top-28">

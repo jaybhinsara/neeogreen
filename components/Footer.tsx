@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import type { MouseEvent } from "react";
+import { useRef, type MouseEvent } from "react";
 import { Container } from "./Container";
 import { scrollToHash } from "@/lib/lenis-singleton";
 import { SERVICES, SITE } from "@/lib/site";
 import { Emphasis } from "./Emphasis";
 import { CookieSettingsButton } from "./CookieSettingsButton";
 import { SocialIcon } from "./SocialIcon";
+import { usePauseOffscreen } from "@/lib/use-pause-offscreen";
 
 function handleAnchorClick(e: MouseEvent<HTMLAnchorElement>, href: string) {
   const hashIndex = href.indexOf("#");
@@ -28,8 +29,11 @@ const PAGES = [
 ];
 
 export function Footer() {
+  // The wordmark's glass shine repaints every frame, so it only runs in view.
+  const footerRef = useRef<HTMLElement>(null);
+  usePauseOffscreen(footerRef);
   return (
-    <footer className="relative overflow-hidden bg-brand text-white">
+    <footer ref={footerRef} className="relative overflow-hidden bg-brand text-white">
       <Container className="relative z-10 pb-10 pt-24 md:pt-32">
         <div className="grid gap-16 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div className="flex flex-col items-start gap-8">

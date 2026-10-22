@@ -431,20 +431,19 @@ export default function LeafScene({ className }: { className?: string }) {
     const prevPointerPx = new THREE.Vector2();
     let mouseSpeed = 0;
     let hasPointer = false;
-    let targetTiltX = 0;
-    let targetTiltY = 0;
+    let pointerX = 0;
+    let pointerY = 0;
     let tiltX = 0;
     let tiltY = 0;
 
+    // Only the raw pointer is stored here; the frame loop turns it into a
+    // tilt. Measuring against the section's box at move time went stale on
+    // scroll (wheel scrolling fires no pointermove), so a mouse that last
+    // moved while the section was still below the fold left the leaf tipped
+    // far over, lying face-down, until the mouse moved again.
     function onPointerMove(e: PointerEvent) {
-      const rect = container!.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      pointerNdc.set((x / rect.width) * 2 - 1, -(y / rect.height) * 2 + 1);
-
-      // Adjust 0.32 / 0.18 to make the tilt more or less pronounced.
-      targetTiltY = pointerNdc.x * 0.32;
-      targetTiltX = -pointerNdc.y * 0.18;
+      pointerX = e.clientX;
+      pointerY = e.clientY;
 
       if (hasPointer) {
         const dx = e.clientX - prevPointerPx.x;
@@ -487,7 +486,23 @@ export default function LeafScene({ className }: { className?: string }) {
       rafId = requestAnimationFrame(animate);
       const elapsed = (performance.now() - startTime) / 1000;
 
+      // Tilt follows where the pointer sits in the window, clamped so it can
+      // never exceed the on-screen range. Adjust 0.32 / 0.18 to make the tilt
+      // more or less pronounced.
+      let targetTiltX = 0;
+      let targetTiltY = 0;
       if (hasPointer) {
+        const nx = THREE.MathUtils.clamp((pointerX / window.innerWidth) * 2 - 1, -1, 1);
+        const ny = THREE.MathUtils.clamp(-(pointerY / window.innerHeight) * 2 + 1, -1, 1);
+        targetTiltY = nx * 0.32;
+        targetTiltX = -ny * 0.18;
+
+        // The ripple still needs the pointer in the canvas's own space.
+        const rect = container!.getBoundingClientRect();
+        pointerNdc.set(
+          ((pointerX - rect.left) / rect.width) * 2 - 1,
+          -((pointerY - rect.top) / rect.height) * 2 + 1
+        );
         raycaster.setFromCamera(pointerNdc, camera);
         raycaster.ray.intersectPlane(dragPlane, hitPoint);
       }

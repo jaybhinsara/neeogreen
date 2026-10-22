@@ -60,7 +60,7 @@ function BookCallButton({ className, onClick }: { className?: string; onClick?: 
       )}
     >
       <span aria-hidden="true" className="relative flex h-1.5 w-1.5">
-        <span className="absolute inset-0 animate-ping rounded-full bg-accent-1 opacity-75 motion-reduce:animate-none" />
+        <span className="absolute inset-0 animate-[ping_1s_cubic-bezier(0,0,0.2,1)_4] rounded-full bg-accent-1 opacity-75 motion-reduce:animate-none" />
         <span className="relative h-1.5 w-1.5 rounded-full bg-accent-1" />
       </span>
       Book a call

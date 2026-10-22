@@ -236,161 +236,175 @@ export default function LeafScene({ className }: { className?: string }) {
 
     const gltfLoader = new GLTFLoader();
     gltfLoader.setMeshoptDecoder(MeshoptDecoder);
-    gltfLoader.load(
-      LEAF_MODEL_URL,
-      (gltf) => {
-        let found: THREE.Mesh | null = null;
-        gltf.scene.traverse((child) => {
-          if (!found && (child as THREE.Mesh).isMesh) found = child as THREE.Mesh;
-        });
-        if (!found) return;
-        const loadedMesh = found as THREE.Mesh;
+    // The model is the heaviest download on the page (~1.3MB), so it waits
+    // until the page has finished loading and the browser is idle instead of
+    // competing with the hero video and keeping phones' loading bars going.
+    const loadModel = () =>
+      gltfLoader.load(
+        LEAF_MODEL_URL,
+        (gltf) => {
+          let found: THREE.Mesh | null = null;
+          gltf.scene.traverse((child) => {
+            if (!found && (child as THREE.Mesh).isMesh) found = child as THREE.Mesh;
+          });
+          if (!found) return;
+          const loadedMesh = found as THREE.Mesh;
 
-        const geometry = loadedMesh.geometry;
-        geometry.computeBoundingBox();
-        const bbox = geometry.boundingBox!;
-        const size = new THREE.Vector3();
-        bbox.getSize(size);
-        const center = new THREE.Vector3();
-        bbox.getCenter(center);
-        geometry.translate(-center.x, -center.y, -center.z);
-        halfHeight = Math.max(size.y / 2, 0.0001);
+          const geometry = loadedMesh.geometry;
+          geometry.computeBoundingBox();
+          const bbox = geometry.boundingBox!;
+          const size = new THREE.Vector3();
+          bbox.getSize(size);
+          const center = new THREE.Vector3();
+          bbox.getCenter(center);
+          geometry.translate(-center.x, -center.y, -center.z);
+          halfHeight = Math.max(size.y / 2, 0.0001);
 
-        loadedMesh.scale.setScalar(LEAF_LENGTH / Math.max(size.y, 0.0001));
+          loadedMesh.scale.setScalar(LEAF_LENGTH / Math.max(size.y, 0.0001));
 
-        // Reuse the model's own normal map (if any) for its sculpted surface
-        // detail, but replace the base material entirely with our own so the
-        // color/glass/glow treatment matches the rest of the brand regardless
-        // of whatever the source model was textured with.
-        const sourceMaterial = Array.isArray(loadedMesh.material)
-          ? loadedMesh.material[0]
-          : loadedMesh.material;
-        const normalMap =
-          sourceMaterial && "normalMap" in sourceMaterial
-            ? (sourceMaterial as THREE.MeshStandardMaterial).normalMap
-            : null;
+          // Reuse the model's own normal map (if any) for its sculpted surface
+          // detail, but replace the base material entirely with our own so the
+          // color/glass/glow treatment matches the rest of the brand regardless
+          // of whatever the source model was textured with.
+          const sourceMaterial = Array.isArray(loadedMesh.material)
+            ? loadedMesh.material[0]
+            : loadedMesh.material;
+          const normalMap =
+            sourceMaterial && "normalMap" in sourceMaterial
+              ? (sourceMaterial as THREE.MeshStandardMaterial).normalMap
+              : null;
 
-        const material = new THREE.MeshPhysicalMaterial({
-          color: new THREE.Color("#1f6b4f"),
-          normalMap: normalMap ?? undefined,
-          metalness: 0.1,
-          roughness: 0.3,
-          clearcoat: lite ? 0 : 1.0,
-          clearcoatRoughness: 0.15,
-          // No `transmission`: it renders the whole scene a second time into
-          // an offscreen buffer every frame, which crashed mobile tabs and
-          // dragged scroll smoothness at full-screen size. The fresnel glow
-          // in the shader below covers the glassy look without it.
-          iridescence: lite ? 0 : 0.5,
-          iridescenceIOR: 1.3,
-          ior: 1.4,
-          side: THREE.DoubleSide,
-          transparent: true,
-          opacity: 0.9,
-        });
+          const material = new THREE.MeshPhysicalMaterial({
+            color: new THREE.Color("#1f6b4f"),
+            normalMap: normalMap ?? undefined,
+            metalness: 0.1,
+            roughness: 0.3,
+            clearcoat: lite ? 0 : 1.0,
+            clearcoatRoughness: 0.15,
+            // No `transmission`: it renders the whole scene a second time into
+            // an offscreen buffer every frame, which crashed mobile tabs and
+            // dragged scroll smoothness at full-screen size. The fresnel glow
+            // in the shader below covers the glassy look without it.
+            iridescence: lite ? 0 : 0.5,
+            iridescenceIOR: 1.3,
+            ior: 1.4,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.9,
+          });
 
-        // Inject fluid noise + mouse-ripple displacement, plus a magical
-        // fresnel/rim glow — into the built-in physical shader, so we keep
-        // Three's PBR lighting for free. The glow uses view-angle (fresnel)
-        // and local vertex position rather than UVs, since this is an
-        // imported model whose UV layout we don't control (unlike the old
-        // procedural leaf's own vein texture, which relied on knowing the
-        // UV mapping exactly).
-        material.onBeforeCompile = (shader) => {
-          shader.uniforms.uTime = { value: 0 };
-          shader.uniforms.uMouseLocal = { value: new THREE.Vector3(999, 999, 0) };
-          shader.uniforms.uMouseStrength = { value: 0 };
-          shader.uniforms.uGlowA = { value: new THREE.Color("#34d399") };
-          shader.uniforms.uGlowB = { value: new THREE.Color("#22d3ee") };
-          shader.uniforms.uHalfHeight = { value: halfHeight };
+          // Inject fluid noise + mouse-ripple displacement, plus a magical
+          // fresnel/rim glow — into the built-in physical shader, so we keep
+          // Three's PBR lighting for free. The glow uses view-angle (fresnel)
+          // and local vertex position rather than UVs, since this is an
+          // imported model whose UV layout we don't control (unlike the old
+          // procedural leaf's own vein texture, which relied on knowing the
+          // UV mapping exactly).
+          material.onBeforeCompile = (shader) => {
+            shader.uniforms.uTime = { value: 0 };
+            shader.uniforms.uMouseLocal = { value: new THREE.Vector3(999, 999, 0) };
+            shader.uniforms.uMouseStrength = { value: 0 };
+            shader.uniforms.uGlowA = { value: new THREE.Color("#34d399") };
+            shader.uniforms.uGlowB = { value: new THREE.Color("#22d3ee") };
+            shader.uniforms.uHalfHeight = { value: halfHeight };
 
-          shader.vertexShader =
-            `
-            uniform float uTime;
-            uniform vec3 uMouseLocal;
-            uniform float uMouseStrength;
-            varying vec3 vLocalPos;
-            ${SNOISE_GLSL}
-            ` + shader.vertexShader;
+            shader.vertexShader =
+              `
+              uniform float uTime;
+              uniform vec3 uMouseLocal;
+              uniform float uMouseStrength;
+              varying vec3 vLocalPos;
+              ${SNOISE_GLSL}
+              ` + shader.vertexShader;
 
-          shader.vertexShader = shader.vertexShader.replace(
-            "#include <begin_vertex>",
-            `
-            #include <begin_vertex>
+            shader.vertexShader = shader.vertexShader.replace(
+              "#include <begin_vertex>",
+              `
+              #include <begin_vertex>
 
-            vLocalPos = position;
+              vLocalPos = position;
 
-            // Ambient ripple: adjust 1.4 (spatial scale) and 0.18 (time speed)
-            // to change how tight / fast the fluid ripples move.
-            float ambientNoise = snoise(vec3(position.x * 1.4, position.y * 1.4, uTime * 0.18));
+              // Ambient ripple: adjust 1.4 (spatial scale) and 0.18 (time speed)
+              // to change how tight / fast the fluid ripples move.
+              float ambientNoise = snoise(vec3(position.x * 1.4, position.y * 1.4, uTime * 0.18));
 
-            // Localized ripple where the mouse recently moved fast.
-            float mouseDist = distance(position.xy, uMouseLocal.xy);
-            float mouseRipple = uMouseStrength * exp(-mouseDist * 3.2) *
-              sin(mouseDist * 10.0 - uTime * 4.0);
+              // Localized ripple where the mouse recently moved fast.
+              float mouseDist = distance(position.xy, uMouseLocal.xy);
+              float mouseRipple = uMouseStrength * exp(-mouseDist * 3.2) *
+                sin(mouseDist * 10.0 - uTime * 4.0);
 
-            // Adjust 0.05 to change how strongly the surface bulges with the ripple.
-            float displacement = ambientNoise * 0.05 + mouseRipple * 0.12;
-            transformed += normal * displacement;
-            `
-          );
+              // Adjust 0.05 to change how strongly the surface bulges with the ripple.
+              float displacement = ambientNoise * 0.05 + mouseRipple * 0.12;
+              transformed += normal * displacement;
+              `
+            );
 
-          shader.fragmentShader =
-            `
-            uniform float uTime;
-            uniform vec3 uGlowA;
-            uniform vec3 uGlowB;
-            uniform float uHalfHeight;
-            varying vec3 vLocalPos;
-            ` + shader.fragmentShader;
+            shader.fragmentShader =
+              `
+              uniform float uTime;
+              uniform vec3 uGlowA;
+              uniform vec3 uGlowB;
+              uniform float uHalfHeight;
+              varying vec3 vLocalPos;
+              ` + shader.fragmentShader;
 
-          shader.fragmentShader = shader.fragmentShader.replace(
-            "#include <dithering_fragment>",
-            `
-            // Magical glow, two parts:
-            // 1. A fresnel rim — brightest at grazing angles, like light
-            //    catching the edge of glass — using the surface normal and
-            //    view direction Three already provides, so it works
-            //    regardless of this model's UV layout.
-            // 2. A hot core gathered near the base (negative local Y, where
-            //    this model's stem sits) fading toward white at its
-            //    brightest point, using the mesh's own measured half-height
-            //    rather than a guessed constant.
-            vec3 viewDir = normalize(vViewPosition);
-            vec3 glowNormal = normalize(vNormal);
-            float fresnel = pow(1.0 - max(dot(glowNormal, viewDir), 0.0), 2.2);
-            float pulse = sin(uTime * 1.6) * 0.5 + 0.5;
-            vec3 rimGlow = mix(uGlowA, uGlowB, fresnel);
+            shader.fragmentShader = shader.fragmentShader.replace(
+              "#include <dithering_fragment>",
+              `
+              // Magical glow, two parts:
+              // 1. A fresnel rim — brightest at grazing angles, like light
+              //    catching the edge of glass — using the surface normal and
+              //    view direction Three already provides, so it works
+              //    regardless of this model's UV layout.
+              // 2. A hot core gathered near the base (negative local Y, where
+              //    this model's stem sits) fading toward white at its
+              //    brightest point, using the mesh's own measured half-height
+              //    rather than a guessed constant.
+              vec3 viewDir = normalize(vViewPosition);
+              vec3 glowNormal = normalize(vNormal);
+              float fresnel = pow(1.0 - max(dot(glowNormal, viewDir), 0.0), 2.2);
+              float pulse = sin(uTime * 1.6) * 0.5 + 0.5;
+              vec3 rimGlow = mix(uGlowA, uGlowB, fresnel);
 
-            float baseAmount = clamp(-vLocalPos.y / uHalfHeight, 0.0, 1.0);
-            float core = smoothstep(0.0, 0.85, baseAmount);
-            vec3 hotColor = mix(rimGlow, vec3(1.0), core * 0.7);
+              float baseAmount = clamp(-vLocalPos.y / uHalfHeight, 0.0, 1.0);
+              float core = smoothstep(0.0, 0.85, baseAmount);
+              vec3 hotColor = mix(rimGlow, vec3(1.0), core * 0.7);
 
-            gl_FragColor.rgb += rimGlow * fresnel * (0.6 + 0.6 * pulse) * 1.3;
-            gl_FragColor.rgb += hotColor * core * (0.5 + 0.5 * pulse) * 0.9;
+              gl_FragColor.rgb += rimGlow * fresnel * (0.6 + 0.6 * pulse) * 1.3;
+              gl_FragColor.rgb += hotColor * core * (0.5 + 0.5 * pulse) * 0.9;
 
-            #include <dithering_fragment>
-            `
-          );
+              #include <dithering_fragment>
+              `
+            );
 
-          shaderRef = shader;
-        };
+            shaderRef = shader;
+          };
 
-        loadedMesh.material = material;
-        loadedGeometry = geometry;
-        loadedMaterial = material;
-        activeMesh = loadedMesh;
-        mesh.add(loadedMesh);
-        // Compile the shaders now, in the background, rather than on the
-        // first frame the section scrolls into view, where the compile
-        // stall landed right in the middle of the scroll.
-        renderer.compileAsync(scene, camera).catch(() => {});
-      },
-      undefined,
-      (error) => {
-        console.error("Failed to load leaf model:", error);
-      }
-    );
+          loadedMesh.material = material;
+          loadedGeometry = geometry;
+          loadedMaterial = material;
+          activeMesh = loadedMesh;
+          mesh.add(loadedMesh);
+          // Compile the shaders now, in the background, rather than on the
+          // first frame the section scrolls into view, where the compile
+          // stall landed right in the middle of the scroll.
+          renderer.compileAsync(scene, camera).catch(() => {});
+        },
+        undefined,
+        (error) => {
+          console.error("Failed to load leaf model:", error);
+        }
+      );
+
+    let idleHandle = 0;
+    const scheduleModel = () => {
+      idleHandle =
+        typeof window.requestIdleCallback === "function"
+          ? window.requestIdleCallback(loadModel, { timeout: 2000 })
+          : window.setTimeout(loadModel, 300);
+    };
+    if (document.readyState === "complete") scheduleModel();
+    else window.addEventListener("load", scheduleModel, { once: true });
 
     // ── Glowing dust particles around the leaf ─────────────────────────────
     const dustGeometry = createDustGeometry();
@@ -575,6 +589,9 @@ export default function LeafScene({ className }: { className?: string }) {
 
     return () => {
       cancelAnimationFrame(rafId);
+      window.removeEventListener("load", scheduleModel);
+      if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idleHandle);
+      window.clearTimeout(idleHandle);
       document.removeEventListener("visibilitychange", onVisibility);
       intersectionObserver.disconnect();
       window.removeEventListener("pointermove", onPointerMove);

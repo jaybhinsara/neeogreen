@@ -36,6 +36,12 @@ type GlobeMesh = {
   oceanDots: Int16Array;
 };
 
+// compileAsync polls each shader on a timer; if a check throws or a browser
+// never reports ready, its promise never settles. Cap the wait so the globe
+// always appears (at worst compiling on its first frame, as before).
+const compiledOrTimeout = (compile: Promise<unknown>) =>
+  Promise.race([compile.catch(() => {}), new Promise((r) => setTimeout(r, 1500))]);
+
 async function loadGlobeMesh(detail: number, signal: AbortSignal): Promise<GlobeMesh> {
   const res = await fetch(`/globe/mesh-${detail}.bin`, { signal });
   if (!res.ok) throw new Error(`globe mesh ${res.status}`);
@@ -218,7 +224,7 @@ export default function GlobeScene({ className }: { className?: string }) {
         oceanDots.scale.setScalar(1.005);
         wireframe.add(oceanDots);
         // Compile its shaders off the main thread before it's first drawn.
-        return renderer.compileAsync(wireframe, camera, scene);
+        return compiledOrTimeout(renderer.compileAsync(wireframe, camera, scene));
       })
       .then(() => {
         if (meshAbort.signal.aborted) return;
@@ -420,13 +426,10 @@ export default function GlobeScene({ className }: { className?: string }) {
       if (ready && inView && !document.hidden) startLoop();
       else stopLoop();
     };
-    renderer
-      .compileAsync(scene, camera)
-      .catch(() => {})
-      .then(() => {
-        ready = true;
-        maybeStart();
-      });
+    compiledOrTimeout(renderer.compileAsync(scene, camera)).then(() => {
+      ready = true;
+      maybeStart();
+    });
 
     const intersection = new IntersectionObserver(([entry]) => {
       inView = entry.isIntersecting;

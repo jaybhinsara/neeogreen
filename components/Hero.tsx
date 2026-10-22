@@ -59,6 +59,10 @@ function HeroFrame({
         className="h-full w-full object-cover will-change-transform"
         style={{ scaleX: videoScaleX, scaleY: videoScaleY }}
       >
+        {/* Both encodes keep their index at the start of the file (so
+            playback starts without fetching the end first) and carry no
+            audio track; phones get a lighter 960px cut. */}
+        <source src="/video/hero-leaf-mobile.mp4" type="video/mp4" media="(max-width: 767px)" />
         <source src="/video/hero-leaf.mp4" type="video/mp4" />
       </motion.video>
     </motion.div>

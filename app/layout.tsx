@@ -23,6 +23,8 @@ export const metadata: Metadata = {
     "LLM integration services",
     "AI development company Surat",
     "web development Surat",
+    "PHP development company",
+    "hire PHP developers",
     "web design Surat",
     "software engineering Gujarat",
     "web development company Ahmedabad",

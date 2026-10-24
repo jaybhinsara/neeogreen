@@ -45,8 +45,16 @@ export const SERVICES = [
     keywords: ["web development Surat", "web development Gujarat", "website development company Surat", "web development Ahmedabad"],
   },
   {
-    slug: "web-design",
+    slug: "php-development",
     n: "03",
+    title: "PHP Development",
+    short: "Emergency PHP security patching, upgrades to supported PHP 8 releases, and Laravel and WordPress development and maintenance.",
+    eyebrow: "PHP, Laravel & security patching",
+    keywords: ["PHP development company", "hire PHP developers", "PHP security patch", "PHP 8 upgrade services", "Laravel development Surat", "PHP developers India"],
+  },
+  {
+    slug: "web-design",
+    n: "04",
     title: "Web Design",
     short: "Interfaces people actually want to use — researched, designed, and tested before a single line of code ships.",
     eyebrow: "UI/UX & visual design",
@@ -54,7 +62,7 @@ export const SERVICES = [
   },
   {
     slug: "software-engineering",
-    n: "04",
+    n: "05",
     title: "Software Engineering",
     short: "Custom software and internal tools engineered around how your business actually operates, not a generic template.",
     eyebrow: "Custom software & internal tools",
@@ -62,7 +70,7 @@ export const SERVICES = [
   },
   {
     slug: "managed-it-support",
-    n: "05",
+    n: "06",
     title: "Managed IT Support",
     short: "Remote and on-site support, 24/7 monitoring, and a help desk that answers — for businesses and home offices alike.",
     eyebrow: "Help desk & proactive monitoring",
@@ -70,7 +78,7 @@ export const SERVICES = [
   },
   {
     slug: "cybersecurity",
-    n: "06",
+    n: "07",
     title: "Cybersecurity & Data Protection",
     short: "Firewalls, endpoint protection, and backup and disaster recovery built around how your business actually operates.",
     eyebrow: "Endpoint security & backup",
@@ -78,7 +86,7 @@ export const SERVICES = [
   },
   {
     slug: "cloud-solutions",
-    n: "07",
+    n: "08",
     title: "Cloud Solutions",
     short: "Migration to Microsoft 365, Google Workspace, AWS, or Azure — then managed, monitored, and cost-optimized.",
     eyebrow: "Migration & cloud management",

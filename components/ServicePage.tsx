@@ -17,6 +17,9 @@ export type ServiceContent = {
   process: { title: string; desc: string }[];
   whyTitle: string;
   whyBody: string;
+  // Questions people search for. Rendered as an FAQ section and as FAQPage
+  // structured data, so answers can appear directly in search results.
+  faq?: { q: string; a: string }[];
 };
 
 // Sets the final word of a headline in the italic serif accent.
@@ -34,6 +37,15 @@ function AccentLast({ text, tone }: { text: string; tone: EmphasisTone }) {
 export function ServicePage({ content, heroAside }: { content: ServiceContent; heroAside?: ReactNode }) {
   const n = SERVICES.find((s) => s.slug === content.slug)?.n ?? "01";
   const others = SERVICES.filter((s) => s.slug !== content.slug);
+  const faqJsonLd = content.faq && {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: content.faq.map(({ q, a }) => ({
+      "@type": "Question",
+      name: q,
+      acceptedAnswer: { "@type": "Answer", text: a },
+    })),
+  };
 
   return (
     <>
@@ -122,7 +134,39 @@ export function ServicePage({ content, heroAside }: { content: ServiceContent; h
           </Container>
         </section>
 
-        <section className="bg-paper py-24 md:py-32">
+        {content.faq && (
+          <section className="bg-paper py-24 md:py-32">
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+            />
+            <Container className="grid gap-12 md:grid-cols-[1fr_1.4fr] md:gap-20">
+              <Reveal>
+                <span className="eyebrow text-brand-deep">Questions</span>
+              </Reveal>
+              <div>
+                {content.faq.map(({ q, a }, i) => (
+                  <Reveal key={q} delay={0.04 * i}>
+                    <details className="group border-t border-line py-6 [&_summary::-webkit-details-marker]:hidden">
+                      <summary className="flex cursor-pointer list-none items-start justify-between gap-6 font-heading text-[clamp(19px,1.6vw,23px)] font-medium leading-snug tracking-[-0.02em]">
+                        <h3>{q}</h3>
+                        <span
+                          aria-hidden="true"
+                          className="mt-1 text-2xl leading-none text-brand transition-transform duration-300 group-open:rotate-45"
+                        >
+                          +
+                        </span>
+                      </summary>
+                      <p className="mt-4 max-w-[60ch] text-[17px] leading-relaxed text-muted">{a}</p>
+                    </details>
+                  </Reveal>
+                ))}
+              </div>
+            </Container>
+          </section>
+        )}
+
+        <section className={content.faq ? "bg-page py-24 md:py-32" : "bg-paper py-24 md:py-32"}>
           <Container>
             <Reveal>
               <span className="eyebrow text-brand-deep">Also see</span>
